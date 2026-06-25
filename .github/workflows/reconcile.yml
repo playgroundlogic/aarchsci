@@ -1,0 +1,101 @@
+# Scheduled reconciler — keeps the curated env images current, autonomously.
+#
+# This is aarch.science's analogue of aarchbio's reconciler, but the trigger differs
+# (DESIGN D2/OQ4): conda-forge has no per-env "new tag" event to watch. Instead, for
+# each committed env spec (envs/<name>.yaml) the reconciler runs a CHEAP dry-run
+# solve (builder/solve-hash.sh) and compares the resolved lock-hash against the
+# committed envs/<name>.lock.txt. If they differ, the channel moved underneath the
+# spec -> dispatch a rebuild via publish.yml. If they match, no-op.
+#
+# Runs on hosted arm64 runners (no farm dependency) — it only ever handles the
+# delta, and the solve is just an API/solver call, so hosted speed is fine and it
+# survives the farm being offline.
+#
+# GUARDRAILS (mirrors aarchbio — it can trigger writes to a public registry):
+#  - additive only: never deletes or unpublishes anything.
+#  - idempotent: build-env.sh no-ops if the resolved set hasn't actually changed
+#    (the published s<lock-hash> tag already exists).
+#  - concurrency-guarded: won't overlap a previous run.
+#  - the rebuild still passes the D3 smoke gate before it can publish.
+
+name: reconcile
+
+on:
+  schedule:
+    - cron: '23 7 * * *'   # daily at 07:23 UTC (off the hour to dodge cron congestion)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Compute the drift but do not dispatch rebuilds'
+        required: false
+        default: 'false'
+        type: string
+      set_public:
+        description: 'Pass through to publish.yml (flip rebuilt repos public)'
+        required: false
+        default: 'false'
+        type: string
+
+concurrency:
+  group: reconcile
+  cancel-in-progress: false   # let a running reconcile finish; don't stack
+
+permissions:
+  contents: read
+  actions: write   # to dispatch publish.yml
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Compute drift (re-solve each env spec, compare committed lock-hash)
+        id: drift
+        run: |
+          set -uo pipefail
+          drifted=()
+          # The tracked set = every committed env spec. The catalog tracks itself.
+          for spec in envs/*.yaml; do
+            env_name="$(basename "$spec" .yaml)"
+            lock="envs/${env_name}.lock.txt"
+            if [ ! -f "$lock" ]; then
+              echo "::notice::$env_name has no committed lock yet -> queue build"
+              drifted+=("$env_name"); continue
+            fi
+            committed="$(grep -m1 'lock-hash:' "$lock" | sed -E 's/.*lock-hash: *([0-9a-f]+).*/\1/')"
+            out="$(mktemp)"
+            if ! GITHUB_OUTPUT="$out" ./builder/solve-hash.sh "$env_name"; then
+              echo "::warning::$env_name failed to solve on arm64 — skipping this run"
+              continue
+            fi
+            current="$(grep '^lock_hash=' "$out" | cut -d= -f2-)"
+            if [ "$current" != "$committed" ]; then
+              echo "::notice::$env_name DRIFTED: committed=$committed current=$current -> rebuild"
+              drifted+=("$env_name")
+            else
+              echo "$env_name up to date ($committed)"
+            fi
+          done
+          echo "envs=${drifted[*]}" >> "$GITHUB_OUTPUT"
+          echo "count=${#drifted[@]}" >> "$GITHUB_OUTPUT"
+          echo "::notice::reconcile drift = ${#drifted[@]} env(s): ${drifted[*]:-none}"
+
+      - name: Dispatch rebuilds for the drifted envs
+        if: ${{ steps.drift.outputs.count != '0' && inputs.dry_run != 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run publish.yml --repo "$GITHUB_REPOSITORY" \
+            -f envs="${{ steps.drift.outputs.envs }}" \
+            -f set_public="${{ inputs.set_public || 'false' }}"
+          echo "::notice::dispatched publish.yml for: ${{ steps.drift.outputs.envs }}"
+
+      - name: Summary
+        run: |
+          echo "Reconcile run: ${{ steps.drift.outputs.count }} env(s) drifted" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.drift.outputs.envs }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

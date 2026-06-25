@@ -1,0 +1,69 @@
+# aarch.science
+
+> Native arm64 (aarch64) containers for the conda-forge scientific stack —
+> geospatial first — for Apple Silicon Macs and AWS Graviton. cosign-signed,
+> public, no account required. `docker pull quay.io/aarchsci/geospatial:latest`
+> and it runs native: no QEMU emulation, no `exec format error`.
+
+aarch.science solves a delivery gap, not a porting problem: conda-forge already
+ships `linux-aarch64` packages for the scientific stack (GDAL, PROJ, GEOS,
+rasterio, shapely, scikit-image), but there is no curated, verified set of
+*containers* built from them. The stack also famously won't `pip install` on
+arm64 (`No matching distribution found for rasterio`) even though it solves clean
+on conda-forge. aarch.science builds curated conda-forge environments native for
+arm64 and publishes them signed.
+
+It is the sister project to aarch.bio (which does this for bioinformatics /
+bioconda). Same machinery; conda-forge science layer instead.
+
+## The crucial difference from a solve: verified to RUN
+
+An environment can *solve* and still fail to *assemble/import* on arm64 (missing
+native lib, ABI mismatch, broken wheel). So every aarch.science image is tested
+inside the built arm64 container before it is tagged: it must import every
+headline package AND pass a functional smoke test (reproject a point with PROJ,
+GEOS geometry ops, write+read a GeoTIFF through rasterio and raw GDAL, round-trip
+a GeoJSON through fiona). The smoke test is baked into the image:
+`docker run --rm quay.io/aarchsci/geospatial:latest python /opt/aarchsci/smoke.py`.
+
+## Use it
+
+- Direct pull: `docker pull quay.io/aarchsci/<env>:latest`
+- Available envs: `geospatial` (123 packages — gdal, proj, geos, rasterio, fiona,
+  shapely, pyproj, scikit-image, numpy, scipy, + deps, all native arm64).
+- Tags: `latest`, a date tag (e.g. `2026.06.25`), and a content-addressed
+  `s<lock-hash>` tag (the hash of the resolved package set).
+- Works on Apple Silicon and AWS Graviton (linux/arm64).
+
+## Verify (don't trust)
+
+Every image is cosign keyless-signed and logged in the Sigstore transparency log:
+```
+cosign verify quay.io/aarchsci/geospatial:latest \
+  --certificate-identity-regexp 'github.com/playgroundlogic/aarchsci' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
+
+## Scope
+
+In scope: the CPU scientific stack on conda-forge (geospatial / earth-observation
+first; geo-ml, climate later). Curated environment images, not a registry mirror.
+Out of scope: GPU/CUDA (Graviton has no NVIDIA GPU — a hardware reality, not a
+packaging one), bioinformatics (that's aarch.bio), and compiling from source
+(gaps go upstream to conda-forge).
+
+## Key links
+
+- Website: https://aarch.science/
+- Registry (browse all images): https://quay.io/organization/aarchsci
+- Source & docs: https://github.com/playgroundlogic/aarchsci
+- Design & decisions: https://github.com/playgroundlogic/aarchsci/blob/main/DESIGN.md
+- Sister project: https://aarch.bio/
+
+## Facts
+
+- v1 `geospatial` image: 123 packages, native arm64, verified + signed + public.
+- Kept current by a daily reconciler that re-solves each env spec and rebuilds
+  when the resolved package set (its lock-hash) changes.
+- Maintained by Playground Logic. Apache-2.0. Unofficial — not affiliated with or
+  endorsed by conda-forge, Anaconda, or AWS.

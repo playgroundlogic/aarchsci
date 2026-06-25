@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>aarch.science — native arm64 (aarch64) conda-forge scientific containers for Apple Silicon &amp; AWS Graviton</title>
+    <meta name="description" content="Native arm64 (aarch64) containers for the conda-forge scientific stack — GDAL, PROJ, GEOS, rasterio, shapely, scikit-image — for Apple Silicon Macs and AWS Graviton. The geo stack that won't pip-install on arm64 (No matching distribution found for rasterio) but solves clean on conda-forge. Verified (it imports and works, not just solves), signed, public.">
+    <meta name="keywords" content="arm64, aarch64, conda-forge, geospatial, GDAL, PROJ, GEOS, rasterio, shapely, pyproj, fiona, scikit-image, Apple Silicon, AWS Graviton, Docker, native arm64 docker, no emulation, rasterio arm64, conda-forge arm64">
+    <meta name="author" content="Playground Logic">
+    <link rel="canonical" href="https://aarch.science/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="aarch.science">
+    <meta property="og:title" content="aarch.science — native arm64 conda-forge scientific containers">
+    <meta property="og:description" content="The conda-forge geo stack (GDAL/PROJ/GEOS/rasterio) rebuilt native for arm64 — verified to import and work, not just solve. Signed, public, no account. quay.io/aarchsci">
+    <meta property="og:url" content="https://aarch.science/">
+    <meta property="og:image" content="https://aarch.science/assets/og.png">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Twitter / X card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="aarch.science — native arm64 conda-forge scientific containers">
+    <meta name="twitter:description" content="The conda-forge geo stack (GDAL/PROJ/GEOS/rasterio) rebuilt native for arm64 — verified to import and work, not just solve. Signed, public. quay.io/aarchsci">
+    <meta name="twitter:image" content="https://aarch.science/assets/og.png">
+
+    <meta name="theme-color" content="#f8fafc">
+    <meta name="theme-color" content="#0c1017" media="(prefers-color-scheme: dark)">
+
+    <!-- Structured data (schema.org) — helps search engines & agents parse what this is -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "aarch.science",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Linux (arm64/aarch64)",
+      "description": "Native arm64 (aarch64) containers for the conda-forge scientific stack (GDAL, PROJ, GEOS, rasterio, shapely, scikit-image) for Apple Silicon and AWS Graviton. Verified to assemble, import, and run — not just solve. Signed and public, no account required.",
+      "url": "https://aarch.science/",
+      "downloadUrl": "https://quay.io/organization/aarchsci",
+      "codeRepository": "https://github.com/playgroundlogic/aarchsci",
+      "license": "https://www.apache.org/licenses/LICENSE-2.0",
+      "author": { "@type": "Organization", "name": "Playground Logic" },
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "keywords": "arm64, aarch64, conda-forge, geospatial, GDAL, PROJ, GEOS, rasterio, shapely, scikit-image, Apple Silicon, AWS Graviton"
+    }
+    </script>
+
+    <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);}());</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap">
+    <link rel="stylesheet" href="css/style.css?v=1">
+
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+    <link rel="icon" href="/assets/favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon-180.png">
+    <link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <nav class="nav" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="/" class="nav-brand" aria-label="aarch.science home">
+                <span class="nav-wordmark">aarch<span class="accent">.science</span></span>
+            </a>
+            <button class="hamburger" id="hamburger-btn" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="nav-links" id="nav-links">
+                <a href="#gap">The gap</a>
+                <a href="#how">How it works</a>
+                <a href="#use">Use it</a>
+                <a href="#trust">Trust</a>
+                <a href="https://github.com/playgroundlogic/aarchsci" target="_blank" rel="noopener noreferrer" aria-label="GitHub (opens in new tab)">GitHub</a>
+                <button class="btn-theme" id="theme-toggle" aria-label="Toggle color theme">
+                    <span id="theme-icon" aria-hidden="true">🌙</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <div class="container">
+
+            <!-- Hero -->
+            <header class="hero">
+                <div class="hero-eyebrow">Open Source · Apache 2.0</div>
+                <h1>
+                    Native <span class="accent-teal">arm64</span> scientific<br>
+                    containers, <span class="accent-green">verified to work</span>.
+                </h1>
+                <p class="hero-sub">
+                    The conda-forge geo stack — GDAL, PROJ, GEOS, rasterio, shapely,
+                    scikit-image — won't <code>pip install</code> on arm64
+                    (<em>No matching distribution found for rasterio</em>). It solves
+                    clean on <a href="https://conda-forge.org/" style="color:inherit">conda-forge</a>.
+                    aarch.science builds it native for Apple Silicon and AWS Graviton —
+                    and proves each image <strong>imports and runs</strong>, not just solves.
+                </p>
+                <div class="hero-buttons">
+                    <a class="btn btn-primary" href="#use">Use it →</a>
+                    <a class="btn btn-secondary" href="https://github.com/playgroundlogic/aarchsci" target="_blank" rel="noopener noreferrer">GitHub</a>
+                </div>
+            </header>
+
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-num green">123</div>
+                    <div class="stat-label">packages in the verified <code>geospatial</code> image, native arm64</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num rose">~2.5×</div>
+                    <div class="stat-label">better price/core on Graviton c7g vs Intel c7i</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-num teal">solve ≠ run</div>
+                    <div class="stat-label">every image must import &amp; pass a functional smoke test</div>
+                </div>
+            </div>
+            <p class="footer-note">The sister project to <a href="https://aarch.bio/" style="color:var(--accent-teal)">aarch.bio</a> — same machinery, the conda-forge science layer instead of bioconda.</p>
+        </div>
+
+        <!-- The gap -->
+        <section id="gap">
+            <div class="container">
+                <div class="section-header">
+                    <h2>A delivery gap, one layer over</h2>
+                    <p>aarch.science stands on conda-forge — an enormous, mostly-volunteer good. The arm64 packages are already there. The way most people reach for them isn't.</p>
+                </div>
+                <div class="prose">
+                    <p><strong>The machines doing science are increasingly arm64</strong> — every
+                    Apple Silicon Mac, every AWS Graviton instance, measured ~2.5× cheaper per
+                    core for CPU-bound geospatial work.</p>
+                    <p>But the native-library scientific stack — GDAL, PROJ, GEOS and the Python
+                    packages on top of them (rasterio, fiona, shapely, pyproj) — has incomplete,
+                    Python-version-fragile arm64 wheel coverage on PyPI. Reach for it with
+                    <code>pip</code> on a Graviton box and you get
+                    <code>No matching distribution found for rasterio</code>. The build falls
+                    back to expensive Intel, leaving the price/perf win on the table.</p>
+                    <p>The packages <em>do</em> exist on arm64 — conda-forge ships
+                    <code>linux-aarch64</code> builds, and the whole geo stack solves cleanly there
+                    (123 packages, all native). The gap isn't porting; it's that there's no
+                    curated, verified set of <strong>containers</strong> built from those packages.
+                    That's what aarch.science fills.</p>
+                    <p style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border);">
+                    <strong>The subtle part — and why "verified" is the whole point:</strong>
+                    an environment can <em>solve</em> and still fail to <em>assemble</em> on arm64
+                    — a missing native lib, an ABI mismatch, a broken wheel. pip "solved" too, then
+                    <code>import rasterio</code> would have failed. So every aarch.science image is
+                    tested <em>inside</em> the built arm64 container: it must import every headline
+                    package <em>and</em> do real work — reproject a point through PROJ, run GEOS
+                    geometry ops, write a GeoTIFF and read it back through both rasterio and raw
+                    GDAL. Only then does it earn the tag.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section id="how" style="background:var(--bg-card-hover);">
+            <div class="container">
+                <div class="section-header">
+                    <h2>How it works</h2>
+                    <p>A curated conda-forge environment, built native per architecture, then proven to run before it's published.</p>
+                </div>
+                <div class="grid">
+                    <div class="card">
+                        <span class="tag teal">native build</span>
+                        <h3>No emulation, ever</h3>
+                        <p>Native-library envs build on a native arm64 runner — no QEMU. We never emulate to publish images whose whole purpose is running native on Graviton and Apple Silicon.</p>
+                    </div>
+                    <div class="card">
+                        <span class="tag green">curated envs</span>
+                        <h3>Whole stacks, not loose packages</h3>
+                        <p>conda-forge ships packages, not containers. We curate version-pinned <em>environments</em> by workflow — <code>geospatial</code> first — committed as the source of truth and versioned by content hash.</p>
+                    </div>
+                    <div class="card">
+                        <span class="tag amber">verified</span>
+                        <h3>Solve ≠ run</h3>
+                        <p>The build refuses to tag unless the env imports every headline package and passes a functional smoke test inside the arm64 image. The smoke test is baked in, so you can re-run it on what you pull.</p>
+                    </div>
+                    <div class="card">
+                        <span class="tag blue">provenance</span>
+                        <h3>Signed, traceable</h3>
+                        <p>Every image is cosign keyless-signed in CI and logged to the Sigstore transparency log. Anyone can verify it was built by our public workflow, from a specific commit — no need to trust us.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use it -->
+        <section id="use">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Use it</h2>
+                    <p>Pull the verified geospatial image and run native. The same image works on an Apple Silicon laptop and a Graviton server.</p>
+                </div>
+                <div class="code">
+<span class="c"># pull the verified geospatial stack — native arm64, no account</span>
+docker pull <span class="k">quay.io/aarchsci</span>/geospatial:latest
+                </div>
+                <div class="code">
+<span class="c"># re-run the verification yourself — it ships inside the image</span>
+docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python /opt/aarchsci/smoke.py
+                </div>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">geospatial</span><br>
+                  <strong>123 packages</strong> — native arm64, verified, signed, public
+                </p>
+                <p class="section-header" style="margin-bottom:1rem;color:var(--text-secondary);">
+                  The fieldwork CPU-prep stack. Headline packages:
+                </p>
+                <div class="catalog">
+                    <span class="chip">gdal</span>
+                    <span class="chip">proj</span>
+                    <span class="chip">geos</span>
+                    <span class="chip">rasterio</span>
+                    <span class="chip">fiona</span>
+                    <span class="chip">shapely</span>
+                    <span class="chip">pyproj</span>
+                    <span class="chip">scikit-image</span>
+                    <span class="chip">numpy</span>
+                    <span class="chip">scipy</span>
+                    <span class="chip">… +113 deps, all native arm64</span>
+                </div>
+                <p class="footer-note">
+                  <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>
+                  &nbsp;·&nbsp; Want another env (earth-observation, geo-ml, climate)? <a href="https://github.com/playgroundlogic/aarchsci/issues/new" style="color:var(--accent-teal)">Request it</a>.
+                </p>
+                <p class="footer-note" style="margin-top:0.5rem;">
+                  🔄 <strong>Kept current automatically.</strong> A
+                  <a href="https://github.com/playgroundlogic/aarchsci/blob/main/.github/workflows/reconcile.yml" style="color:var(--accent-teal)">daily reconciler</a>
+                  re-solves each env spec and rebuilds when the resolved package set changes —
+                  so <code>latest</code> stays current with conda-forge.
+                </p>
+            </div>
+        </section>
+
+        <!-- Trust -->
+        <section id="trust" style="background:var(--bg-card-hover);">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Verify, don't trust</h2>
+                    <p>Two independent things you can check yourself: that it works, and where it came from.</p>
+                </div>
+                <div class="code">
+<span class="c"># 1. it actually runs — the functional smoke test ships in the image</span>
+docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python /opt/aarchsci/smoke.py
+
+<span class="c"># 2. it was built by aarch.science's CI, from source, logged publicly</span>
+cosign verify <span class="k">quay.io/aarchsci</span>/geospatial:latest \
+    --certificate-identity-regexp 'github.com/playgroundlogic/aarchsci' \
+    --certificate-oidc-issuer https://token.actions.githubusercontent.com
+                </div>
+                <div class="prose" style="margin-top:1.5rem;">
+                    <p>Images are built by a public GitHub Actions workflow, keyless-signed with
+                    <a href="https://www.sigstore.dev/">Sigstore</a>, and recorded in the Rekor
+                    transparency log. The signature attests <em>which workflow, which repo, which
+                    commit</em> produced the image. And because the smoke test is baked in, you can
+                    confirm the env imports and runs on your own hardware. Trust the process, not
+                    the publisher.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-brand">aarch<span class="accent">.science</span></div>
+                <div class="footer-links">
+                    <a href="https://github.com/playgroundlogic/aarchsci" target="_blank" rel="noopener noreferrer">GitHub</a>
+                    <a href="https://quay.io/organization/aarchsci" target="_blank" rel="noopener noreferrer">Registry</a>
+                    <a href="https://aarch.bio/" target="_blank" rel="noopener noreferrer">aarch.bio (sister)</a>
+                    <a href="https://github.com/playgroundlogic/aarchsci/issues/new" target="_blank" rel="noopener noreferrer">Request an env</a>
+                </div>
+            </div>
+            <p class="footer-note">
+                An unofficial community project by Playground Logic — not affiliated with or endorsed by
+                conda-forge, Anaconda, or AWS. Apache 2.0.
+            </p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

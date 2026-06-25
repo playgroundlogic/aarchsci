@@ -1,0 +1,13 @@
+{
+  "name": "aarch.science",
+  "short_name": "aarch.science",
+  "description": "Native arm64 (aarch64) conda-forge scientific containers for Apple Silicon and AWS Graviton.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c1017",
+  "theme_color": "#0c1017",
+  "icons": [
+    { "src": "/assets/favicon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/favicon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
