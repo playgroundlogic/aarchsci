@@ -43,11 +43,14 @@ aarchbio's gap was "no arm64 build exists" (solve check suffices). Here the gap 
 `import` every headline package → run a minimal functional smoke test (open a tiny
 raster, reproject a point). "Verified" is earned by the smoke test, not the tag.
 
-## Settled
-- **Domain: aarch.science** is secured (site goes there, like aarch.bio).
+## Settled — naming
+Rule: the brand is **aarchsci** everywhere it's a free choice; **`.science` only
+in the domain** (forced — there's no `.sci` TLD).
+- Domain: **aarch.science** (secured)
+- Quay org / registry: **quay.io/aarchsci**
+- GitHub repo: **playgroundlogic/aarchsci**
+- Robot account (when created): `aarchsci+robot` (mirrors `aarchbio+robot`)
 
-## Open questions (DESIGN OQ1–OQ4)
+## Open questions (DESIGN OQ1, OQ2, OQ4)
 Image granularity (broad vs fine), versioning scheme (date vs spec-hash),
-**quay org name** (still open — aarch.bio used `quay.io/aarchbio`; pick one for
-science), reconciler "changed" definition. Only the quay org is now blocking
-publish.
+reconciler "changed" definition. (OQ3 naming is now settled above.)
