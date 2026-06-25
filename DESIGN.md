@@ -110,16 +110,21 @@ wins on price/perf. (The pip-arm64-wheel gap is a CPU-stack problem anyway.)
 ## Open questions
 
 - **OQ1 — image granularity:** few broad domain images (easy to use, larger) vs
-  many fine-grained ones (composable, more to maintain)? Lean broad for v1.
-- **OQ2 — versioning scheme:** date tag (`geospatial:2026.06`) vs spec content
-  hash vs both? Needs to be reproducible and reconciler-friendly.
+  many fine-grained ones (composable, more to maintain)? Lean broad for v1
+  (`geospatial` is one broad image). Still open for the catalog as a whole.
+- **OQ2 — versioning scheme: SETTLED.** Three tags per build: `<date>`
+  (`2026.06.25` — human/reconciler-friendly), `s<lock-hash>` (sha256 of the
+  resolved set, short — content-addressed + idempotent), and `latest`. The
+  resolved set is read from the **finished image**, never predicted (aarchbio #16),
+  and committed to `envs/<env>.lock.txt`.
 - **OQ3 — registry/org: SETTLED.** Naming rule: brand is **aarchsci** everywhere
   it's a free choice; `.science` only in the domain (no `.sci` TLD exists).
-  → domain **aarch.science** (secured), registry **quay.io/aarchsci/<env>**,
-  repo **playgroundlogic/aarchsci**, robot `aarchsci+robot`.
-- **OQ4 — reconciler trigger:** conda-forge has no "new tag" event per env; the
-  reconciler re-solves each spec and rebuilds if the pinned set changed. Define
-  "changed."
+  → domain **aarch.science** (secured), registry **quay.io/aarchsci/<env>** (org
+  created), repo **playgroundlogic/aarchsci**, robot `aarchsci+robot`.
+- **OQ4 — reconciler trigger: SETTLED.** "Changed" = the lock-hash differs. The
+  reconciler re-solves each spec inside an arm64 image, builds, and compares the
+  new `s<lock-hash>` against the committed `envs/<env>.lock.txt`. Differs → publish
+  a new dated tag + commit the lock; matches → no-op.
 
 ## Non-goals (v1)
 

@@ -1,0 +1,106 @@
+# Build → verify (D3) → push → keyless-sign a curated conda-forge env image.
+#
+# Adapted from aarchbio's publish.yml for the ENV model (DESIGN D2): the unit of
+# work is a curated env spec (envs/<name>.yaml), not a single bioconda pkg=version.
+#
+# The geospatial head is arch-specific as a whole (gdal/proj/geos are native libs),
+# so v1 builds the arm64 leg natively on an arm64 runner (NO QEMU — D1). amd64
+# already assembles upstream via conda/pip; this fills the arm64 gap fieldwork hit.
+#
+# D3 is enforced by build-env.sh itself: it runs the in-image smoke test and exits
+# non-zero (failing the job) unless the env imports + does real work. "Verified" is
+# earned in the build, not asserted by the tag.
+#
+# SAFETY: set-public is OFF by default. CI builds + signs into the (private) repo;
+# making it public is a deliberate, separate action (set_public=true), so nothing
+# reaches the world unattended before the org/domain go-live is confirmed.
+
+name: publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      envs:
+        description: 'Space-separated env names (e.g. "geospatial earth-observation")'
+        required: true
+        default: 'geospatial'
+        type: string
+      set_public:
+        description: 'Flip the repo public after signing (default false)'
+        required: false
+        default: 'false'
+        type: string
+
+permissions:
+  contents: read
+  id-token: write   # cosign keyless (OIDC)
+
+env:
+  REGISTRY: quay.io/aarchsci
+
+jobs:
+  # Split the space-separated env list into a JSON array for the matrix.
+  prep:
+    runs-on: ubuntu-24.04-arm
+    outputs:
+      envs: ${{ steps.j.outputs.envs }}
+    steps:
+      - id: j
+        run: |
+          set -uo pipefail
+          arr=()
+          for e in ${{ inputs.envs }}; do arr+=("\"$e\""); done
+          join() { local IFS=,; echo "[$*]"; }
+          echo "envs=$(join "${arr[@]}")" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: prep
+    if: ${{ needs.prep.outputs.envs != '[]' }}
+    runs-on: ubuntu-24.04-arm    # native arm64 — no emulation (D1)
+    strategy:
+      fail-fast: false
+      matrix:
+        env: ${{ fromJSON(needs.prep.outputs.envs) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: sigstore/cosign-installer@v3
+      - name: Login
+        run: echo "${{ secrets.QUAY_TOKEN }}" | docker login quay.io -u "${{ secrets.QUAY_USER }}" --password-stdin
+
+      - name: Build + verify (D3) + push, then keyless-sign
+        env:
+          PUSH: '1'
+          COSIGN_YES: 'true'
+        run: |
+          set -uo pipefail
+          out="$(mktemp)"
+          # build-env.sh runs the smoke test and exits non-zero if the env doesn't
+          # assemble/work on arm64 — that failure fails this job (D3 gate).
+          GITHUB_OUTPUT="$out" ./builder/build-env.sh "${{ matrix.env }}"
+          pinned="$(grep '^pinned=' "$out" | cut -d= -f2-)"
+          [ -n "$pinned" ] || { echo "no digest — build/push did not complete"; exit 1; }
+          echo "signing $pinned"
+          cosign sign --yes "$pinned"
+
+      - name: Set repo public (only if explicitly requested)
+        if: ${{ inputs.set_public == 'true' }}
+        env:
+          QUAY_OAUTH_TOKEN: ${{ secrets.QUAY_OAUTH_TOKEN }}
+        run: |
+          set -uo pipefail
+          code="$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer $QUAY_OAUTH_TOKEN" -H 'Content-Type: application/json' \
+            -d '{"visibility":"public"}' \
+            "https://quay.io/api/v1/repository/aarchsci/${{ matrix.env }}/changevisibility")"
+          [ "$code" = "200" ] && echo "public ✓" || { echo "changevisibility HTTP $code"; exit 1; }
+
+      - name: Commit the refreshed lock
+        run: |
+          set -uo pipefail
+          if ! git diff --quiet -- "envs/${{ matrix.env }}.lock.txt"; then
+            echo "::notice::envs/${{ matrix.env }}.lock.txt changed — resolved set drifted (commit it)."
+            git --no-pager diff --stat -- "envs/${{ matrix.env }}.lock.txt" || true
+          else
+            echo "lock unchanged"
+          fi

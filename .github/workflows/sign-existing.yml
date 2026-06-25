@@ -1,0 +1,65 @@
+# Sign env images that already exist in the registry (e.g. pushed by the local
+# build farm, which has no OIDC so can't keyless-sign). Mirrors aarchbio's D6 loop:
+# farm builds heavy+local (private/unsigned) -> this signs light+in-CI (truthful
+# Sigstore/Rekor provenance) -> optionally sets public.
+#
+# Input: space-separated "env:tag" pairs, e.g. "geospatial:2026.06.25".
+
+name: sign-existing
+
+on:
+  workflow_dispatch:
+    inputs:
+      images:
+        description: 'Space-separated env:tag pairs (e.g. "geospatial:2026.06.25")'
+        required: true
+        type: string
+      set_public:
+        description: 'Flip each repo public after signing (default false)'
+        required: false
+        default: 'false'
+        type: string
+
+permissions:
+  contents: read
+  id-token: write   # cosign keyless (OIDC)
+
+jobs:
+  sign:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: sigstore/cosign-installer@v3
+      - name: Login (robot — needed to resolve private repos)
+        run: echo "${{ secrets.QUAY_TOKEN }}" | docker login quay.io -u "${{ secrets.QUAY_USER }}" --password-stdin
+      - name: Sign (+ optionally publish) each image
+        env:
+          COSIGN_YES: 'true'
+          SET_PUBLIC: ${{ inputs.set_public }}
+          QUAY_OAUTH_TOKEN: ${{ secrets.QUAY_OAUTH_TOKEN }}
+        run: |
+          set -uo pipefail
+          fail=0
+          for ref in ${{ inputs.images }}; do
+            env_name="${ref%%:*}"; tag="${ref#*:}"
+            echo "::group::$ref"
+            image="quay.io/aarchsci/$env_name:$tag"
+
+            # Sign by digest (correct for both single- and multi-arch tags).
+            digest="$(docker buildx imagetools inspect "$image" --format '{{.Manifest.Digest}}' 2>/dev/null)"
+            if [ -z "$digest" ]; then echo "  cannot resolve digest for $image"; fail=1; echo '::endgroup::'; continue; fi
+            pinned="quay.io/aarchsci/$env_name@$digest"
+
+            echo "  signing $pinned"
+            if ! cosign sign --yes "$pinned"; then echo "  sign FAILED"; fail=1; echo '::endgroup::'; continue; fi
+
+            if [ "$SET_PUBLIC" = "true" ]; then
+              echo "  setting $env_name public"
+              code="$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+                -H "Authorization: Bearer $QUAY_OAUTH_TOKEN" -H 'Content-Type: application/json' \
+                -d '{"visibility":"public"}' \
+                "https://quay.io/api/v1/repository/aarchsci/$env_name/changevisibility")"
+              [ "$code" = "200" ] && echo "  public ✓" || { echo "  changevisibility HTTP $code"; fail=1; }
+            fi
+            echo '::endgroup::'
+          done
+          exit $fail
