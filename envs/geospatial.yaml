@@ -1,0 +1,18 @@
+# aarch.science — geospatial environment (v1)
+# The fieldwork/BuckAI CPU-prep stack. Validated to solve native arm64 on
+# conda-forge (123 pkgs). Versions left to the channel's current; the reconciler
+# pins + rebuilds on change. Headline packages get import + functional smoke tests.
+name: geospatial
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - gdal
+  - proj
+  - geos
+  - rasterio
+  - fiona
+  - shapely
+  - pyproj
+  - scikit-image
+  - numpy
