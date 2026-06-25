@@ -43,7 +43,11 @@ aarchbio's gap was "no arm64 build exists" (solve check suffices). Here the gap 
 `import` every headline package → run a minimal functional smoke test (open a tiny
 raster, reproject a point). "Verified" is earned by the smoke test, not the tag.
 
+## Settled
+- **Domain: aarch.science** is secured (site goes there, like aarch.bio).
+
 ## Open questions (DESIGN OQ1–OQ4)
 Image granularity (broad vs fine), versioning scheme (date vs spec-hash),
-org/registry name (quay.io/aarchscience?), reconciler "changed" definition.
-Confirm the **aarch.science domain** + **quay org** before publishing.
+**quay org name** (still open — aarch.bio used `quay.io/aarchbio`; pick one for
+science), reconciler "changed" definition. Only the quay org is now blocking
+publish.

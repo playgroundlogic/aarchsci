@@ -113,8 +113,9 @@ wins on price/perf. (The pip-arm64-wheel gap is a CPU-stack problem anyway.)
   many fine-grained ones (composable, more to maintain)? Lean broad for v1.
 - **OQ2 — versioning scheme:** date tag (`geospatial:2026.06`) vs spec content
   hash vs both? Needs to be reproducible and reconciler-friendly.
-- **OQ3 — naming/registry:** `quay.io/aarchscience/<env>`? Confirm the org +
-  domain (aarch.science).
+- **OQ3 — registry/org:** domain **aarch.science is secured** ✓. Still open: the
+  quay org name (`quay.io/aarchscience/<env>`? aarch.bio used `quay.io/aarchbio`).
+  Site → aarch.science.
 - **OQ4 — reconciler trigger:** conda-forge has no "new tag" event per env; the
   reconciler re-solves each spec and rebuilds if the pinned set changed. Define
   "changed."
