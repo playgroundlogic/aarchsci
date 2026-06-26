@@ -35,6 +35,11 @@ on:
         required: false
         default: 'false'
         type: string
+      include_stuck:
+        description: 'Also re-check skip-list "stuck" envs this run (monthly otherwise)'
+        required: false
+        default: 'false'
+        type: string
 
 concurrency:
   group: reconcile
@@ -53,12 +58,36 @@ jobs:
 
       - name: Compute drift (re-solve each env spec, compare committed lock-hash)
         id: drift
+        env:
+          # 'stuck' skip-list entries re-check on the 1st of the month or on a
+          # manual dispatch with include_stuck; the daily run skips them.
+          INCLUDE_STUCK: ${{ inputs.include_stuck }}
         run: |
           set -uo pipefail
-          drifted=()
+          drifted=(); skipped=0
+
+          # Read the skip-list (farm/skip-list.tsv): map an "env:<name>" or a plain
+          # env name to its tier. We skip a whole env if it (or a package it needs)
+          # is a recorded dead-end. wontfix = never; stuck = daily-skip/monthly-retry.
+          today_day="$(date -u +%d | sed 's/^0//')"
+          include_stuck=0
+          { [ "$INCLUDE_STUCK" = "true" ] || [ "$today_day" = "1" ]; } && include_stuck=1
+          skip_tier() {  # echo the tier for an env name, or empty
+            [ -f farm/skip-list.tsv ] || return 0
+            awk -F'\t' -v e="env:$1" -v p="$1" \
+              '!/^#/ && NF>=2 && ($1==e || $1==p){print $2; exit}' farm/skip-list.tsv
+          }
+
           # The tracked set = every committed env spec. The catalog tracks itself.
           for spec in envs/*.yaml; do
             env_name="$(basename "$spec" .yaml)"
+            tier="$(skip_tier "$env_name")"
+            if [ "$tier" = "wontfix" ]; then
+              echo "$env_name skipped (skip-list: wontfix)"; skipped=$((skipped+1)); continue
+            fi
+            if [ "$tier" = "stuck" ] && [ "$include_stuck" = "0" ]; then
+              echo "$env_name skipped (skip-list: stuck — revisits monthly)"; skipped=$((skipped+1)); continue
+            fi
             lock="envs/${env_name}.lock.txt"
             if [ ! -f "$lock" ]; then
               echo "::notice::$env_name has no committed lock yet -> queue build"
@@ -80,7 +109,7 @@ jobs:
           done
           echo "envs=${drifted[*]}" >> "$GITHUB_OUTPUT"
           echo "count=${#drifted[@]}" >> "$GITHUB_OUTPUT"
-          echo "::notice::reconcile drift = ${#drifted[@]} env(s): ${drifted[*]:-none}"
+          echo "::notice::reconcile drift = ${#drifted[@]} env(s): ${drifted[*]:-none} (skip-list skipped: ${skipped})"
 
       - name: Dispatch rebuilds for the drifted envs
         if: ${{ steps.drift.outputs.count != '0' && inputs.dry_run != 'true' }}

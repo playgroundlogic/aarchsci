@@ -1,0 +1,31 @@
+# Reconciler skip-list — env/package pairs the reconciler should NOT keep retrying.
+#
+# aarch.science's gaps differ from aarchbio's (DESIGN D2/D3). aarchbio's unit is a
+# single bioconda tool that may have "no arm64 build". Here the unit is a curated
+# ENV, and a gap is a package we'd want in an env that EITHER won't solve on arm64
+# conda-forge OR solves-but-won't-assemble/import on arm64 (the D3 failure mode —
+# the subtle one). When such a package blocks an env, record it here so the daily
+# reconciler stops re-trying a known dead-end, and document it in GAPS.md.
+#
+# Two tiers (mirrors aarchbio):
+#   wontfix  — genuine dead-end; never retry (only a human edit removes it).
+#   stuck    — real chance of an upstream fix (conda-forge feedstock re-enables
+#              arm64, an ABI bug is fixed); skip the DAILY run but re-check every
+#              <revisit_days>.
+#
+# Columns (tab-separated):  package  tier  revisit_days  reason
+# (revisit_days is ignored for wontfix; use 0. `package` is the conda-forge package
+#  name; prefix with `env:` to skip a whole env spec instead.)
+#
+# Edit this file to add/remove entries. The reconciler reads it each run.
+#
+# STATUS: EMPTY. As of 2026-06, every package probed for the planned envs
+# (geospatial, earth-observation, geo-ml, climate, lidar/point-cloud) solves clean
+# on conda-forge linux-aarch64 — there are no known hard arm64 gaps in the curated
+# science head. The mechanism exists so that when a gap DOES appear (most likely a
+# D3 assemble-not-solve failure on a future package), we have a place to record it
+# instead of looping on it forever. See GAPS.md.
+
+# --- wontfix: genuine dead-ends (none yet) ---
+
+# --- stuck: arm64 blocked with a real chance of upstream fix (none yet) ---
