@@ -29,11 +29,17 @@ a GeoJSON through fiona). The smoke test is baked into the image:
 ## Use it
 
 - Direct pull: `docker pull quay.io/aarchsci/<env>:latest`
-- Available envs:
-  - `geospatial` (123 packages — gdal, proj, geos, rasterio, fiona, shapely,
-    pyproj, scikit-image, numpy, scipy, + deps, all native arm64).
-  - `earth-observation` (236 packages — the geospatial base plus xarray, dask,
-    rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr, all native arm64).
+- Available envs (all native arm64, verified, signed, public):
+  - `geospatial` (123 pkgs — gdal, proj, geos, rasterio, fiona, shapely, pyproj,
+    scikit-image, numpy, scipy).
+  - `earth-observation` (236 pkgs — geospatial base + xarray, dask, rioxarray,
+    stackstac, pystac-client, odc-stac, netcdf4, zarr).
+  - `geo-ml` (378 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
+    geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
+  - `climate` (247 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+    esmpy, netcdf4, zarr; atmospheric/climate analysis with GRIB + regridding).
+  - `pointcloud` (287 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
+    LiDAR/DEM/terrain processing).
 - Tags: `latest`, a date tag (e.g. `2026.06.25`), and a content-addressed
   `s<lock-hash>` tag (the hash of the resolved package set).
 - Works on Apple Silicon and AWS Graviton (linux/arm64).
@@ -65,8 +71,8 @@ packaging one), bioinformatics (that's aarch.bio), and compiling from source
 
 ## Facts
 
-- Images: `geospatial` (123 pkgs) and `earth-observation` (236 pkgs) — native
-  arm64, verified (assemble+import+functional) + signed + public.
+- 5 env images (geospatial, earth-observation, geo-ml, climate, pointcloud) —
+  native arm64, verified (assemble+import+functional) + signed + public.
 - Kept current by a daily reconciler that re-solves each env spec and rebuilds
   when the resolved package set (its lock-hash) changes.
 - Maintained by Playground Logic. Apache-2.0. Unofficial — not affiliated with or

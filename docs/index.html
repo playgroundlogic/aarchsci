@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">2</div>
-                    <div class="stat-label">verified env images — <code>geospatial</code> &amp; <code>earth-observation</code>, native arm64</div>
+                    <div class="stat-num green">5</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">~2.5×</div>
@@ -204,6 +204,9 @@
 <span class="c"># pull a verified stack — native arm64, no account</span>
 docker pull <span class="k">quay.io/aarchsci</span>/geospatial:latest
 docker pull <span class="k">quay.io/aarchsci</span>/earth-observation:latest
+docker pull <span class="k">quay.io/aarchsci</span>/geo-ml:latest
+docker pull <span class="k">quay.io/aarchsci</span>/climate:latest
+docker pull <span class="k">quay.io/aarchsci</span>/pointcloud:latest
                 </div>
                 <div class="code">
 <span class="c"># re-run the verification yourself — it ships inside the image</span>
@@ -246,6 +249,43 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                     <span class="chip">netcdf4</span>
                     <span class="chip">zarr</span>
                     <span class="chip">… on the full geospatial stack</span>
+                </div>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">geo-ml</span><br>
+                  <strong>378 packages</strong> — CPU machine learning on geospatial / tabular data
+                </p>
+                <div class="catalog">
+                    <span class="chip">+ scikit-learn</span>
+                    <span class="chip">xgboost</span>
+                    <span class="chip">lightgbm</span>
+                    <span class="chip">geopandas</span>
+                    <span class="chip">pysal</span>
+                    <span class="chip">statsmodels</span>
+                    <span class="chip">datashader</span>
+                </div>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">climate</span><br>
+                  <strong>247 packages</strong> — atmospheric / climate analysis (GRIB + regridding)
+                </p>
+                <div class="catalog">
+                    <span class="chip">xarray</span>
+                    <span class="chip">dask</span>
+                    <span class="chip">cartopy</span>
+                    <span class="chip">cfgrib / eccodes</span>
+                    <span class="chip">metpy</span>
+                    <span class="chip">xesmf / esmpy</span>
+                    <span class="chip">netcdf4 · zarr</span>
+                </div>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">pointcloud</span><br>
+                  <strong>287 packages</strong> — LiDAR / DEM / terrain processing
+                </p>
+                <div class="catalog">
+                    <span class="chip">+ pdal</span>
+                    <span class="chip">python-pdal</span>
+                    <span class="chip">laspy</span>
+                    <span class="chip">richdem</span>
+                    <span class="chip">on the full geospatial stack</span>
                 </div>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>
