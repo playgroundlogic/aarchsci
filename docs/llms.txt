@@ -40,6 +40,8 @@ a GeoJSON through fiona). The smoke test is baked into the image:
     esmpy, netcdf4, zarr; atmospheric/climate analysis with GRIB + regridding).
   - `pointcloud` (287 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
+  - `comp-chem` (195 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
+    pdbfixer, ase, pyscf, xtb-python; cheminformatics + MD + quantum chemistry).
 - Tags: `latest`, a date tag (e.g. `2026.06.25`), and a content-addressed
   `s<lock-hash>` tag (the hash of the resolved package set).
 - Works on Apple Silicon and AWS Graviton (linux/arm64).
@@ -71,8 +73,8 @@ packaging one), bioinformatics (that's aarch.bio), and compiling from source
 
 ## Facts
 
-- 5 env images (geospatial, earth-observation, geo-ml, climate, pointcloud) —
-  native arm64, verified (assemble+import+functional) + signed + public.
+- 6 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+  comp-chem) — native arm64, verified (assemble+import+functional) + signed + public.
 - Kept current by a daily reconciler that re-solves each env spec and rebuilds
   when the resolved package set (its lock-hash) changes.
 - Maintained by Playground Logic. Apache-2.0. Unofficial — not affiliated with or

@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">5</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud</div>
+                    <div class="stat-num green">6</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">~2.5×</div>
@@ -207,6 +207,7 @@ docker pull <span class="k">quay.io/aarchsci</span>/earth-observation:latest
 docker pull <span class="k">quay.io/aarchsci</span>/geo-ml:latest
 docker pull <span class="k">quay.io/aarchsci</span>/climate:latest
 docker pull <span class="k">quay.io/aarchsci</span>/pointcloud:latest
+docker pull <span class="k">quay.io/aarchsci</span>/comp-chem:latest
                 </div>
                 <div class="code">
 <span class="c"># re-run the verification yourself — it ships inside the image</span>
@@ -286,6 +287,20 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                     <span class="chip">laspy</span>
                     <span class="chip">richdem</span>
                     <span class="chip">on the full geospatial stack</span>
+                </div>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">comp-chem</span><br>
+                  <strong>195 packages</strong> — cheminformatics, molecular dynamics &amp; quantum chemistry
+                </p>
+                <div class="catalog">
+                    <span class="chip">rdkit</span>
+                    <span class="chip">openbabel</span>
+                    <span class="chip">openmm</span>
+                    <span class="chip">mdanalysis</span>
+                    <span class="chip">mdtraj</span>
+                    <span class="chip">ase</span>
+                    <span class="chip">pyscf</span>
+                    <span class="chip">xtb</span>
                 </div>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>
