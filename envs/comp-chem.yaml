@@ -1,0 +1,29 @@
+# aarch.science — comp-chem environment
+# Computational chemistry: cheminformatics + molecular dynamics + quantum chemistry
+# (DESIGN D2). rdkit for cheminformatics; openmm for MD; pyscf for quantum chemistry;
+# ase for atomistic simulation; mdanalysis/mdtraj for trajectory analysis; openbabel
+# + pdbfixer + parmed for structure prep; xtb-python for semi-empirical QM. All
+# CPU-bound — a strong Graviton price/perf case (D4: GPU out, this is the CPU stack).
+# All 13 candidates probe-verified to solve native arm64 on conda-forge.
+# Versions left to the channel's current; the reconciler pins + rebuilds on change.
+name: comp-chem
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  - pandas
+  # --- cheminformatics ---
+  - rdkit
+  - openbabel
+  # --- molecular dynamics + trajectory analysis ---
+  - openmm
+  - mdanalysis
+  - mdtraj
+  - parmed
+  - pdbfixer
+  # --- quantum / atomistic ---
+  - ase
+  - pyscf
+  - xtb-python
