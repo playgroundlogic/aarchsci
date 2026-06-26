@@ -1,0 +1,31 @@
+# aarch.science — earth-observation environment (v2)
+# The geospatial base + the labeled-array / lazy / STAC layer EO workflows need
+# (DESIGN D2). xarray/dask/rioxarray for n-dimensional raster analysis at scale;
+# stackstac/pystac-client/odc-stac for pulling STAC catalogs into xarray.
+# Versions left to the channel's current; the reconciler pins + rebuilds on change.
+# Headline packages get import + functional smoke tests (D3).
+name: earth-observation
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  # --- geospatial base (mirrors envs/geospatial.yaml) ---
+  - gdal
+  - proj
+  - geos
+  - rasterio
+  - fiona
+  - shapely
+  - pyproj
+  - scikit-image
+  - numpy
+  # --- the earth-observation layer ---
+  - xarray
+  - dask
+  - rioxarray
+  - stackstac
+  - pystac-client
+  - odc-stac
+  - netcdf4
+  - zarr
+  - bottleneck
