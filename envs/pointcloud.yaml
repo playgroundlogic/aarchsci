@@ -1,0 +1,31 @@
+# aarch.science — pointcloud environment
+# The geospatial base + LiDAR / DEM / terrain processing (DESIGN D2). PDAL (a heavy
+# native-library point-cloud engine) + its python bindings; laspy for LAS/LAZ I/O;
+# whitebox + richdem for terrain/hydrology on DEMs. PDAL's deep native-lib stack is
+# exactly the assemble-not-solve risk D3 exists for — a strong verification showcase.
+# Versions left to the channel's current; the reconciler pins + rebuilds on change.
+name: pointcloud
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  # --- geospatial base (mirrors envs/geospatial.yaml) ---
+  - gdal
+  - proj
+  - geos
+  - rasterio
+  - fiona
+  - shapely
+  - pyproj
+  - scikit-image
+  - numpy
+  # --- the point-cloud / terrain layer ---
+  - pdal
+  - python-pdal
+  - laspy
+  - richdem
+  # NOTE: `whitebox` is intentionally EXCLUDED. The conda-forge package is a thin
+  # shim that downloads a pre-compiled WhiteboxTools_linux_amd64 binary from the
+  # network on first use — wrong arch for arm64 (would need emulation) and a
+  # runtime network fetch, both antithetical to this project. richdem covers the
+  # native terrain/hydrology need. See GAPS.md / farm/skip-list.tsv (wontfix).

@@ -1,0 +1,31 @@
+# aarch.science — geo-ml environment
+# The geospatial base + classic CPU machine-learning on geospatial / tabular data
+# (DESIGN D2). scikit-learn / xgboost / lightgbm for modeling; geopandas / pysal
+# for vector + spatial statistics; datashader for large-scale rasterization.
+# CPU-bound training/inference is the strongest Graviton price/perf case (D4: GPU
+# is out — this is deliberately the CPU ML stack).
+# Versions left to the channel's current; the reconciler pins + rebuilds on change.
+name: geo-ml
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  # --- geospatial base (mirrors envs/geospatial.yaml) ---
+  - gdal
+  - proj
+  - geos
+  - rasterio
+  - fiona
+  - shapely
+  - pyproj
+  - scikit-image
+  - numpy
+  # --- the geo-ml layer ---
+  - geopandas
+  - pysal
+  - scikit-learn
+  - xgboost
+  - lightgbm
+  - statsmodels
+  - pandas
+  - datashader

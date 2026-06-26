@@ -31,12 +31,23 @@ silent until you `import`.
 | Kind | Count | Notes |
 |------|------:|-------|
 | **solve-gap** | 0 | every package probed for the planned envs solves clean on conda-forge linux-aarch64 |
-| **assemble-gap** | 0 | both shipped envs (geospatial, earth-observation) pass the full D3 smoke test |
+| **assemble-gap** | 1 | `whitebox` — solves, imports, but fetches an amd64 binary at runtime (wontfix); see below |
 
-**There are no known hard arm64 gaps in the curated science head.** This is the
-real finding, and it's the inverse of the pip experience: the exact stack that
-fails `No matching distribution found for rasterio` on PyPI solves *and* assembles
-cleanly on conda-forge. The delivery channel was the whole problem.
+**The curated science head is near-complete on arm64.** This is the real finding,
+and it's the inverse of the pip experience: the exact stack that fails `No matching
+distribution found for rasterio` on PyPI solves *and* assembles cleanly on
+conda-forge. Five envs ship verified (geospatial, earth-observation, geo-ml,
+climate, pointcloud); exactly one package across all of them is a true dead-end.
+
+Two near-misses caught by the D3 smoke test (and fixed in-spec, not skip-listed)
+are worth recording, because they're precisely the assemble-not-solve trap D3
+exists for — both would have shipped broken under a solve-only check:
+
+- **`xesmf` (climate)** — the env *solved* but `import xesmf` failed
+  (`No module named 'ESMF'`). The resolver picked xesmf 0.6.0, which predates the
+  ESMF 8.4 module rename (`ESMF` → `esmpy`). Fixed by pinning `xesmf >=0.8.4` in
+  the spec so the post-rename line is chosen. Not a gap — a version floor.
+- **`whitebox` (pointcloud)** — see Active gaps below.
 
 ### Coverage probe (conda-forge linux-aarch64 dry-run solve)
 
@@ -69,4 +80,20 @@ that's what we'd ship.
 
 ## Active gaps
 
-_None._
+### `whitebox` — wontfix (assemble-gap, by design)
+
+**Env affected:** `pointcloud` (excluded; richdem covers the terrain/hydrology need).
+
+The conda-forge `whitebox` package solves and imports fine, but it is a thin Python
+shim: on first use it **downloads a pre-compiled `WhiteboxTools_linux_amd64.zip`
+binary from `whiteboxgeo.com` at runtime.** On arm64 that is the wrong architecture
+(would require emulation) and a runtime network fetch — both directly against this
+project's principles (native, no emulation, verifiable build, no runtime download).
+The D3 smoke test caught it as a `PermissionError`/exec failure for the non-root
+container user.
+
+This is not upstream-fixable in a feedstock the way a missing build is — it's the
+package's design. It is therefore **wontfix** (`farm/skip-list.tsv`) and excluded
+from the spec. If WhiteboxGeo ships a native arm64 binary and the conda-forge
+package selects it by arch, revisit. `richdem` (native, verified) covers terrain
+analysis in the meantime.

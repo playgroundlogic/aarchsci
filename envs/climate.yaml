@@ -1,0 +1,32 @@
+# aarch.science — climate environment
+# The xarray/dask array core + the atmospheric/climate-science stack (DESIGN D2).
+# cartopy for projected mapping; cfgrib/eccodes for GRIB; metpy for meteorological
+# calculations; xesmf/esmpy for regridding; netcdf4/zarr for storage. GRIB and
+# regridding are the parts that are painful to pip-install and clean on conda-forge.
+# Versions left to the channel's current; the reconciler pins + rebuilds on change.
+name: climate
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  # --- array / lazy / storage core ---
+  - numpy
+  - xarray
+  - dask
+  - netcdf4
+  - zarr
+  - bottleneck
+  - pandas
+  # --- the climate / atmospheric layer ---
+  - cartopy
+  - cfgrib
+  - eccodes
+  - metpy
+  # xesmf < 0.8.3 still does `import ESMF`; ESMF 8.4+ renamed that module to
+  # `esmpy`. Without this floor the solver picks xesmf 0.6.0 against esmpy 8.9 and
+  # the env solves but xesmf won't import (caught by the D3 smoke test). Pin to the
+  # post-rename line so the resolver can't regress. See GAPS.md.
+  - xesmf >=0.8.4
+  - esmpy
+  - cftime
+  - pyproj

@@ -26,6 +26,7 @@
 # D3 assemble-not-solve failure on a future package), we have a place to record it
 # instead of looping on it forever. See GAPS.md.
 
-# --- wontfix: genuine dead-ends (none yet) ---
+# --- wontfix: genuine dead-ends ---
+whitebox	wontfix	0	conda-forge pkg downloads a precompiled WhiteboxTools_linux_amd64 binary from the network at runtime — wrong arch for arm64 (needs emulation) + runtime fetch; both violate native/no-emulation/verifiable. Excluded from `pointcloud`; richdem covers terrain/hydrology natively.
 
 # --- stuck: arm64 blocked with a real chance of upstream fix (none yet) ---
