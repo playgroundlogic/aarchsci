@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">123</div>
-                    <div class="stat-label">packages in the verified <code>geospatial</code> image, native arm64</div>
+                    <div class="stat-num green">2</div>
+                    <div class="stat-label">verified env images — <code>geospatial</code> &amp; <code>earth-observation</code>, native arm64</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">~2.5×</div>
@@ -201,8 +201,9 @@
                     <p>Pull the verified geospatial image and run native. The same image works on an Apple Silicon laptop and a Graviton server.</p>
                 </div>
                 <div class="code">
-<span class="c"># pull the verified geospatial stack — native arm64, no account</span>
+<span class="c"># pull a verified stack — native arm64, no account</span>
 docker pull <span class="k">quay.io/aarchsci</span>/geospatial:latest
+docker pull <span class="k">quay.io/aarchsci</span>/earth-observation:latest
                 </div>
                 <div class="code">
 <span class="c"># re-run the verification yourself — it ships inside the image</span>
@@ -227,6 +228,24 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                     <span class="chip">numpy</span>
                     <span class="chip">scipy</span>
                     <span class="chip">… +113 deps, all native arm64</span>
+                </div>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">earth-observation</span><br>
+                  <strong>236 packages</strong> — native arm64, verified, signed, public
+                </p>
+                <p class="section-header" style="margin-bottom:1rem;color:var(--text-secondary);">
+                  The geospatial base plus the labeled-array / lazy / STAC layer:
+                </p>
+                <div class="catalog">
+                    <span class="chip">+ xarray</span>
+                    <span class="chip">dask</span>
+                    <span class="chip">rioxarray</span>
+                    <span class="chip">stackstac</span>
+                    <span class="chip">pystac-client</span>
+                    <span class="chip">odc-stac</span>
+                    <span class="chip">netcdf4</span>
+                    <span class="chip">zarr</span>
+                    <span class="chip">… on the full geospatial stack</span>
                 </div>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

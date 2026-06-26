@@ -29,8 +29,11 @@ a GeoJSON through fiona). The smoke test is baked into the image:
 ## Use it
 
 - Direct pull: `docker pull quay.io/aarchsci/<env>:latest`
-- Available envs: `geospatial` (123 packages — gdal, proj, geos, rasterio, fiona,
-  shapely, pyproj, scikit-image, numpy, scipy, + deps, all native arm64).
+- Available envs:
+  - `geospatial` (123 packages — gdal, proj, geos, rasterio, fiona, shapely,
+    pyproj, scikit-image, numpy, scipy, + deps, all native arm64).
+  - `earth-observation` (236 packages — the geospatial base plus xarray, dask,
+    rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr, all native arm64).
 - Tags: `latest`, a date tag (e.g. `2026.06.25`), and a content-addressed
   `s<lock-hash>` tag (the hash of the resolved package set).
 - Works on Apple Silicon and AWS Graviton (linux/arm64).
@@ -62,7 +65,8 @@ packaging one), bioinformatics (that's aarch.bio), and compiling from source
 
 ## Facts
 
-- v1 `geospatial` image: 123 packages, native arm64, verified + signed + public.
+- Images: `geospatial` (123 pkgs) and `earth-observation` (236 pkgs) — native
+  arm64, verified (assemble+import+functional) + signed + public.
 - Kept current by a daily reconciler that re-solves each env spec and rebuilds
   when the resolved package set (its lock-hash) changes.
 - Maintained by Playground Logic. Apache-2.0. Unofficial — not affiliated with or
