@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="aarch.science">
+  <!-- aarch.science mark: a double-arch container enclosing a signal waveform,
+       on the dark brand background. Redrawn as vector so it stays crisp at any size. -->
+  <rect width="64" height="64" rx="12" fill="#0c1017"/>
+  <g fill="none" stroke="#ff6a00" stroke-linecap="round" stroke-linejoin="round">
+    <!-- outer arch -->
+    <path d="M14 54 V26 a18 18 0 0 1 36 0 V54" stroke-width="2"/>
+    <!-- inner arch -->
+    <path d="M21 54 V27 a11 11 0 0 1 22 0 V54" stroke-width="1.6"/>
+    <!-- baseline (dashed) through the container -->
+    <path d="M12 37 H52" stroke-width="1.6" stroke-dasharray="2 3"/>
+    <!-- signal waveform crossing the baseline -->
+    <path d="M23 37 q3 -12 6 0 q3 12 6 0 q3 -9 5 0" stroke-width="2"/>
+  </g>
+</svg>
