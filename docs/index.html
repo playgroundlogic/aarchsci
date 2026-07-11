@@ -116,13 +116,20 @@
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">~2.5×</div>
-                    <div class="stat-label">better price/core on Graviton c7g vs Intel c7i</div>
+                    <div class="stat-label">better price/core on Graviton c7g vs Intel c7i (published pricing)</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num teal">solve ≠ run</div>
                     <div class="stat-label">every image must import &amp; pass a functional smoke test</div>
                 </div>
             </div>
+            <p class="footer-note">
+              Native arm64 isn't just cheaper — it's <em>the same answer</em>: on a
+              representative prep workload the arm64 build produced
+              <strong>bit-identical output</strong> to x86 (177,643 features,
+              1,405,988 vertices), and ran in the same class.
+              <a href="https://github.com/playgroundlogic/aarchsci/tree/main/benchmark" style="color:var(--accent-teal)">See the benchmark →</a>
+            </p>
             <p class="footer-note">The sister project to <a href="https://aarch.bio/" style="color:var(--accent-teal)">aarch.bio</a> — same machinery, the conda-forge science layer instead of bioconda.</p>
         </div>
 
@@ -135,8 +142,8 @@
                 </div>
                 <div class="prose">
                     <p><strong>The machines doing science are increasingly arm64</strong> — every
-                    Apple Silicon Mac, every AWS Graviton instance, measured ~2.5× cheaper per
-                    core for CPU-bound geospatial work.</p>
+                    Apple Silicon Mac, every AWS Graviton instance, ~2.5× cheaper per physical
+                    core (published c7g vs c7i on-demand pricing) for CPU-bound geospatial work.</p>
                     <p>But the native-library scientific stack — GDAL, PROJ, GEOS and the Python
                     packages on top of them (rasterio, fiona, shapely, pyproj) — has incomplete,
                     Python-version-fragile arm64 wheel coverage on PyPI. Reach for it with

@@ -1,0 +1,6 @@
+{"host":"orion/local (Apple M-series)","arch":"aarch64","seconds":8.11,"tiles_per_sec":4.932,"features":177643,"vertices":1405988}
+{"host":"orion/local (Apple M-series)","arch":"aarch64","seconds":8.5643,"tiles_per_sec":4.671,"features":177643,"vertices":1405988}
+{"host":"orion/local (Apple M-series)","arch":"aarch64","seconds":8.7106,"tiles_per_sec":4.592,"features":177643,"vertices":1405988}
+{"host":"janus (x86_64, Rocky 9)","arch":"x86_64","seconds":12.973,"tiles_per_sec":3.083,"features":177643,"vertices":1405988}
+{"host":"janus (x86_64, Rocky 9)","arch":"x86_64","seconds":13.1738,"tiles_per_sec":3.036,"features":177643,"vertices":1405988}
+{"host":"janus (x86_64, Rocky 9)","arch":"x86_64","seconds":13.4762,"tiles_per_sec":2.968,"features":177643,"vertices":1405988}
