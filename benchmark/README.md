@@ -24,33 +24,44 @@ polygonized features and 1,405,988 reprojected vertices. That is the correctness
 half of "verified": the native arm64 stack isn't just fast, it's *the same answer*.
 No silent numerical drift, no emulation artifacts.
 
-## What this is NOT (read before quoting a number)
+The farm numbers above are **two different physical machines** (Apple laptop vs
+Rocky x86 server) — useful only for the *correctness parity* point (identical
+output). For the real price/performance claim, we ran it on AWS. See below.
 
-The wall-clock ratio above (~1.6× on these boxes) is **two different physical
-machines** — an Apple laptop vs a Rocky x86 server — **not** AWS `c7g` vs `c7i`, and
-**not** an apples-to-apples core-for-core hardware comparison. Do not cite it as a
-Graviton-vs-Intel speedup. It establishes two honest things:
+## Measured on AWS: c7g vs c7i (the real apples-to-apples)
 
-1. **The native arm64 build works and is competitive** — it is not slower; the
-   native stack performs in the same class as (here, ahead of) the x86 build on
-   comparable general-purpose silicon.
-2. **Correctness parity** — identical output across arches (the point above).
+Run on 2026-07-11 in us-west-2, **native on each arch** (no emulation), same env
+spec (gdal 3.12.3), same workload, **both vCPUs saturated**, results collected via
+SSM (`benchmark/aws_bench.sh`). Both instances are 2 vCPU, on-demand. Output was
+**bit-identical** (177,643 features) on both — same correctness parity as the farm.
 
-## The price/perf claim (`~2.5×`) is *cited pricing*, not measured here
+| Instance | CPU | vCPU | Throughput | $/hr | Throughput per $/hr |
+|----------|-----|-----:|-----------:|-----:|--------------------:|
+| **c7g.large** | Graviton4 | 2 | **5.52** tiles/s | $0.0725 | **76.1** |
+| c7i.large | Intel Sapphire Rapids | 2 | 3.63 tiles/s | $0.08925 | 40.7 |
 
-The project's headline economic claim — Graviton ~2.5× better price per physical
-core — comes from **published AWS on-demand pricing** on equivalent instance
-families (the fieldwork bake-off: `c7g` $0.036 vs `c7i` $0.089 per physical core),
-combined with the "performs in the same class" result above. It is a *pricing*
-argument, not a benchmark result. Keep the two separate when quoting.
+- **Raw performance:** c7g is **1.52× faster** than c7i on this workload.
+- **Price:** c7g is **1.23× cheaper** per hour.
+- **→ Price/performance: `1.87×` in Graviton's favor** (throughput per dollar).
 
-## To get a true AWS c7g-vs-c7i number
+That is the honest, measured number for *this workload* on *these instance sizes*
+with *live on-demand pricing*. It is lower than the often-cited "~2.5×" because that
+figure is a *per-physical-core price* comparison on larger instances; this is a
+*whole-workload throughput-per-dollar* result — a stricter, end-to-end measure. We
+quote **1.87× (measured)** and describe ~2.5× as a per-core pricing figure.
 
-Run `geo_prep_bench.py` inside `quay.io/aarchsci/geospatial:latest` on a real `c7g`
-and the equivalent `c7i`, same vCPU count, and divide (throughput ÷ $/hr). That
-requires launching EC2 instances — deliberately not done here (CLAUDE.md: no
-instance launches without confirmation). The harness is ready for it: the script is
-self-contained and emits one JSON line per run.
+Notably, `quay.io/aarchsci/geospatial:latest` is **arm64-only by design** (D2 — amd64
+assembles upstream), so it won't run on c7i (`no matching manifest for linux/amd64`).
+The x86 leg builds the *same env spec* natively via micromamba on the c7i box — the
+fair comparison of the identical stack per arch.
+
+## Reproduce the AWS run
+
+```bash
+AWS_PROFILE=aws ./benchmark/aws_bench.sh launch c7g.large   # + c7i.large
+# then drive the bench via SSM Run Command; see git history for the exact commands.
+# Instances self-terminate (shutdown +25 safety net); terminate explicitly when done.
+```
 
 ## Reproduce
 

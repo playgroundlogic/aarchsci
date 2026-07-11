@@ -1,0 +1,2 @@
+{"instance":"c7g.large","arch":"aarch64","vcpu":2,"cpu":"Graviton4","agg_tiles_per_sec":5.52,"best_single_s":14.43,"usd_per_hr":0.0725,"features":177643,"gdal":"3.12.3","region":"us-west-2","native":true}
+{"instance":"c7i.large","arch":"x86_64","vcpu":2,"cpu":"Intel Sapphire Rapids","agg_tiles_per_sec":3.63,"best_single_s":22.02,"usd_per_hr":0.08925,"features":177643,"gdal":"3.12.3","region":"us-west-2","native":true}
