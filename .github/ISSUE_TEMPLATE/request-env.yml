@@ -1,0 +1,53 @@
+name: Request an environment
+description: Ask for a new curated conda-forge env (or a package added to an existing one), built native arm64.
+title: "env-request: <name>"
+labels: ["env-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the request! aarch.science builds **curated conda-forge
+        environments** as verified, signed, native arm64 containers. Before filing,
+        note the scope: **CPU scientific stack only** — GPU/CUDA is out (Graviton
+        has no NVIDIA GPU), and bioinformatics lives at
+        [aarchbio](https://github.com/playgroundlogic/aarchbio), not here.
+  - type: input
+    id: env-name
+    attributes:
+      label: Environment name (or existing env to extend)
+      placeholder: e.g. "hydrology", or "add rioxarray to geospatial"
+    validations:
+      required: true
+  - type: textarea
+    id: packages
+    attributes:
+      label: Packages
+      description: The conda-forge packages you need. Headline packages first.
+      placeholder: |
+        - gdal
+        - whitebox      # note: some packages can't be built native arm64 — see GAPS.md
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What workflow is this for? What arm64 hardware (Apple Silicon, which Graviton instance)? A concrete consumer helps us prioritize.
+    validations:
+      required: true
+  - type: input
+    id: pip-fails
+    attributes:
+      label: Does it fail on pip/arm64 today?
+      description: If you've hit "No matching distribution found" or an import/ABI error on arm64, paste the gist — that's exactly the gap this fills.
+    validations:
+      required: false
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This is a CPU workload (not GPU/CUDA).
+          required: true
+        - label: These packages are on conda-forge (not bioconda — that's aarchbio).
+          required: true

@@ -7,8 +7,9 @@ Sister project to [aarchbio](https://github.com/playgroundlogic/aarchbio) (which
 does this for bioinformatics / BioContainers). aarch.science covers the layer
 aarchbio scopes out: the **conda-forge** scientific stack.
 
-> **Status:** design stage. The architecture is settled — see [DESIGN.md](DESIGN.md).
-> The builder and first images are not built yet.
+> **Status:** live. **6 verified, signed, public env images** on
+> [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
+> and a site at **[aarch.science](https://aarch.science/)**.
 
 ## Why
 
@@ -23,6 +24,39 @@ cleanly there (123 packages, verified). The gap is the same one
 **the capability is present, the delivery is broken.** aarch.science builds a
 verified, signed arm64 container from the conda-forge packages so the work can run
 native on Graviton.
+
+## Use it
+
+```bash
+# pull a verified stack — native arm64, no account, no login
+docker pull quay.io/aarchsci/geospatial:latest
+
+# re-run the verification yourself — it ships inside every image
+docker run --rm quay.io/aarchsci/geospatial:latest python /opt/aarchsci/smoke.py
+
+# confirm it was built by this repo's CI, from source, logged in Sigstore/Rekor
+cosign verify quay.io/aarchsci/geospatial:latest \
+  --certificate-identity-regexp 'github.com/playgroundlogic/aarchsci' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
+
+## Available environments
+
+Each is a curated, version-pinned conda-forge env, built native arm64, verified
+(assemble + import + functional smoke test), signed, and public. Tags: `latest`,
+a date (`2026.06.26`), and a content-addressed `s<lock-hash>`.
+
+| Env | Pkgs | What's in it |
+|-----|-----:|--------------|
+| [`geospatial`](envs/geospatial.yaml) | 123 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
+| [`earth-observation`](envs/earth-observation.yaml) | 236 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr |
+| [`geo-ml`](envs/geo-ml.yaml) | 378 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader |
+| [`climate`](envs/climate.yaml) | 247 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy |
+| [`pointcloud`](envs/pointcloud.yaml) | 287 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
+| [`comp-chem`](envs/comp-chem.yaml) | 195 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb |
+
+Want another? [Request an env](https://github.com/playgroundlogic/aarchsci/issues/new?template=request-env.yml).
+Known arm64 gaps and why: [GAPS.md](GAPS.md).
 
 ## How it will differ from aarchbio
 

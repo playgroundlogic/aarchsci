@@ -1,0 +1,36 @@
+name: Report an arm64 gap
+description: A package won't solve, or solves but won't import/run on arm64 (the assemble-gap).
+title: "arm64-gap: <package>"
+labels: ["arm64-gap"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        aarch.science has two gap kinds (see [GAPS.md](../blob/main/GAPS.md)):
+        **solve-gap** (no `linux-aarch64` build on conda-forge) and **assemble-gap**
+        (solves, but fails to import/run on arm64 — the subtle one). We fix these
+        *upstream* in the conda-forge feedstock; we don't compile from source.
+  - type: input
+    id: package
+    attributes:
+      label: Package (and version, if relevant)
+      placeholder: e.g. "whitebox" or "xesmf=0.6.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Gap kind
+      options:
+        - "solve-gap — won't resolve on conda-forge linux-aarch64"
+        - "assemble-gap — solves, but import/run fails on arm64"
+        - "not sure"
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: The solve error, the import traceback, or the smoke-test failure. Which env spec surfaced it?
+    validations:
+      required: true
