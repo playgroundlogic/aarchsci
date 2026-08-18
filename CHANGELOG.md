@@ -79,9 +79,10 @@ versioned per-image (date + content-hash tags); this records project-level miles
   `libraryps`. It is arm64, OpenMPI-flavored, and has its data on disk, so it clears
   exactly the bar `gpaw` cleared. So does `psi4`, whose `share/psi4/` ships `basis`,
   `databases`, `grids`, `quadratures` and `samples` (arm64, serial/threaded rather than
-  MPI). The objection does hold for `siesta` (only `gen-basis`), `lammps` (no
-  `potentials/`) and `elk` (no species files); `dftbplus` is left explicitly unverified
-  rather than assumed, since its search was truncated. Both data-shipping
+  MPI, and confirmed functionally: H2O SCF/cc-pVDZ = -76.026620 Eh computed offline on
+  arm64, basis resolved from `share/psi4/basis`). The objection does hold for `siesta`
+  (only `gen-basis`), `dftbplus` (zero `*.skf` in the prefix), `lammps` (no
+  `potentials/`) and `elk` (no species files). Both data-shipping
   engines stay out of `dft` on domain grounds instead — molecular quantum chemistry, not
   plane-wave/PAW DFT — and become candidates for a future molecular-QC env. `GAPS.md` now
   records the per-package evidence. The general lesson: "engines don't ship data" is too

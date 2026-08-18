@@ -122,16 +122,17 @@ packages and looking (2026-08-18):
 |---|---|---|
 | `nwchem` | **yes** | 606 basis files in `share/nwchem/libraries`, 1339 more in `libraries.bse`, 8 pseudopotentials in `libraryps` |
 | `siesta` | no | ships only the `gen-basis` tool; no basis/pseudopotential data |
-| `dftbplus` | **unverified** | the `.skf` search hit its output limit on `.mod` compile artifacts before absence was established. Upstream distributes Slater-Koster sets separately from the code, so "no" is likely — but likely is not verified, so this row is pending a recheck |
+| `dftbplus` | no | zero `*.skf` files in the whole prefix; `share/` holds only toolchain/doc dirs plus the bundled `dftd4` and `s-dftd3` dispersion data. Upstream distributes Slater-Koster sets separately from the code |
 | `lammps` | no | no `potentials/` directory in the conda package |
 | `elk` | no | no species files anywhere in the prefix |
-| `psi4` | **yes** | `share/psi4/` ships `basis`, `databases`, `grids`, `quadratures` and `samples`, plus libint's 90 basis files in `share/libint/<ver>/basis` |
+| `psi4` | **yes** | `share/psi4/` ships `basis`, `databases`, `grids`, `quadratures` and `samples`, plus libint's 90 basis files in `share/libint/<ver>/basis`. Proven functionally: psi4 1.11 ran H2O SCF/cc-pVDZ = -76.026620 Eh offline on arm64, resolving the basis from `share/psi4/basis` |
 
-(The `nwchem`, `psi4`, `siesta`, `lammps` and `elk` rows rest on searches that completed
-without truncation; `dftbplus` does not, and says so. The first version of this table got
-`psi4` wrong precisely by reading a truncated listing as evidence of absence.)
+(Every row rests on a search that completed without truncation. That is worth stating
+because the first version of this table got `psi4` exactly backwards by reading a
+`head`-truncated listing as evidence of absence — an absence claim is only as good as the
+completeness of the search behind it.)
 
-So the verification objection holds for `siesta`, `lammps` and `elk`, but
+So the verification objection holds for `siesta`, `dftbplus`, `lammps` and `elk`, but
 **not** for `nwchem` or `psi4` — both have their basis sets on disk and so clear exactly
 the bar `gpaw` cleared (`nwchem` on arm64 + OpenMPI, `psi4` on arm64 serial/threaded).
 Both stay out of `dft` on domain grounds instead: they are molecular quantum chemistry,
