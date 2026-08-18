@@ -33,6 +33,17 @@ versioned per-image (date + content-hash tags); this records project-level miles
   lock-hash drift rather than file content, so the `Built:`/`Builder:` header does
   not generate empty churn. This also makes OQ4 work as designed for the first time —
   "changed = lock-hash drift" needs a current baseline to diff against.
+- **...and the lock commit no longer sits behind the registry visibility flip.** `dft`'s
+  first publish found the fix above could still be defeated: the image built, passed D3,
+  pushed and was signed, then Quay's `changevisibility` returned 403 (CI's
+  `QUAY_OAUTH_TOKEN` lacks `repo:admin`), which skipped the lock-commit step sitting
+  downstream of it — re-arming the loop on the very first env to publish after the fix.
+  Registry visibility is orthogonal to what was built; the artifact has already shipped
+  by that point. So the lock commit now runs immediately after build/push/sign, and
+  set-public runs last, as the only step that changes nothing about the image. Confirmed
+  in production: `envs/dft.lock.txt drifted: d7203fdaf84e -> c5674a815d28` committed and
+  pushed on attempt 1, and a fresh `solve-hash.sh dft` now returns that same hash — so
+  the next reconcile should report `dft` up to date rather than drifted.
 
 ### Notable
 - **First real arm64 gaps, and a third kind of gap.** Scoping `dft` moved the
