@@ -40,7 +40,7 @@ Active gaps.
 
 | Kind | Count | Notes |
 |------|------:|-------|
-| **solve-gap** | 5 | `cp2k`, `sisl`, `asap3`, `kimpy`, `openkim-models` — no `linux-aarch64` build at all. All surfaced while scoping `dft`; none blocks a shipping env. `cp2k` is the highest-value upstream target. |
+| **solve-gap** | 16 | No `linux-aarch64` build at all. Engines/potentials: `cp2k`, `sisl`, `asap3`, `kimpy`, `openkim-models`, `quippy`, `chgnet`, `m3gnet`. Phonons/transport: `phono3py`, `alamode`, `dynaphopy`, `boltztrap2`, `kwant`. DMFT: `triqs`, `triqs_dft_tools`, `edrixs`. All surfaced while scoping `dft` and probing its neighborhood; **none blocks a shipping env** — they are candidates we probed and declined. `cp2k` is the highest-value target, `phono3py` the cheapest. |
 | **assemble-gap** | 1 | `whitebox` — solves, imports, but fetches an amd64 binary at runtime (wontfix); see below |
 | **MPI-flavor conflict** | 1 | `abinit` — has an arm64 build, solves standalone, but MPICH-only (stuck); see below |
 
@@ -52,13 +52,19 @@ climate, pointcloud, comp-chem, dft), and every headline package in all seven
 assembles and does real work natively.
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
-changed: the five solve-gaps are **candidates we probed and declined**, not holes in
-a shipping image. They cluster in one place — classical-potential and DFT tooling
-(`cp2k`, `asap3`, `kimpy`, `openkim-models`, `sisl`) — which is simply the least
-arm64-travelled corner of the science stack we've reached so far. `cp2k` is the one
-worth upstream effort: a major plane-wave/Gaussian DFT code, entirely absent on
-`linux-aarch64` while `gpaw`, `siesta`, `nwchem`, `psi4`, `dftbplus` and `lammps` all
-have builds.
+changed: every solve-gap listed above is a **candidate we probed and declined**, not a
+hole in a shipping image. They cluster in one region — atomistic simulation beyond the
+DFT engines themselves: classical/ML potentials (`asap3`, `kimpy`, `openkim-models`,
+`quippy`, `chgnet`, `m3gnet`), anharmonic phonons and transport (`phono3py`, `alamode`,
+`dynaphopy`, `boltztrap2`, `kwant`), and DMFT (`triqs` and friends). That is simply the
+least arm64-travelled corner of the science stack we've reached so far, and the pattern
+is informative: the *engines* mostly have arm64 builds (`gpaw`, `qe`, `siesta`, `nwchem`,
+`psi4`, `dftbplus`, `lammps`, `elk`, `yambo`, `wannier90`), while the tooling layered
+around them often doesn't.
+
+`cp2k` remains the one most worth upstream effort — a major plane-wave/Gaussian DFT code,
+entirely absent on `linux-aarch64` while all of those engines have builds. `phono3py` is
+the cheapest, since `phonopy` already builds on arm64. See the neighborhood probe below.
 
 Two near-misses caught by the D3 smoke test (and fixed in-spec, not skip-listed)
 are worth recording, because they're precisely the assemble-not-solve trap D3
@@ -104,11 +110,82 @@ The first probe to return real gaps. Resolving native arm64 on conda-forge:
 
 `siesta`, `dftbplus`, `lammps`, `nwchem` and `psi4` all co-solve with the shipped
 OpenMPI `dft` stack, so they are *available* — they're left out of the v1 spec for a
-verification reason, not an arm64 one: none of them bundles the pseudopotential /
-Slater-Koster / basis-set data its calculations need, so D3 could only `import` them,
-which would quietly downgrade "verified" from functional to import-only. `gpaw` is in
-precisely because `gpaw-data` ships its PAW setups in-package (559 files, resolved
-from disk with no runtime download — cf. `whitebox`).
+verification reason, not an arm64 one. `gpaw` is in precisely because `gpaw-data` ships
+its PAW setups in-package (559 files, resolved from disk with no runtime download —
+cf. `whitebox`), so D3 can do real work rather than merely `import`.
+
+**Does each engine ship the data its calculations need?** This was first written up as a
+blanket "none of them does," which was wrong. Checked properly by extracting the arm64
+packages and looking (2026-08-18):
+
+| Package | Ships its own data? | Evidence |
+|---|---|---|
+| `nwchem` | **yes** | 606 basis files in `share/nwchem/libraries`, 1339 more in `libraries.bse`, 8 pseudopotentials in `libraryps` |
+| `siesta` | no | ships only the `gen-basis` tool; no basis/pseudopotential data |
+| `dftbplus` | no | no Slater-Koster `.skf` files (only `.mod` compile artifacts match) |
+| `lammps` | no | no `potentials/` directory in the conda package |
+| `elk` | no | no species files anywhere in the prefix |
+| `psi4` | partly | carries libint's 90 basis files (`share/libint/<ver>/basis`); its own `share/psi4/` has `scripts`/`plugin`/`fsapt` but no `basis/` |
+
+So the verification objection holds for `siesta`, `dftbplus`, `lammps` and `elk`, but
+**not** for `nwchem` — which is arm64, OpenMPI-flavored, and has its basis sets on disk,
+i.e. it clears exactly the bar `gpaw` cleared. `nwchem` stays out of `dft` on domain
+grounds instead: it is molecular quantum chemistry, not plane-wave/PAW DFT, so it belongs
+in a future molecular-QC env rather than this one. The lesson generalizes — "engines don't
+ship data" is too coarse a heuristic; it has to be checked per package, which is the D3
+doctrine applied one level earlier, at scoping time rather than build time.
+
+### Coverage probe — the wider gpaw neighborhood (2026-08-18)
+
+A follow-up sweep of ~90 packages across the roles that surround a DFT env: engines,
+Wannier/tight-binding/transport, phonons, workflow managers, ML interatomic potentials,
+analysis/defects, and DMFT. MPI flavor was checked too, since that is what excluded
+`abinit`.
+
+**arm64 build AND OpenMPI-flavored** (so they could co-exist with the shipped `dft`
+stack): `qe` 7.5 (Quantum ESPRESSO) · `yambo` 5.3.0 (GW/BSE) · `wannier90` 4.0.1 ·
+`nwchem` 7.3.1 · `siesta` 5.4.2 · `dftbplus` 25.1 · `deepmd-kit` 3.1.3 · `plumed` 2.10.1.
+Serial-only on arm64: `elk` 10.2.4, `psi4` 1.12a3. Also arm64: `dftd4` 4.2.0 and
+`simple-dftd3` 1.5.0 (dispersion corrections — natural gpaw/ase companions), and
+`elpa` 2026.02.002, newer than the 2025.06.001 our solve currently picks.
+
+`abinit` remains the **only** MPICH-only case found, which is worth knowing: the third
+gap kind is real but rare, not endemic.
+
+**`noarch`, so arm64 is a non-issue** — the whole workflow and analysis layer is pure
+Python and carries no porting risk at all: `aiida-core` · `atomate2` · `jobflow` ·
+`quacc` · `fireworks` · `custodian` · `myqueue` · `mp-api` · `matminer` · `abipy` ·
+`pyprocar` · `sumo` · `doped` · `pydefect` · `shakenbreak` ·
+`pymatgen-analysis-defects` · `cclib` · `crystal-toolkit` · `nglview` · `py3dmol` ·
+`seekpath` · `hiphive` · `amset` · `wannierberri` · `pythtb` · `matgl` · `nequip` ·
+`sevenn`. (Most of them *wrap* an engine, so they are only as useful as the engine
+shipped beside them — which is a granularity question, OQ1, not an arm64 one.)
+
+**No `linux-aarch64` build (solve-gap) — 11 more:** `phono3py` · `kwant` ·
+`boltztrap2` · `alamode` · `dynaphopy` · `chgnet` · `m3gnet` · `quippy` · `triqs` ·
+`triqs_dft_tools` · `edrixs`.
+
+Two of these deserve attention:
+
+- **`phono3py` is the best upstream target in the list.** We ship `phonopy` 4.4.0 on
+  arm64; `phono3py` is the same author's anharmonic / thermal-conductivity companion at
+  the same version, and has no arm64 build. Because phonopy already builds, this is
+  plausibly the lowest effort-per-value fix available
+  ([`conda-forge/phono3py-feedstock`](https://github.com/conda-forge/phono3py-feedstock)).
+- **`libxsmm` 2.1.0 *does* have an arm64 build**, so it does not explain `cp2k`'s
+  absence. The obvious excuse for the highest-value gap is gone, and the real fix may be
+  more tractable than assumed.
+
+**A data package that changes a scoping call:** `sssp` — the Standard Solid State
+Pseudopotentials library — is on conda-forge as a **`noarch`, 62.7 MB, zero-dependency**
+package. Size and empty dependency list mean it ships the UPF files rather than fetching
+them at runtime (the `whitebox` failure mode is a few KB of Python shim). `pslibrary` has
+no arm64 build, but `sssp` covers the need without it, and `basis_set_exchange` is
+likewise `noarch`. That means **`qe` + `sssp` looks functionally D3-verifiable on arm64
+with no runtime download** — so the pseudopotential-data objection that kept plane-wave
+QE out of v1 may not survive. The natural v2 is therefore a QE-centered env
+(`qe` + `sssp` + `wannier90` + `yambo`, all OpenMPI on arm64) rather than more packages
+bolted onto `dft`: a second engine with its own data story earns its own image.
 
 ## When a real gap appears
 
