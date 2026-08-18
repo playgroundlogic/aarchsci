@@ -19,14 +19,14 @@
 #
 # Edit this file to add/remove entries. The reconciler reads it each run.
 #
-# STATUS: EMPTY. As of 2026-06, every package probed for the planned envs
-# (geospatial, earth-observation, geo-ml, climate, lidar/point-cloud) solves clean
-# on conda-forge linux-aarch64 — there are no known hard arm64 gaps in the curated
-# science head. The mechanism exists so that when a gap DOES appear (most likely a
-# D3 assemble-not-solve failure on a future package), we have a place to record it
-# instead of looping on it forever. See GAPS.md.
+# STATUS: 2 entries (as of 2026-08). The geo/climate/point-cloud/comp-chem head is
+# still gap-free on conda-forge linux-aarch64 — both entries below came from scoping
+# the `dft` env, which is where this catalog first met packages arm64 can't take:
+# one runtime-download dead-end (whitebox) and one MPI-flavor collision (abinit).
+# See GAPS.md for the full record and the upstream-contribution roadmap.
 
 # --- wontfix: genuine dead-ends ---
 whitebox	wontfix	0	conda-forge pkg downloads a precompiled WhiteboxTools_linux_amd64 binary from the network at runtime — wrong arch for arm64 (needs emulation) + runtime fetch; both violate native/no-emulation/verifiable. Excluded from `pointcloud`; richdem covers terrain/hydrology natively.
 
-# --- stuck: arm64 blocked with a real chance of upstream fix (none yet) ---
+# --- stuck: arm64 blocked with a real chance of upstream fix ---
+abinit	stuck	90	Third gap kind (MPI-flavor conflict), not a solve- or assemble-gap: abinit 10.0.3 HAS a linux-aarch64 build and solves standalone (59 pkgs), but only against MPICH — conda-forge ships no openmpi variant for it on aarch64. conda-forge permits one MPI implementation per env, so it cannot coexist with the OpenMPI-flavored gpaw in `dft`. Forcing the env to MPICH instead regresses the whole stack (gpaw 25.7.0 -> 23.9.1, python 3.14 -> 3.12, libxc 7.1.2 -> 6.2.2, elpa 2025.06 -> 2021.11), so OpenMPI wins and abinit is excluded. Fixable upstream: add an openmpi variant to conda-forge/abinit-feedstock for linux-aarch64. Revisit quarterly.

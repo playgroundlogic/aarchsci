@@ -7,7 +7,7 @@ Sister project to [aarchbio](https://github.com/playgroundlogic/aarchbio) (which
 does this for bioinformatics / BioContainers). aarch.science covers the layer
 aarchbio scopes out: the **conda-forge** scientific stack.
 
-> **Status:** live. **6 verified, signed, public env images** on
+> **Status:** live. **7 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -54,6 +54,16 @@ a date (`2026.06.26`), and a content-addressed `s<lock-hash>`.
 | [`climate`](envs/climate.yaml) | 247 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy |
 | [`pointcloud`](envs/pointcloud.yaml) | 287 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
 | [`comp-chem`](envs/comp-chem.yaml) | 195 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb |
+| [`dft`](envs/dft.yaml) | 191 | gpaw, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
+
+`dft` is the first MPI-parallel env, so its verification goes further than the
+others': the smoke test runs the same bulk-silicon DFT calculation serially and again
+under `mpiexec -n 2`, and fails unless the two energies agree. Run it in parallel the
+same way:
+
+```bash
+docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python your_script.py
+```
 
 Want another? [Request an env](https://github.com/playgroundlogic/aarchsci/issues/new?template=request-env.yml).
 Known arm64 gaps and why: [GAPS.md](GAPS.md).

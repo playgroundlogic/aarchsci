@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">6</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem</div>
+                    <div class="stat-num green">7</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -217,6 +217,7 @@ docker pull <span class="k">quay.io/aarchsci</span>/geo-ml:latest
 docker pull <span class="k">quay.io/aarchsci</span>/climate:latest
 docker pull <span class="k">quay.io/aarchsci</span>/pointcloud:latest
 docker pull <span class="k">quay.io/aarchsci</span>/comp-chem:latest
+docker pull <span class="k">quay.io/aarchsci</span>/dft:latest
                 </div>
                 <div class="code">
 <span class="c"># re-run the verification yourself — it ships inside the image</span>
@@ -311,6 +312,28 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                     <span class="chip">pyscf</span>
                     <span class="chip">xtb</span>
                 </div>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">dft</span><br>
+                  <strong>191 packages</strong> — plane-wave &amp; LCAO density-functional theory, MPI-parallel
+                </p>
+                <div class="catalog">
+                    <span class="chip">gpaw</span>
+                    <span class="chip">ase</span>
+                    <span class="chip">libxc</span>
+                    <span class="chip">libvdwxc</span>
+                    <span class="chip">elpa</span>
+                    <span class="chip">scalapack</span>
+                    <span class="chip">openmpi</span>
+                    <span class="chip">mpi4py</span>
+                    <span class="chip">spglib</span>
+                    <span class="chip">phonopy</span>
+                    <span class="chip">pymatgen</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  The first MPI-parallel env — its verification runs the same bulk-silicon DFT
+                  calculation serially and under <code>mpiexec -n 2</code>, and fails unless the
+                  two energies agree.
+                </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>
                   &nbsp;·&nbsp; Want another env (earth-observation, geo-ml, climate)? <a href="https://github.com/playgroundlogic/aarchsci/issues/new" style="color:var(--accent-teal)">Request it</a>.

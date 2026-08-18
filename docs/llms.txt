@@ -42,6 +42,10 @@ a GeoJSON through fiona). The smoke test is baked into the image:
     LiDAR/DEM/terrain processing).
   - `comp-chem` (195 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, xtb-python; cheminformatics + MD + quantum chemistry).
+  - `dft` (191 pkgs — gpaw, ase, libxc, libvdwxc, elpa, scalapack, fftw, openmpi,
+    mpi4py, spglib, phonopy, pymatgen; plane-wave/LCAO density-functional theory,
+    MPI-parallel. Run in parallel with
+    `docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python script.py`).
 - Tags: `latest`, a date tag (e.g. `2026.06.25`), and a content-addressed
   `s<lock-hash>` tag (the hash of the resolved package set).
 - Works on Apple Silicon and AWS Graviton (linux/arm64).
@@ -73,8 +77,12 @@ packaging one), bioinformatics (that's aarch.bio), and compiling from source
 
 ## Facts
 
-- 6 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
-  comp-chem) — native arm64, verified (assemble+import+functional) + signed + public.
+- 7 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+  comp-chem, dft) — native arm64, verified (assemble+import+functional) + signed
+  + public.
+- `dft` (gpaw, ase, libxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen) is
+  MPI-parallel; its verification also runs the calculation under `mpiexec -n 2` and
+  requires the parallel and serial energies to agree.
 - Kept current by a daily reconciler that re-solves each env spec and rebuilds
   when the resolved package set (its lock-hash) changes.
 - Maintained by Playground Logic. Apache-2.0. Unofficial — not affiliated with or

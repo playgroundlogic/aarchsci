@@ -3,6 +3,61 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-08-18
+
+### Added
+- **`dft` env (191 pkgs)** — the 7th verified image, and the first MPI-parallel one.
+  Plane-wave / LCAO density-functional theory: `gpaw` 25.7.0
+  (`py314_mpi_openmpi_omp`), `ase`, `libxc` 7.1.2, `libvdwxc`, `elpa` 2025.06.001,
+  `scalapack`, `fftw`, OpenMPI 5.0.10, `mpi4py`, plus `spglib`/`phonopy`/`pymatgen`
+  for structure, symmetry and phonons. The strongest Graviton case in the catalog:
+  DFT is CPU-bound, MPI+OpenMP, bandwidth-hungry, and gpaw's GPU path is CUDA — so
+  D4 (no GPU on Graviton) costs this workload nothing.
+- **D3 now verifies parallelism, not just assembly.** `envs/dft.smoke.py` runs the
+  same bulk-Si `PW(200)`/LDA calculation serially and under `mpiexec -n 2` and fails
+  unless the energies agree (measured delta: 6e-08 eV). An MPI stack that links but
+  computes wrong is invisible to a single-process check. It stays a single entrypoint
+  (`python /opt/aarchsci/smoke.py`) by re-invoking itself under mpiexec, so the
+  consumer-facing re-verification command is unchanged.
+
+### Fixed
+- **The reconciler was rebuilding all six envs every day, indefinitely.**
+  `publish.yml`'s "Commit the refreshed lock" step only printed a notice — it never
+  committed, and the job ran with `contents: read`. So the committed lock-hash stayed
+  frozen at each env's first build while the registry moved on, every reconcile run
+  saw drift, and every run dispatched a full rebuild + republish. Observed: 40
+  consecutive daily reconcile→publish pairs, ~230 accumulated tags, and geospatial's
+  committed lock still reading `c35344f5346d`/123 pkgs against a published
+  `s615335b5a733`/124. The step now actually commits and pushes, with `contents:
+  write` and a rebase-retry loop for the concurrent matrix legs. It gates on
+  lock-hash drift rather than file content, so the `Built:`/`Builder:` header does
+  not generate empty churn. This also makes OQ4 work as designed for the first time —
+  "changed = lock-hash drift" needs a current baseline to diff against.
+
+### Notable
+- **First real arm64 gaps, and a third kind of gap.** Scoping `dft` moved the
+  solve-gap count off zero and turned up a failure mode the two-kind taxonomy
+  couldn't express:
+  - **MPI-flavor conflict** (new category, `GAPS.md`) — `abinit` 10.0.3 has a
+    `linux-aarch64` build and solves standalone, but only against MPICH. conda-forge
+    permits one MPI implementation per env, so it cannot join an OpenMPI env. Not a
+    solve-gap (it solves alone), not an assemble-gap (it never gets that far).
+    Recorded `stuck`, 90-day revisit; upstream fix is an `openmpi` variant in
+    `conda-forge/abinit-feedstock`.
+  - Rebuilding `dft` on MPICH to accommodate `abinit` was measured and rejected: it
+    regresses gpaw 25.7.0→23.9.1, python 3.14→3.12, libxc 7.1.2→6.2.2 and elpa
+    2025.06→2021.11. Hence the load-bearing `mpi=*=openmpi` pin in `envs/dft.yaml`.
+  - **5 solve-gaps** — `cp2k`, `sisl`, `asap3`, `kimpy`, `openkim-models` have no
+    `linux-aarch64` build at all. None blocks a shipping env; `cp2k` is the
+    highest-value upstream target (a major DFT code, absent on arm64 while gpaw,
+    siesta, nwchem, psi4, dftbplus and lammps all have builds).
+- **Scope call on `dft` (OQ1 applied):** `siesta`, `dftbplus`, `lammps`, `nwchem` and
+  `psi4` all co-solve with the shipped OpenMPI stack, but none bundles the
+  pseudopotential / Slater-Koster / basis data its calculations need — so D3 could
+  only import them, weakening "verified" from functional to import-only. Left out.
+  `gpaw` qualifies because `gpaw-data` ships its 559 PAW setup files in-package,
+  resolved from disk with no runtime download (cf. the `whitebox` wontfix).
+
 ## 2026-06-26
 
 ### Added

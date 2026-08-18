@@ -1,0 +1,47 @@
+# aarch.science — dft environment
+# Plane-wave / LCAO density-functional theory, built on GPAW + ASE (DESIGN D2).
+# gpaw is the DFT engine (PAW, plane-wave + LCAO + finite-difference modes); libxc
+# supplies the exchange-correlation functionals, libvdwxc the van der Waals ones;
+# ELPA + ScaLAPACK + FFTW + OpenMPI are the parallel eigensolver/FFT/transport layer;
+# spglib/phonopy/pymatgen are the structure, symmetry and phonon tooling around it.
+#
+# This is the strongest Graviton case in the catalog so far: DFT is CPU-bound,
+# MPI + OpenMP parallel, and memory-bandwidth hungry, and gpaw's GPU path is CUDA —
+# so D4 (no GPU on Graviton) costs this workload nothing it could otherwise have.
+#
+# Verified to solve AND assemble native arm64 on conda-forge, including 2-rank MPI
+# (see dft.smoke.py). Versions are left to the channel's current except for the
+# floors below; the reconciler pins the resolved set and rebuilds on change.
+name: dft
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  # --- MPI flavor lock: LOAD-BEARING, do not remove ---
+  # conda-forge permits exactly one MPI implementation per env, so the flavor is an
+  # env-wide decision, not a per-package one. Pinning it at the `mpi` metapackage
+  # (rather than on gpaw's build string) forces elpa, fftw and libvdwxc to follow the
+  # same flavor. Measured cost of letting it drift to MPICH: the whole stack regresses
+  # to gpaw 23.9.1 / python 3.12 / libxc 6.2.2 / elpa 2021.11.002 — about two years
+  # old — because gpaw's current arm64 MPICH builds don't line up with the rest.
+  # This is also why `abinit` is not here: its arm64 build is MPICH-only and cannot
+  # coexist with OpenMPI-flavored gpaw. See GAPS.md + farm/skip-list.tsv.
+  - mpi=*=openmpi
+  - openmpi
+  - mpi4py
+  # --- DFT engine + its native math stack ---
+  # Floors, in the same spirit as climate's `xesmf >=0.8.4`: each keeps the resolver
+  # off an older line that solves and imports but is not what we mean to ship.
+  - gpaw >=25.7
+  - ase
+  - libxc >=7
+  - libvdwxc
+  - elpa >=2025
+  - scalapack
+  - fftw
+  # --- structure / symmetry / phonons ---
+  - spglib
+  - phonopy
+  - pymatgen
