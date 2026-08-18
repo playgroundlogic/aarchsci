@@ -83,18 +83,6 @@ jobs:
           echo "signing $pinned"
           cosign sign --yes "$pinned"
 
-      - name: Set repo public (only if explicitly requested)
-        if: ${{ inputs.set_public == 'true' }}
-        env:
-          QUAY_OAUTH_TOKEN: ${{ secrets.QUAY_OAUTH_TOKEN }}
-        run: |
-          set -uo pipefail
-          code="$(curl -s -o /dev/null -w '%{http_code}' -X POST \
-            -H "Authorization: Bearer $QUAY_OAUTH_TOKEN" -H 'Content-Type: application/json' \
-            -d '{"visibility":"public"}' \
-            "https://quay.io/api/v1/repository/aarchsci/${{ matrix.env }}/changevisibility")"
-          [ "$code" = "200" ] && echo "public ✓" || { echo "changevisibility HTTP $code"; exit 1; }
-
       # Commit the lock the build actually produced. This is NOT bookkeeping — it is
       # what makes the reconciler work at all: reconcile.yml decides "has the channel
       # moved?" by diffing a fresh solve against the COMMITTED lock-hash (OQ4). If the
@@ -103,8 +91,13 @@ jobs:
       # republished daily. (That is exactly what happened: geospatial's committed
       # lock-hash sat at c35344f5346d/123 pkgs while the registry moved on for ~40 days.)
       #
-      # Runs after sign/set-public so a committed lock always corresponds to an image
-      # that passed D3 AND actually shipped. build-env.sh wrote the file in step 4.
+      # Runs after build/push/sign so a committed lock always corresponds to an image
+      # that passed D3 AND actually shipped (build-env.sh wrote the file in step 4),
+      # but BEFORE the visibility flip — deliberately. Registry visibility is orthogonal
+      # to what was built: an image is shipped and signed by the time we get here. Having
+      # the lock commit sit downstream of set-public means a failed cosmetic flip skips
+      # it and silently re-arms the daily-rebuild loop this step exists to prevent. That
+      # is not hypothetical — it happened on dft's first publish (changevisibility 403).
       - name: Commit the refreshed lock
         run: |
           set -uo pipefail
@@ -154,4 +147,24 @@ jobs:
             sleep $(( attempt * 3 ))
           done
           echo "::error::exhausted push retries for ${{ matrix.env }}'s lock — the reconciler will keep rebuilding it until this lands"
+          exit 1
+
+      # Last, because it is the only step that changes nothing about the artifact.
+      # Quay creates repos private; going public stays a deliberate opt-in (SAFETY note
+      # at the top of this file). A 403 here means QUAY_OAUTH_TOKEN lacks `repo:admin`
+      # for the aarchsci org — the image is already built, pushed and signed, so the fix
+      # is to re-mint the secret with admin scope, not to rebuild.
+      - name: Set repo public (only if explicitly requested)
+        if: ${{ inputs.set_public == 'true' }}
+        env:
+          QUAY_OAUTH_TOKEN: ${{ secrets.QUAY_OAUTH_TOKEN }}
+        run: |
+          set -uo pipefail
+          code="$(curl -s -o /dev/null -w '%{http_code}' -X POST \
+            -H "Authorization: Bearer $QUAY_OAUTH_TOKEN" -H 'Content-Type: application/json' \
+            -d '{"visibility":"public"}' \
+            "https://quay.io/api/v1/repository/aarchsci/${{ matrix.env }}/changevisibility")"
+          [ "$code" = "200" ] && { echo "public ✓"; exit 0; }
+          echo "::error::changevisibility HTTP $code for ${{ matrix.env }} — image IS published+signed but still private."
+          [ "$code" = "403" ] && echo "::error::403 = QUAY_OAUTH_TOKEN is missing repo:admin scope on the aarchsci org; re-mint it in Quay (Applications -> Generate Token) and update the repo secret."
           exit 1
