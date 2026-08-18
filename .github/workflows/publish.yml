@@ -32,7 +32,7 @@ on:
         type: string
 
 permissions:
-  contents: read
+  contents: write   # commit the refreshed envs/<name>.lock.txt back to main
   id-token: write   # cosign keyless (OIDC)
 
 env:
@@ -95,12 +95,63 @@ jobs:
             "https://quay.io/api/v1/repository/aarchsci/${{ matrix.env }}/changevisibility")"
           [ "$code" = "200" ] && echo "public ✓" || { echo "changevisibility HTTP $code"; exit 1; }
 
+      # Commit the lock the build actually produced. This is NOT bookkeeping — it is
+      # what makes the reconciler work at all: reconcile.yml decides "has the channel
+      # moved?" by diffing a fresh solve against the COMMITTED lock-hash (OQ4). If the
+      # lock never lands on main, that baseline is frozen at the day the env was first
+      # built, every reconcile run sees drift forever, and all six envs get rebuilt and
+      # republished daily. (That is exactly what happened: geospatial's committed
+      # lock-hash sat at c35344f5346d/123 pkgs while the registry moved on for ~40 days.)
+      #
+      # Runs after sign/set-public so a committed lock always corresponds to an image
+      # that passed D3 AND actually shipped. build-env.sh wrote the file in step 4.
       - name: Commit the refreshed lock
         run: |
           set -uo pipefail
-          if ! git diff --quiet -- "envs/${{ matrix.env }}.lock.txt"; then
-            echo "::notice::envs/${{ matrix.env }}.lock.txt changed — resolved set drifted (commit it)."
-            git --no-pager diff --stat -- "envs/${{ matrix.env }}.lock.txt" || true
-          else
-            echo "lock unchanged"
+          LOCK="envs/${{ matrix.env }}.lock.txt"
+          lock_hash_of() { grep -m1 'lock-hash:' | sed -E 's/.*lock-hash: *([0-9a-f]+).*/\1/'; }
+
+          # Gate on the LOCK-HASH, not on file content. The lock header also carries
+          # `Built: <date>` and `Builder: <sha>`, so the file differs on every rebuild
+          # even when the resolved package set is byte-identical — gating on `git diff`
+          # would commit empty-meaning churn on any manual re-dispatch. OQ4 defines
+          # "changed" as lock-hash drift, so that is what we commit on.
+          hash="$(lock_hash_of < "$LOCK")"
+          pkgs="$(grep -m1 'lock-hash:' "$LOCK" | sed -E 's/.*packages: *([0-9]+).*/\1/')"
+          committed="$(git show "HEAD:$LOCK" 2>/dev/null | lock_hash_of || true)"
+
+          if [ -n "$committed" ] && [ "$committed" = "$hash" ]; then
+            echo "lock-hash unchanged ($hash) — resolved set identical, nothing to commit"
+            git checkout -- "$LOCK" || true   # drop the date/sha-only header churn
+            exit 0
           fi
+          echo "::notice::$LOCK drifted: ${committed:-none} -> $hash; committing the new baseline."
+          git --no-pager diff --stat -- "$LOCK" || true
+
+          git config user.name  'aarchsci-bot'
+          git config user.email 'aarchsci-bot@users.noreply.github.com'
+
+          git add -- "$LOCK"
+          git commit -q -m "lock: ${{ matrix.env }} -> s${hash} (${pkgs} pkgs)" \
+                        -m "Resolved set drifted on conda-forge linux-aarch64; rebuilt, D3-verified, signed, published. Automated by publish.yml."
+
+          # The matrix runs up to 6 envs concurrently and each pushes to main, so a
+          # non-fast-forward is expected, not exceptional. Each leg touches only its
+          # own lock file, so a rebase always resolves cleanly — retry rather than fail
+          # (a lost push would silently re-arm the daily-rebuild loop for that env).
+          for attempt in 1 2 3 4 5; do
+            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "::notice::pushed lock for ${{ matrix.env }} (s${hash}) on attempt ${attempt}"
+              exit 0
+            fi
+            echo "push rejected (attempt ${attempt}) — rebasing onto origin/${GITHUB_REF_NAME}"
+            git fetch -q origin "${GITHUB_REF_NAME}"
+            if ! git rebase "origin/${GITHUB_REF_NAME}"; then
+              git rebase --abort || true
+              echo "::error::could not rebase lock commit for ${{ matrix.env }} — push it by hand or the reconciler will rebuild this env daily"
+              exit 1
+            fi
+            sleep $(( attempt * 3 ))
+          done
+          echo "::error::exhausted push retries for ${{ matrix.env }}'s lock — the reconciler will keep rebuilding it until this lands"
+          exit 1
