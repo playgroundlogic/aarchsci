@@ -122,17 +122,27 @@ packages and looking (2026-08-18):
 |---|---|---|
 | `nwchem` | **yes** | 606 basis files in `share/nwchem/libraries`, 1339 more in `libraries.bse`, 8 pseudopotentials in `libraryps` |
 | `siesta` | no | ships only the `gen-basis` tool; no basis/pseudopotential data |
-| `dftbplus` | no | no Slater-Koster `.skf` files (only `.mod` compile artifacts match) |
+| `dftbplus` | **unverified** | the `.skf` search hit its output limit on `.mod` compile artifacts before absence was established. Upstream distributes Slater-Koster sets separately from the code, so "no" is likely — but likely is not verified, so this row is pending a recheck |
 | `lammps` | no | no `potentials/` directory in the conda package |
 | `elk` | no | no species files anywhere in the prefix |
-| `psi4` | partly | carries libint's 90 basis files (`share/libint/<ver>/basis`); its own `share/psi4/` has `scripts`/`plugin`/`fsapt` but no `basis/` |
+| `psi4` | **yes** | `share/psi4/` ships `basis`, `databases`, `grids`, `quadratures` and `samples`, plus libint's 90 basis files in `share/libint/<ver>/basis` |
 
-So the verification objection holds for `siesta`, `dftbplus`, `lammps` and `elk`, but
-**not** for `nwchem` — which is arm64, OpenMPI-flavored, and has its basis sets on disk,
-i.e. it clears exactly the bar `gpaw` cleared. `nwchem` stays out of `dft` on domain
-grounds instead: it is molecular quantum chemistry, not plane-wave/PAW DFT, so it belongs
-in a future molecular-QC env rather than this one. The lesson generalizes — "engines don't
-ship data" is too coarse a heuristic; it has to be checked per package, which is the D3
+(The `nwchem`, `psi4`, `siesta`, `lammps` and `elk` rows rest on searches that completed
+without truncation; `dftbplus` does not, and says so. The first version of this table got
+`psi4` wrong precisely by reading a truncated listing as evidence of absence.)
+
+So the verification objection holds for `siesta`, `lammps` and `elk`, but
+**not** for `nwchem` or `psi4` — both have their basis sets on disk and so clear exactly
+the bar `gpaw` cleared (`nwchem` on arm64 + OpenMPI, `psi4` on arm64 serial/threaded).
+Both stay out of `dft` on domain grounds instead: they are molecular quantum chemistry,
+not plane-wave/PAW DFT, so they belong in a future molecular-QC env rather than this one.
+Note that the two *are* the ones that ship data, which is not a coincidence — molecular QC
+basis sets are small text files that fit in a package, whereas pseudopotential and
+Slater-Koster libraries are large, licence-encumbered, or curated out-of-band (which is
+why `sssp` being a 62.7 MB `noarch` package is such a useful find; see below).
+
+The lesson generalizes: "engines don't ship data" is too coarse a heuristic, and so is any
+scoping claim asserted rather than checked. It has to be verified per package — the D3
 doctrine applied one level earlier, at scoping time rather than build time.
 
 ### Coverage probe — the wider gpaw neighborhood (2026-08-18)

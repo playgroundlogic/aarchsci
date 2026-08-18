@@ -70,20 +70,24 @@ versioned per-image (date + content-hash tags); this records project-level miles
   resolved from disk with no runtime download (cf. the `whitebox` wontfix).
 
 ### Corrected
-- **"None of the other engines bundles its data" was wrong about `nwchem`.** The `dft`
+- **"None of the other engines bundles its data" was wrong about `nwchem` and `psi4`.** The `dft`
   scope note above justified leaving `siesta`/`dftbplus`/`lammps`/`nwchem`/`psi4` out on
   the grounds that none ships the pseudopotential / Slater-Koster / basis data its
   calculations need, so D3 could only `import` them. Checked properly — by extracting the
   arm64 packages and looking rather than assuming — `nwchem` **does**: 606 basis files in
   `share/nwchem/libraries`, 1339 more in `libraries.bse`, and 8 pseudopotentials in
   `libraryps`. It is arm64, OpenMPI-flavored, and has its data on disk, so it clears
-  exactly the bar `gpaw` cleared. The objection does hold for `siesta` (only `gen-basis`),
-  `dftbplus` (no `.skf` files), `lammps` (no `potentials/`) and `elk` (no species files);
-  `psi4` carries libint's 90 basis files but no `share/psi4/basis`. `nwchem` stays out of
-  `dft` on domain grounds instead — it is molecular quantum chemistry, not plane-wave/PAW
-  DFT — and becomes a candidate for a future molecular-QC env. `GAPS.md` now records the
-  per-package evidence. The general lesson: "engines don't ship data" is too coarse to
-  scope on, which is the D3 doctrine applied one step earlier, at scoping time.
+  exactly the bar `gpaw` cleared. So does `psi4`, whose `share/psi4/` ships `basis`,
+  `databases`, `grids`, `quadratures` and `samples` (arm64, serial/threaded rather than
+  MPI). The objection does hold for `siesta` (only `gen-basis`), `lammps` (no
+  `potentials/`) and `elk` (no species files); `dftbplus` is left explicitly unverified
+  rather than assumed, since its search was truncated. Both data-shipping
+  engines stay out of `dft` on domain grounds instead — molecular quantum chemistry, not
+  plane-wave/PAW DFT — and become candidates for a future molecular-QC env. `GAPS.md` now
+  records the per-package evidence. The general lesson: "engines don't ship data" is too
+  coarse to scope on, and neither that claim nor its first correction should have been
+  written from anything but an extracted package — the D3 doctrine applied one step
+  earlier, at scoping time.
 
 ### Notable (neighborhood probe, 2026-08-18)
 - **Swept ~90 packages around a DFT env** — engines, Wannier/transport, phonons, workflow
