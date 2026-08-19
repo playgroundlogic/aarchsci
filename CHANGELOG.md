@@ -90,6 +90,64 @@ versioned per-image (date + content-hash tags); this records project-level miles
   written from anything but an extracted package — the D3 doctrine applied one step
   earlier, at scoping time.
 
+### Notable (ARM SIMD dispatch, measured on real Graviton3 + Graviton4)
+- **The published images already run SVE kernels on Graviton, with no rebuild.** The
+  question "can these containers use NEON/SVE/SVE2 or generation-specific tuning?" was
+  answered by measurement rather than by reasoning from the from-source non-goal.
+  New `benchmark/sve_dispatch_bench.py`, run on real c7g.large and c8g.large via
+  `aws_bench.sh sve` (two independent runs each, agreeing within ~1%), using the
+  **unmodified `quay.io/aarchsci/dft:latest`** on both:
+  - aarch.science compiles nothing, so it never *selects* an ISA target — but it
+    inherits conda-forge's **runtime dispatch**. OpenBLAS 0.3.34 is `DYNAMIC_ARCH`
+    with 27 core kernel families (`armv8sve`, `neoversev1`, `neoversev2`, `a64fx`,
+    `armv9sme`, …) and NumPy compiles an `SVE` dispatch path over its mandatory
+    NEON/ASIMD baseline. `auto` selects **`neoversev1` on c7g** and **`neoversev2` on
+    c8g**, NumPy reports `SVE: true` on both, and the same image falls back to
+    `neoversen1`/`SVE: false` on Apple silicon.
+  - **Worth ~23% on Graviton3** (DGEMM 48.45 vs 39.39 GF/s, SGEMM 99.25 vs 79.81,
+    pinning `OPENBLAS_CORETYPE=neoversen1` to take SVE off the table), and ~5% on a
+    real 16-atom Si SCF cycle. **Worth nothing measurable on Graviton4** — `neoversev2`
+    is within noise of, and marginally behind, the NEON-only path. Recorded as measured
+    rather than explained; we did not determine whether that is the 4×128-bit geometry
+    (vs Graviton3's 2×256-bit, both measured via `prctl(PR_SVE_GET_VL)`) or an
+    under-tuned kernel.
+  - **D3 applied to dispatch:** all six kernel configurations returned an identical
+    −5.940776 eV/atom, matching the Apple-silicon run to the last digit. A faster
+    kernel that changes the answer is worthless.
+  - Cross-generation, the microbenchmark and the workload disagree and the workload
+    wins the argument: Graviton3 takes DGEMM by 1.19×, while Graviton4 finishes the
+    DFT calculation 1.17× faster and 1.06× cheaper per calculation.
+  - Ceiling worth knowing: conda-forge ships `_x86_64-microarch-level` (up to v4) so the
+    x86 solver can pick a tuned build, but there is **no aarch64 equivalent** and
+    `__archspec` on arm64 reports a bare `aarch64`. On arm64 there is exactly one
+    packaging tier — armv8-a baseline plus whatever each package dispatches internally.
+    That is the real limit on this axis, and it is a packaging-ecosystem limit rather
+    than a container or DESIGN one.
+
+### Corrected (2026-08-18)
+- **c7g is Graviton3, not Graviton4.** `benchmark/README.md` and the July results JSONL
+  both labelled c7g.large "Graviton4". c7g is **Graviton3 / Neoverse V1**; c8g is
+  Graviton4 / Neoverse V2. Confirmed two ways: AWS's pricing API reports
+  `physicalProcessor=AWS Graviton3 Processor` for c7g.large, and the instance itself
+  reports CPU part `0xd40` (Neoverse V1) against c8g's `0xd4f` (Neoverse V2). The
+  measured throughput numbers were never affected — only the CPU label — but the
+  mislabel mattered here, because this is exactly the generation distinction the SVE
+  work turns on.
+
+### Fixed (benchmark harness, 2026-08-18)
+- `aws_bench.sh` no longer honours an inherited **`AWS_REGION`** (`R="${AWS_REGION:-…}"`
+  silently sent `RunInstances` at us-east-1 on a shell exporting it, where the pinned
+  us-west-2 subnet legitimately does not exist → `InvalidSubnetID.NotFound`). Region and
+  subnet are a matched pair and now share a namespaced override.
+- Its SSM command is built with `--cli-input-json` instead of the CLI's shorthand
+  `--parameters`, which does not unescape a JSON string — multi-line commands arrived on
+  the instance with literal `\n` and died at bash line 1.
+- The cleanup trap uses a global, not a `local`: under `set -e` bash unwinds the function
+  frame before running the `EXIT` trap, so the trap died on `unbound variable` exactly
+  when it was supposed to terminate a leaked instance.
+- AMIs are resolved from the current AL2023 SSM parameter per arch rather than pinned to
+  ids that were months stale.
+
 ### Notable (neighborhood probe, 2026-08-18)
 - **Swept ~90 packages around a DFT env** — engines, Wannier/transport, phonons, workflow
   managers, ML potentials, analysis, DMFT — checking arm64 availability *and* MPI flavor.
