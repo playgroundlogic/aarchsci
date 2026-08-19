@@ -3,6 +3,92 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-08-19
+
+### Notable (five-generation Graviton sweep: Graviton2 → Graviton5)
+- **Extended the SIMD-dispatch measurement to every Graviton generation AWS rents**, at
+  two problem sizes — **24 configurations, 8 instance types, 5 generations** — all on the
+  unmodified published `quay.io/aarchsci/dft:latest`. Raw records in
+  `benchmark/results/aws-generation-sweep-2026.08.19.jsonl`. Findings:
+  - **Graviton5 (c9g) exists and is the fastest thing in the catalog for DFT**: part
+    `0xd84`, SVE2 + `i8mm` + `bf16`, 128-bit vectors. Graviton2 → Graviton5 is **2.49×
+    faster and 1.95× cheaper per SCF calculation** on real gpaw.
+  - **…and OpenBLAS has not caught up to it.** 0.3.34's dispatch table has no entry for
+    `0xd84`, so it falls back to the Graviton4 `neoversev2` kernel. Graviton5 wins anyway,
+    on microarchitecture alone, while running someone else's kernel — unclaimed headroom
+    sitting in a future OpenBLAS, not something this project can fix.
+  - **The Graviton3 SVE uplift replicates**: 1.22–1.23× on DGEMM at 2 vCPU and again at
+    16 vCPU with 4× the problem size, across three separate instances.
+  - **Graviton3E (hpc7g) is the cleanest controlled comparison in the set** — identical
+    CPU part `0xd40`, identical 16 physical cores, identical 256-bit SVE as c7g.4xlarge.
+    AWS's ~35% higher-vector-performance claim **holds and is exceeded** on BLAS3
+    (**1.53× DGEMM, 1.54× SGEMM**) while buying only 1.03× on the DFT calculation. See the
+    two corrections below: the mechanism is **not** a wider vector unit, and the
+    cost-per-calculation figure is not a verdict on the family.
+  - **D3 across the whole sweep:** all 24 configurations returned one energy per cell size
+    (−5.940776 eV/atom at 16 atoms, −5.942215 at 54), the former still matching the local
+    Apple-silicon run to the last printed digit.
+
+### Corrected (2026-08-19)
+- **"SVE2 is marginally *behind* the NEON path on Graviton4" was over-reading noise.** The
+  claim published a day earlier rested on a 0.98× ratio with nothing to compare it against.
+  Adding a **no-SVE control (c6g / Graviton2)** settled it: there, `auto` and pinned
+  `neoversen1` select the *literally identical kernel* and still differ by **0.980×**, so
+  ~2% is this harness's ordering/noise floor (the `auto` leg runs first, on a colder cache).
+  Every SVE2 measurement — both generations, both sizes — sits at 0.980–0.982×, i.e. exactly
+  the control. The corrected claim is a **bounded null**: on Graviton4 and Graviton5, SVE2
+  delivers no benefit *and* no penalty, within ±2%. Graviton3's 1.22–1.23× is ten times that
+  floor and unaffected. The control was the cheapest leg of the sweep and the only one that
+  changed a conclusion — a reminder that D3's "verify, don't assert" applies to our own
+  measurements, not just to upstream packages.
+
+### Corrected (Graviton3E, 2026-08-19)
+- **The hpc7g advantage is not a wider vector unit, and we can now say what it is.** Prompted
+  by the reasonable question "doesn't the 3E have a wider vector unit?", pinning the kernel
+  decomposed the 1.53× BLAS3 gain by ISA path — and it is **not vector-specific**: NEON-only
+  kernels gain 1.51–1.59×, SVE kernels 1.53–1.54× (SVE/NEON = 0.96 DGEMM, 1.02 SGEMM). The
+  vector *width* is measurably identical too — same CPU part `0xd40`, same 256-bit VL via
+  `prctl` — and AWS's own HPC blog confirms Graviton3E "implement[s] Scalable Vector Extension
+  (SVE) of the Neoverse V1 architecture", i.e. the same core as Graviton3. AWS's 35% claim is
+  about vector-instruction *performance*, not width.
+  The supported mechanism instead: **every hpc7g size is the same machine at the same price**
+  (verified against the pricing API — 4xlarge/8xlarge/16xlarge are all $1.6832/hr with 128 GiB
+  and 200 Gbps), so hpc7g.4xlarge is a 64-core node with 48 cores off, giving ~4× the memory
+  bandwidth per core of c7g.4xlarge. That explains a broad ~1.5× on an n=6144 GEMM (~900 MB
+  streaming working set) *and* explains the SCF not benefiting (54 atoms is latency/FFT-bound,
+  not bandwidth-bound). This supersedes yesterday's "we did not establish the mechanism", whose
+  stated objection — that bandwidth should have sped up DFT too — was itself the error: it
+  assumed DFT is bandwidth-hungry generically without checking the two working-set sizes.
+- **…and the hpc7g cost-per-calculation figure is not a verdict on hpc7g.** Because all sizes
+  cost the same, benchmarking the 4xlarge means paying for 64 cores and using 16. The measured
+  2.83×-worse cost per SCF is a fair number for the instance rented and an unfair one for the
+  family; at the same $1.6832/hr, hpc7g.16xlarge offers 4× the cores. The operational lesson is
+  worth more than the benchmark: **on hpc7g, always take the largest size.** Not corrected by
+  re-measuring — whether a 54-atom gpaw SCF thread-scales to 64 cores is a separate experiment,
+  and this bench runs serial gpaw with threaded BLAS.
+
+### Changed (benchmark harness now uses the spore.host tools)
+- **`aws_bench.sh` delegates discovery to `truffle` and lifecycle to `spawn`** instead of
+  hand-rolling both. The hand-rolled versions produced three of the four bugs recorded
+  under "Fixed (benchmark harness)" below, and each is now structurally impossible rather
+  than merely patched:
+  - a pinned subnet id plus a region read from `$AWS_REGION` → `InvalidSubnetID.NotFound`;
+    `spawn` creates and tags its own VPC/subnet.
+  - a hand-maintained per-family region/AZ table; `truffle find` reports offered AZs, so
+    the harness now *derives* that hpc7g is us-east-1a-only, and `truffle spot` returning
+    no JSON is what tells it the family has no spot market.
+  - a cleanup trap whose instance id was lost to `set -e` frame unwinding; `spawn --ttl`
+    puts the timer on the instance, where a dead launcher cannot defeat it.
+- One call to `truffle spot --show-savings` also replaces the hand-rolled pricing-API loop,
+  returning spot and on-demand price together. Noted in-code: `spawn launch --estimate-only`
+  reports a rounder figure ($0.1000/hr for a c8g.large that truffle and the pricing API both
+  put at $0.07976) — fine as a pre-flight cost warning, wrong for a published ratio.
+- **SSM stays the results channel** even under `spawn` (which also offers SSH), and
+  `LAUNCHER=awscli` forces a pure aws-cli path, so a third party can reproduce the numbers
+  with no key material, no inbound ports and no spore.host tools installed.
+- New subcommands: `discover <type>` (facts + pricing, launches nothing) and `audit`
+  (leak check via `spawn orphans --all-regions` plus a tag scan across both regions).
+
 ## 2026-08-18
 
 ### Added
@@ -110,7 +196,8 @@ versioned per-image (date + content-hash tags); this records project-level miles
     is within noise of, and marginally behind, the NEON-only path. Recorded as measured
     rather than explained; we did not determine whether that is the 4×128-bit geometry
     (vs Graviton3's 2×256-bit, both measured via `prctl(PR_SVE_GET_VL)`) or an
-    under-tuned kernel.
+    under-tuned kernel. **("marginally behind" is superseded — a no-SVE control run the
+    next day showed that was the harness noise floor. See 2026-08-19 → Corrected.)**
   - **D3 applied to dispatch:** all six kernel configurations returned an identical
     −5.940776 eV/atom, matching the Apple-silicon run to the last digit. A faster
     kernel that changes the answer is worthless.

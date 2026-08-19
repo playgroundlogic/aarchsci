@@ -29,14 +29,19 @@ import sys
 import time
 
 CORETYPES = ["auto", "neoversen1", "armv8"]
-GEMM_N = 3072
-GEMM_REPS = 5
-# 2x2x2 repeat of the 2-atom diamond cell. Sized so a 2-vCPU Graviton spends tens
-# of seconds in the SCF loop rather than in setup — the 2-atom cell that D3 uses
-# finishes in 0.25s, which measures process startup, not the science.
-SI_REPEAT = 2
-SI_CUTOFF = 400
-SI_KPTS = 2
+# Sizes are env-overridable so the same script can scale from a 2-vCPU instance to a
+# 16-vCPU one. A benchmark whose problem fits in 2 cores tells you very little about 16,
+# and the reverse wastes an hour. This earned its keep: the "SVE2 does nothing on
+# Graviton4" null was first seen at 2 vCPU, and only re-running it at 16 vCPU with 4x the
+# problem established that it was a property of the kernel and not of the problem size.
+GEMM_N = int(os.environ.get("AARCHSCI_GEMM_N", 3072))
+GEMM_REPS = int(os.environ.get("AARCHSCI_GEMM_REPS", 5))
+# NxNxN repeat of the 2-atom diamond cell. Sized so the host spends tens of seconds in
+# the SCF loop rather than in setup — the 2-atom cell that D3 uses finishes in 0.25s,
+# which measures process startup, not the science.
+SI_REPEAT = int(os.environ.get("AARCHSCI_SI_REPEAT", 2))
+SI_CUTOFF = int(os.environ.get("AARCHSCI_SI_CUTOFF", 400))
+SI_KPTS = int(os.environ.get("AARCHSCI_SI_KPTS", 2))
 
 
 # ---------------------------------------------------------------- host identity
@@ -209,6 +214,8 @@ def main():
         "cpuinfo": cpuinfo_facts(),
         "sve_vector_bits": sve_vector_length_bits(),
         "image": os.environ.get("AARCHSCI_IMAGE", "unknown"),
+        "sizes": {"gemm_n": GEMM_N, "gemm_reps": GEMM_REPS, "si_repeat": SI_REPEAT,
+                  "si_cutoff": SI_CUTOFF, "si_kpts": SI_KPTS},
     }
     print("RESULT " + json.dumps(host), flush=True)
     print(f"[bench] host: {host['cpuinfo'].get('implementer')}/"
