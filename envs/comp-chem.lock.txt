@@ -1,6 +1,6 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.08.20   Builder: bcd04ee
-# lock-hash: 08446bb3572a   packages: 207
+# Source spec: envs/comp-chem.yaml   Built: 2026.08.21   Builder: 0a696c4
+# lock-hash: e05d84c39a48   packages: 207
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -131,7 +131,7 @@ mrcfile 1.5.4
 msgpack-python 1.2.1
 multicharge 0.5.0
 munkres 1.1.4
-narwhals 2.24.0
+narwhals 2.25.0
 ncurses 6.6
 netcdf4 1.7.4
 networkx 3.6.1
@@ -174,7 +174,7 @@ pytz 2026.3.post1
 qhull 2020.2
 rdkit 2026.03.5
 readline 8.3
-reportlab 5.0.0
+reportlab 5.0.1
 rlpycairo 0.4.0
 s2n 1.7.6
 scikit-learn 1.9.0
