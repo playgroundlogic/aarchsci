@@ -1,6 +1,6 @@
 # climate — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/climate.yaml   Built: 2026.08.20   Builder: bcd04ee
-# lock-hash: 0991d115a246   packages: 248
+# Source spec: envs/climate.yaml   Built: 2026.08.21   Builder: 0a696c4
+# lock-hash: 3cfa5f0cb82d   packages: 248
 # Regenerate with: ./builder/build-env.sh climate
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -168,7 +168,7 @@ matplotlib-base 3.11.1
 metpy 1.7.1
 msgpack-python 1.2.1
 munkres 1.1.4
-narwhals 2.24.0
+narwhals 2.25.0
 ncurses 6.6
 netcdf-fortran 4.6.3
 netcdf4 1.7.4
