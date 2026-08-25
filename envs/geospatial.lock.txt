@@ -1,6 +1,6 @@
 # geospatial — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geospatial.yaml   Built: 2026.08.20   Builder: bcd04ee
-# lock-hash: 397148b6f58a   packages: 124
+# Source spec: envs/geospatial.yaml   Built: 2026.08.25   Builder: d2617af
+# lock-hash: 07860135e123   packages: 124
 # Regenerate with: ./builder/build-env.sh geospatial
 _openmp_mutex 4.5
 affine 3.0.0
@@ -50,12 +50,12 @@ libexpat 2.8.1
 libffi 3.7.0
 libfreetype 2.14.3
 libfreetype6 2.14.3
-libgcc 16.1.0
-libgcc-ng 16.1.0
+libgcc 16.2.0
+libgcc-ng 16.2.0
 libgdal-core 3.12.4
-libgfortran 16.1.0
-libgfortran5 16.1.0
-libgomp 16.1.0
+libgfortran 16.2.0
+libgfortran5 16.2.0
+libgomp 16.2.0
 libhwy 1.4.0
 libiconv 1.18
 libjpeg-turbo 3.2.0
@@ -73,8 +73,8 @@ librttopo 1.1.0
 libspatialite 5.1.0
 libsqlite 3.53.4
 libssh2 1.11.1
-libstdcxx 16.1.0
-libstdcxx-ng 16.1.0
+libstdcxx 16.2.0
+libstdcxx-ng 16.2.0
 libtiff 4.7.2
 libuuid 2.42.2
 libwebp-base 1.6.0
@@ -115,7 +115,7 @@ snappy 1.2.2
 snuggs 1.4.7
 sqlite 3.53.4
 svt-av1 4.2.0
-tifffile 2026.7.31
+tifffile 2026.8.23
 tk 8.6.13
 tzdata 2026c
 uriparser 0.9.8
