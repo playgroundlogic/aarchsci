@@ -1,6 +1,6 @@
 # earth-observation — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/earth-observation.yaml   Built: 2026.08.21   Builder: 0a696c4
-# lock-hash: 5f605986383c   packages: 260
+# Source spec: envs/earth-observation.yaml   Built: 2026.08.25   Builder: d2617af
+# lock-hash: 27d0d5bf7878   packages: 260
 # Regenerate with: ./builder/build-env.sh earth-observation
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -105,12 +105,12 @@ libexpat 2.8.1
 libffi 3.7.0
 libfreetype 2.14.3
 libfreetype6 2.14.3
-libgcc 16.1.0
-libgcc-ng 16.1.0
+libgcc 16.2.0
+libgcc-ng 16.2.0
 libgdal-core 3.12.4
-libgfortran 16.1.0
-libgfortran5 16.1.0
-libgomp 16.1.0
+libgfortran 16.2.0
+libgfortran5 16.2.0
+libgomp 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
 libgrpc 1.82.1
@@ -137,8 +137,8 @@ librttopo 1.1.0
 libspatialite 5.1.0
 libsqlite 3.53.4
 libssh2 1.11.1
-libstdcxx 16.1.0
-libstdcxx-ng 16.1.0
+libstdcxx 16.2.0
+libstdcxx-ng 16.2.0
 libthrift 0.22.0
 libtiff 4.7.2
 libutf8proc 2.11.3
@@ -239,7 +239,7 @@ sqlite 3.53.4
 stackstac 0.5.1
 svt-av1 4.2.0
 tblib 3.2.2
-tifffile 2026.7.31
+tifffile 2026.8.23
 tk 8.6.13
 toolz 1.1.0
 tornado 6.5.8
