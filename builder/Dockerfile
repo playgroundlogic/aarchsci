@@ -8,8 +8,9 @@
 #
 # DIVERGENCE (D3): the smoke test is COPIED INTO the image, not just run at build
 # time. Verification then travels with the artifact — anyone who pulls the image
-# can re-run `python /opt/aarchsci/smoke.py` and re-earn the "verified" claim. The
-# builder runs it during the build and refuses to tag if it fails.
+# can re-run `python /opt/aarchsci/smoke.py` (or `Rscript /opt/aarchsci/smoke.R`, for
+# an env with no Python) and re-earn the "verified" claim. The builder runs it during
+# the build and refuses to tag if it fails.
 #
 # Base: micromamba (multi-arch). On a NATIVE arm64 host this resolves the
 # linux-aarch64 conda-forge packages with NO emulation (D1).
@@ -20,6 +21,10 @@ FROM mambaorg/micromamba:${MAMBA_VERSION}
 ARG ENV_NAME
 ARG ENV_FILE=${ENV_NAME}.yaml
 ARG SMOKE_FILE=${ENV_NAME}.smoke.py
+# The in-image name, and thus the interpreter a consumer reaches for. build-env.sh
+# derives both from the spec's smoke-test extension: `smoke.py` (nine envs) or
+# `smoke.R` (the `r` env, whose base has no Python to run a .py with).
+ARG SMOKE_DEST=smoke.py
 
 # Provenance (mirrors aarchbio D6): trace any tag back to its committed spec + the
 # builder commit that produced it.
@@ -68,7 +73,7 @@ RUN for rc in /opt/conda/bin.*/GMXRC.bash; do \
 ENV PATH=/opt/conda/bin:$PATH
 
 # Bake the D3 smoke test in so verification is reproducible by any consumer.
-COPY ${SMOKE_FILE} /opt/aarchsci/smoke.py
+COPY ${SMOKE_FILE} /opt/aarchsci/${SMOKE_DEST}
 
 # Override misleading labels inherited from the micromamba base.
 LABEL org.opencontainers.image.title="${ENV_NAME}" \

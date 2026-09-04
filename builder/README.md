@@ -18,8 +18,8 @@ This is the aarchbio builder adapted across the four design divergences:
 ## Files
 
 - `Dockerfile` — `micromamba install -f <env>.yaml` on a multi-arch base; **bakes
-  the smoke test into the image** (`/opt/aarchsci/smoke.py`) so verification travels
-  with the artifact; stamps provenance labels.
+  the smoke test into the image** (`/opt/aarchsci/smoke.py`, or `smoke.R` for an env
+  with no Python) so verification travels with the artifact; stamps provenance labels.
 - `build-env.sh` — the builder: build `--platform linux/arm64` (native, no QEMU on
   an arm64 host) → read the **actually-resolved** package set from the finished
   image → run the in-image **D3 smoke test** (refuse to tag if it fails) → write the
@@ -53,6 +53,13 @@ no push — unless the env:
 
 The smoke test is also baked into the image, so any consumer can re-run it:
 `docker run --rm <image> python /opt/aarchsci/smoke.py`.
+
+**The test's language follows the env, not the builder.** `build-env.sh` looks for
+`envs/<name>.smoke.py` first, then `envs/<name>.smoke.R`, and runs it with `python` or
+`Rscript` respectively. This exists because the `r` env has no Python in it at all, and
+adding one purely to run a `.py` would have meant verifying the wrong interpreter. To add
+an env in another language, add the extension here and in the Dockerfile's `SMOKE_DEST`
+— nothing else in the pipeline cares.
 
 ## Versioning + the lock (OQ2 / OQ4)
 

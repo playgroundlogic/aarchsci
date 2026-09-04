@@ -99,6 +99,18 @@ Therefore every build MUST, inside the arm64 image:
 "Solves" is necessary but not sufficient. The smoke test is the trust the name
 "verified" earns.
 
+**Amended 2026-09-04 (the `r` env):** D3 says nothing about what *language* the smoke
+test is written in, and the builder used to assume Python — `smoke.py`, run by `python`.
+That held for nine envs and broke on the tenth: `r-base` brings no Python at all.
+Installing one purely so the test could run would have verified the wrong interpreter
+and inflated the one env whose appeal is a small, fast-starting image. So the test's
+language now follows the env: `builder/build-env.sh` looks for `envs/<env>.smoke.py`
+then `envs/<env>.smoke.R` and picks `python` or `Rscript` accordingly. The contract is
+unchanged — install, load every headline package, do real work, refuse to tag on
+failure — and the consumer promise is unchanged in shape, just `Rscript
+/opt/aarchsci/smoke.R` for that env. Point 2 above should be read as "load", not
+"`import`".
+
 ### D4 — Scope: CPU scientific stack only; GPU is out (hardware, not packaging)
 
 The fieldwork GPU stage (SAM / PyTorch on `g5`) is **out of scope** — and not

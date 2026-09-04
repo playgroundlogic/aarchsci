@@ -25,6 +25,8 @@ headline package AND pass a functional smoke test (reproject a point with PROJ,
 GEOS geometry ops, write+read a GeoTIFF through rasterio and raw GDAL, round-trip
 a GeoJSON through fiona). The smoke test is baked into the image:
 `docker run --rm quay.io/aarchsci/geospatial:latest python /opt/aarchsci/smoke.py`.
+The test's language follows the env, not the builder: the `r` env has no Python, so its
+verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
 
 ## Use it
 
@@ -55,6 +57,12 @@ a GeoJSON through fiona). The smoke test is baked into the image:
     is `gmx_mpi`, not `gmx`, and conda-forge builds it `ARM_NEON_ASIMD`, so it uses NEON
     and leaves SVE/SVE2 idle on Graviton 3+. `pmemd` is not included — paid Amber
     licence only).
+  - `r` (328 pkgs — R 4.5.3 + tidyverse, data.table, arrow, sf, terra, glmnet,
+    randomForest, caret, knitr/rmarkdown with pandoc, ragg, Rcpp; the catalog's first
+    non-Python env, so its verification is `Rscript /opt/aarchsci/smoke.R`. Pinned to
+    the R 4.5 line on purpose: r-base reaches 4.6.1 on arm64 but ZERO of conda-forge's
+    3162 linux-aarch64 `r-*` packages have an r46 build, and `r-base=4.6.1 r-tidyverse`
+    does not solve at all).
   - `viz` (245 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
@@ -119,8 +127,8 @@ packaging one), bioinformatics (that's aarch.bio), and compiling from source
 
 ## Facts
 
-- 9 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
-  comp-chem, dft, md, viz) — native arm64, verified (assemble+import+functional) +
+- 10 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+  comp-chem, dft, md, viz, r) — native arm64, verified (assemble+import+functional) +
   signed + public.
 - `dft` (gpaw, siesta, psi4, ase, libxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy,
   pymatgen) and `md` (gromacs, lammps, ambertools) are MPI-parallel; their verification

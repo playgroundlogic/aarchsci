@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">9</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz</div>
+                    <div class="stat-num green">10</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -390,6 +390,35 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   pillow &mdash; which had no part in drawing it &mdash; and proves the frame contains
                   real geometry rather than a blank background. No GPU needed; a display <em>is</em>
                   (Xvfb ships in the image).
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">r</span><br>
+                  <strong>328 packages</strong> &mdash; R for scientific work, the catalog's first non-Python env
+                </p>
+                <div class="catalog">
+                    <span class="chip">R 4.5.3</span>
+                    <span class="chip">tidyverse</span>
+                    <span class="chip">data.table</span>
+                    <span class="chip">arrow</span>
+                    <span class="chip">sf</span>
+                    <span class="chip">terra</span>
+                    <span class="chip">glmnet</span>
+                    <span class="chip">randomForest</span>
+                    <span class="chip">caret</span>
+                    <span class="chip">knitr / rmarkdown</span>
+                    <span class="chip">Rcpp</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  Being non-Python changes the verification, not the standard: this env's smoke
+                  test is <code>Rscript /opt/aarchsci/smoke.R</code>, and it still has to do real
+                  work &mdash; reproject through PROJ, write and re-read a GeoTIFF and a
+                  GeoPackage through GDAL, round-trip Parquet, recover a known sparse signal with
+                  glmnet, render a 400&times;300 PNG and decode its header back, and
+                  <em>compile</em> C++ through <code>Rcpp::sourceCpp()</code>.
+                  Pinned to the R&nbsp;4.5 line deliberately: <code>r-base</code> reaches 4.6.1 on
+                  arm64, but <strong>zero</strong> of conda-forge's 3162 <code>r-*</code> packages
+                  have an r46 build, and <code>r-base=4.6.1 r-tidyverse</code> does not solve at
+                  all. Newest is not always usable.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

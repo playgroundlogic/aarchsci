@@ -30,11 +30,24 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 ENV_DIR="$ROOT/envs"
 ENV_FILE="$ENV_DIR/${ENV_NAME}.yaml"
-SMOKE_FILE="$ENV_DIR/${ENV_NAME}.smoke.py"
 LOCK_FILE="$ENV_DIR/${ENV_NAME}.lock.txt"
 
-[ -f "$ENV_FILE" ]   || { echo "[build] ERROR: no env spec at $ENV_FILE" >&2; exit 2; }
-[ -f "$SMOKE_FILE" ] || { echo "[build] ERROR: no smoke test at $SMOKE_FILE (D3 requires one)" >&2; exit 2; }
+[ -f "$ENV_FILE" ] || { echo "[build] ERROR: no env spec at $ENV_FILE" >&2; exit 2; }
+
+# The smoke test's LANGUAGE follows the env, not the builder. Every env through the
+# ninth was Python-centric, so `smoke.py` run by `python` was a safe hardcode. The `r`
+# env broke it: its base has no Python at all, and adding one purely so the test could
+# run would have meant testing the wrong interpreter — and inflating an env whose whole
+# appeal is a small, fast-starting image. So the extension picks the runner. All nine
+# existing envs keep `.smoke.py` and are unaffected.
+if   [ -f "$ENV_DIR/${ENV_NAME}.smoke.py" ]; then
+  SMOKE_FILE="$ENV_DIR/${ENV_NAME}.smoke.py"; SMOKE_DEST="smoke.py"; SMOKE_RUNNER="python"
+elif [ -f "$ENV_DIR/${ENV_NAME}.smoke.R" ];  then
+  SMOKE_FILE="$ENV_DIR/${ENV_NAME}.smoke.R";  SMOKE_DEST="smoke.R";  SMOKE_RUNNER="Rscript"
+else
+  echo "[build] ERROR: no smoke test at $ENV_DIR/${ENV_NAME}.smoke.{py,R} (D3 requires one)" >&2
+  exit 2
+fi
 
 # Provenance: link any tag back to the committed spec + builder commit.
 SOURCE_SPEC="https://github.com/playgroundlogic/aarchsci/blob/main/envs/${ENV_NAME}.yaml"
@@ -58,6 +71,8 @@ docker buildx build \
   --build-arg ENV_NAME="$ENV_NAME" \
   --build-arg SOURCE_SPEC="$SOURCE_SPEC" \
   --build-arg BUILDER_GIT_SHA="$GIT_SHA" \
+  --build-arg SMOKE_FILE="$(basename "$SMOKE_FILE")" \
+  --build-arg SMOKE_DEST="$SMOKE_DEST" \
   -f "$HERE/Dockerfile" \
   -t "$TMP_IMAGE" \
   --load \
@@ -95,10 +110,11 @@ HASH_TAG="s${LOCK_HASH}"
 echo "[build] lock-hash: ${LOCK_HASH}  (tag ${HASH_TAG})"
 
 # --- 3. D3 smoke test: prove ASSEMBLE + IMPORT + FUNCTION, not just solve ----
-# The image already carries /opt/aarchsci/smoke.py. Run it on the target arch; a
+# The image already carries /opt/aarchsci/${SMOKE_DEST}. Run it on the target arch; a
 # non-zero exit here is fatal — we will NOT tag an env that doesn't actually work.
 echo "[build] running D3 smoke test (assemble + import + functional) on ${PLATFORM} ..."
-if ! docker run --rm --platform "$PLATFORM" "$TMP_IMAGE" python /opt/aarchsci/smoke.py; then
+echo "[build]   ${SMOKE_RUNNER} /opt/aarchsci/${SMOKE_DEST}"
+if ! docker run --rm --platform "$PLATFORM" "$TMP_IMAGE" "$SMOKE_RUNNER" "/opt/aarchsci/${SMOKE_DEST}"; then
   echo "[build] ERROR: smoke test FAILED — env solved but does not assemble/work on ${PLATFORM}." >&2
   echo "[build]        Refusing to tag. This is exactly the fieldwork failure (D3)." >&2
   docker rmi "$TMP_IMAGE" >/dev/null 2>&1 || true
@@ -132,6 +148,8 @@ if [ "${PUSH:-0}" = "1" ]; then
     --build-arg ENV_NAME="$ENV_NAME" \
     --build-arg SOURCE_SPEC="$SOURCE_SPEC" \
     --build-arg BUILDER_GIT_SHA="$GIT_SHA" \
+    --build-arg SMOKE_FILE="$(basename "$SMOKE_FILE")" \
+    --build-arg SMOKE_DEST="$SMOKE_DEST" \
     -f "$HERE/Dockerfile" \
     -t "$DATE_IMAGE" \
     -t "${REGISTRY}/${ENV_NAME}:${HASH_TAG}" \

@@ -7,7 +7,7 @@ Sister project to [aarchbio](https://github.com/playgroundlogic/aarchbio) (which
 does this for bioinformatics / BioContainers). aarch.science covers the layer
 aarchbio scopes out: the **conda-forge** scientific stack.
 
-> **Status:** live. **9 verified, signed, public env images** on
+> **Status:** live. **10 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -57,6 +57,7 @@ a date (`2026.06.26`), and a content-addressed `s<lock-hash>`.
 | [`dft`](envs/dft.yaml) | 237 | gpaw, siesta, psi4, nwchem, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 227 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
 | [`viz`](envs/viz.yaml) | 245 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
+| [`r`](envs/r.yaml) | 328 | R 4.5 + tidyverse, data.table, arrow, sf, terra, glmnet, randomForest, caret, knitr/rmarkdown + pandoc, Rcpp |
 
 `dft` and `md` are the MPI-parallel envs, so their verification goes further than the
 others': the smoke tests run the same calculation serially and again under

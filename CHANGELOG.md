@@ -5,6 +5,63 @@ versioned per-image (date + content-hash tags); this records project-level miles
 
 ## 2026-09-04
 
+### Added — an `r` env, the catalog's 10th and its first non-Python one (issue #8)
+- **`r` — 328 packages, lock-hash `s813f6d1c2008`.** R 4.5.3 plus `r-recommended`, the
+  tidyverse, `data.table`, `arrow`, `sf`/`terra`, `glmnet`/`randomForest`/`caret`,
+  `knitr`/`rmarkdown`, `ragg` and `Rcpp`. Every D3 check passed on the first build.
+- **The request's central premise was wrong, and checking it cost nothing.** Issue #8
+  reported that `r-essentials` and `r-tidyverse` have "no linux-aarch64 build at all", so
+  the env would have to be `r-base` plus hand-picked CRAN packages. Both exist and both
+  solve on arm64 — they are `noarch` metapackages, absent from the `linux-aarch64` subdir
+  precisely *because* they install everywhere. `r-base r-tidyverse` → 200 packages,
+  `r-essentials` → 398. **Lesson worth keeping: a platform-subdir listing is not an
+  availability check.** We take `r-tidyverse` and not `r-essentials`, since the latter is
+  tidyverse + recommended + a Jupyter kernel stack, and a kernel in an image with no
+  notebook server is 90-odd packages of nothing.
+- **What the request got right in spirit and wrong in direction: the version.** It asked
+  for `r-base` 4.6.1, which is genuinely the newest on arm64. Pinning it would have
+  produced an R with no CRAN ecosystem: of the **3162 `r-*` packages installable on
+  linux-aarch64, exactly zero have an `r46` build.** The whole CRAN layer is built against
+  R 4.5 (`r45`) or older. This is not a preference — `r-base=4.6.1 r-tidyverse` **does not
+  solve at all**. So the spec pins `r-base >=4.5,<4.6` and says why.
+  - Checked before recording it as a gap: linux-64, osx-64, osx-arm64, win-64 and
+    linux-ppc64le show the same `r34..r45` families with no `r46`, and the 2542 `noarch`
+    r-* packages are platform-independent by construction and likewise r45-max. It is a
+    **channel-wide migration that has not run**, so it belongs in the spec as a pin, not
+    in `GAPS.md` — the same call made for `paraview`'s hdf5 soname bug.
+- **`pandoc` is in the spec even though it is not an R package**, because nothing pulls it
+  and without it `rmarkdown::render()` cannot produce HTML or PDF at all — only
+  `knitr::knit()` keeps working. Shipping rmarkdown without pandoc would be shipping the
+  half that looks installed. The smoke test renders an actual HTML document to prove it.
+- **`GAPS.md` records the project's first gap that is a percentage rather than a list.**
+  729 of the 3891 `r-*` packages usable on linux-64 have no arm64 build — 18.7%, the
+  largest absolute gap recorded here, and the env ships anyway because it is a long tail:
+  of 73 well-known R packages, 58 have arm64 builds. The 12 that don't include `r-duckdb`,
+  `r-torch`, `r-prophet`, `r-rpostgres` and `r-exactextractr`. The arithmetic that makes
+  this survivable is that **2542 of the 3162 usable packages are `noarch`** — most of CRAN
+  in conda-forge is pure R and therefore arm64-native for free.
+- Incidental but telling: `r` resolves **libgdal-core 3.13.3** while the four geo envs are
+  still held at 3.12.4. `r-sf`/`r-terra` link libgdal directly and never touch
+  `imagecodecs`, which is what pins the Python side back
+  (`conda-forge/imagecodecs-feedstock#166`). Evidence that the blocker lives in the Python
+  bindings layer, not in GDAL on arm64.
+
+### Changed — the D3 smoke test's language now follows the env (builder)
+- `builder/build-env.sh` looked for `envs/<env>.smoke.py` and ran it with `python`. That
+  was a safe hardcode for nine Python-centric envs and wrong for the tenth: `r-base`
+  brings no Python. It now resolves `.smoke.py` → `python` or `.smoke.R` → `Rscript`, and
+  passes the in-image filename to the Dockerfile as `SMOKE_DEST`. All nine existing envs
+  are untouched.
+- Rejected alternative, recorded because it was tempting: add `python` to the `r` env so
+  the existing machinery worked. That would have verified the wrong interpreter and
+  inflated the one env whose appeal is a small, fast-starting image. `DESIGN.md` D3 is
+  amended accordingly — point 2 reads "load", not "`import`".
+- One thing the R port surfaced about the idiom itself: a `warning=` handler in R's
+  `tryCatch` **unwinds at the first warning**, leaving the rest of a check unexecuted
+  while still reporting `ok` — the same vacuous-pass shape that nearly let `dft` ship a
+  serial gpaw. `envs/r.smoke.R` uses `withCallingHandlers` + `invokeRestart` so warnings
+  print and execution continues.
+
 ### Added — `nwchem` in `dft`, a fourth ab-initio engine (issue #7)
 - **`dft` goes 225 → 237 packages** and gains NWChem 7.3.1. It joins the existing env
   rather than getting its own because all 30 of its `linux-aarch64` builds are

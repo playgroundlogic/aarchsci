@@ -61,12 +61,13 @@ nothing. See `envs/dft.yaml`.
 | **assemble-gap** | 1 | `whitebox` — solves, imports, but fetches an amd64 binary at runtime (wontfix); see below |
 | **MPI-flavor conflict** | 1 | `abinit` — has an arm64 build, solves standalone, but MPICH-only (stuck); see below |
 | **python-ABI collision** | 1 | `psi4` in `comp-chem` — no py313 arm64 build; relocated to `dft` (py314) instead of downgrading 13 packages. Not a gap in any shipping image; see below |
+| **solve-gap (R/CRAN layer)** | 729 | Counted separately because it is a *coverage* measurement, not a list of probed candidates: 729 of the 3891 `r-*` packages installable on linux-64 have no arm64 build. 18.7%, and the `r` env ships anyway. See "The R layer" below |
 
 **The curated science head is near-complete on arm64.** This is still the real
 finding, and it's the inverse of the pip experience: the exact stack that fails
 `No matching distribution found for rasterio` on PyPI solves *and* assembles cleanly
-on conda-forge. Nine envs ship verified (geospatial, earth-observation, geo-ml,
-climate, pointcloud, comp-chem, dft, md, viz), and every headline package in all nine
+on conda-forge. Ten envs ship verified (geospatial, earth-observation, geo-ml,
+climate, pointcloud, comp-chem, dft, md, viz, r), and every headline package in all ten
 assembles and does real work natively.
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
@@ -83,6 +84,49 @@ around them often doesn't.
 `cp2k` remains the one most worth upstream effort — a major plane-wave/Gaussian DFT code,
 entirely absent on `linux-aarch64` while all of those engines have builds. `phono3py` is
 the cheapest, since `phonopy` already builds on arm64. See the neighborhood probe below.
+
+### The R layer — the first gap that is a percentage, not a list (2026-09-04, issue #8)
+
+Every gap above is a named package we probed and declined. R is different: it is a whole
+second package ecosystem, with 3891 `r-*` packages installable on linux-64, so the useful
+question is coverage rather than a list. Measured against conda-forge repodata:
+
+| | linux-64 | linux-aarch64 |
+|---|---:|---:|
+| `r-*` built for the platform | 2249 | **658** |
+| `r-*` `noarch` (serve every platform) | 2542 | 2542 |
+| **usable** | **3891** | **3162** |
+
+So **729 packages (18.7%) are linux-64-only** — by far the largest absolute gap this
+project has recorded, and yet the `r` env ships, because the missing 18.7% is a long
+tail. Of 73 well-known R packages checked by hand, 58 have arm64 builds and 12 do not:
+`r-duckdb`, `r-torch`, `r-prophet`, `r-fable`, `r-umap`, `r-rpostgres`,
+`r-exactextractr`, `r-amelia`, `r-actuar`, `r-bart`, `r-bayesforecast`,
+`r-adehabitathr`. The shape is the same power law the project's scoping rule assumes:
+the head (tidyverse, `sf`/`terra`, `data.table`, `arrow`, `Matrix`/`MASS`/`survival`,
+`glmnet`, `randomForest`, `caret`, `knitr`/`rmarkdown`, `Rcpp`) is all present.
+`r-duckdb` and `r-exactextractr` are the two most worth upstream effort — both are
+current, widely used, and have no arm64 blocker beyond the feedstock not enabling it.
+
+Note the arithmetic that makes this survivable: **2542 of the 3162 usable packages are
+`noarch`**, which is to say most of CRAN in conda-forge is pure R and therefore
+arm64-native for free. The 729 gap is almost entirely packages with compiled code.
+
+**What is emphatically NOT a gap, though it looks exactly like one.** `r-base` reaches
+4.6.1 on linux-aarch64 while **zero of the 3162 `r-*` packages have an `r46` build** —
+the whole CRAN layer is built against R 4.5 (`r45`) and older. It would be easy to file
+that as an arm64 hole. It isn't: linux-64, osx-64, osx-arm64, win-64 and linux-ppc64le
+show the identical `r34..r45` families with no `r46`, and the 2542 `noarch` r-* packages
+are platform-independent by construction and likewise r45-max. It is a channel-wide
+migration that has not run yet. So it belongs in `envs/r.yaml` as a version pin
+(`r-base >=4.5,<4.6`) and not in this file — the same discipline applied to `paraview`'s
+hdf5 soname bug, which also breaks identically on linux-64.
+
+It is worth stating what over-pinning would have cost, because the request that started
+this env proposed exactly that: `r-base=4.6.1 r-tidyverse` **does not solve at all**.
+libmamba walks every r-* candidate wanting `r-base >=4.5,<4.6.0a0` (then >=4.4,<4.5, and
+so on down to 3.6) and gives up. Pinning the newest interpreter would have produced an R
+image with no CRAN ecosystem available to it.
 
 Two near-misses caught by the D3 smoke test (and fixed in-spec, not skip-listed)
 are worth recording, because they're precisely the assemble-not-solve trap D3

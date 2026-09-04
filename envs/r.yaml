@@ -1,0 +1,94 @@
+# aarch.science — r environment
+# R for scientific work on arm64: the interpreter, the base+recommended library set R
+# itself ships with, the tidyverse, and a curated layer of the CRAN packages that carry
+# real scientific work (sf/terra for geospatial, arrow/data.table for tabular scale,
+# glmnet/randomForest/caret for modelling, knitr/rmarkdown for reporting).
+#
+# This is the catalog's first non-Python env, which matters for more than taxonomy:
+# `r-base` brings no Python, so the D3 smoke test here is `envs/r.smoke.R` run by
+# `Rscript`, not a `.py` run by `python`. builder/build-env.sh picks the runner from the
+# extension. Adding Python purely to run the test would have verified the wrong
+# interpreter and inflated the one env whose appeal is a small, fast-starting image.
+name: r
+channels:
+  - conda-forge
+dependencies:
+  # --- the interpreter, and the pin that is the whole story of this env ---------
+  # THE PIN IS LOAD-BEARING AND IT IS NOT WHAT ISSUE #8 EXPECTED. `r-base` on
+  # linux-aarch64 goes up to 4.6.1, and that is the version an env request naturally
+  # reaches for. Do not. Measured 2026-09-04 against conda-forge repodata: of the
+  # **3162 distinct `r-*` packages** installable on linux-aarch64, **exactly zero have
+  # an `r46` build.** The entire CRAN tree in this channel is built against R 4.5
+  # (`r45`), 4.4 (`r44`) and older. R 4.6 exists in conda-forge as an interpreter with
+  # no package ecosystem behind it yet.
+  #
+  # That is not a preference, it is mutually exclusive. `r-base=4.6.1 r-tidyverse`
+  # does not solve at all — libmamba reports every r-* candidate wanting
+  # `r-base >=4.5,<4.6.0a0` (and >=4.4,<4.5, and so on down to 3.6) and gives up. So
+  # the failure mode of over-pinning here is loud, but the failure mode of NOT pinning
+  # is silent: a bare `r-base` with no other r-* package in the spec resolves happily
+  # to 4.6.1, and any CRAN package added later drags it back to 4.5.3. Pinning the
+  # 4.5 line states the constraint the ecosystem actually imposes.
+  #
+  # NOT an arm64 gap — checked before writing it down. linux-64, osx-64, osx-arm64,
+  # win-64 and linux-ppc64le all show the same `r34..r45` families and no `r46` for
+  # arch-specific packages, and the noarch r-* set (2542 packages, platform-independent
+  # by construction) is likewise r45-max. It is a channel-wide migration that has not
+  # run yet, so it belongs here as a pin and not in GAPS.md.
+  #
+  # Revisit when conda-forge's r-base 4.6 migration completes; the tell is any r-*
+  # package appearing with an `r46` build string.
+  - r-base >=4.5,<4.6
+  # `r-recommended` is the set R upstream considers part of a working install (MASS,
+  # Matrix, survival, nlme, mgcv, boot, cluster, lattice, ...). Naming it is cheaper and
+  # more honest than listing fifteen packages and getting the list subtly wrong.
+  - r-recommended
+  # --- data wrangling ----------------------------------------------------------
+  # `r-tidyverse` and `r-essentials` are BOTH available on linux-aarch64 and both solve,
+  # against issue #8's premise that neither has an arm64 build. The premise came from
+  # checking the `linux-aarch64` subdir, where they are indeed absent — because they are
+  # `noarch` metapackages, which install on every platform. Verified by solve rather
+  # than by listing: `r-base r-tidyverse` -> 200 packages, `r-essentials` -> 398.
+  #
+  # We take tidyverse and not essentials. essentials is tidyverse plus recommended plus
+  # r-irkernel and a Jupyter stack, and a Jupyter kernel in a container that ships no
+  # notebook server is 90-odd packages of nothing. The two named above cover it.
+  - r-tidyverse
+  - r-data.table
+  - r-arrow
+  # --- geospatial, matching the catalog's geo-first identity -------------------
+  # These are the arm64 assemble risk in this env, and the reason D3 opens a GeoTIFF
+  # here rather than stopping at `library(sf)`: r-sf and r-terra link the same
+  # GDAL/PROJ/GEOS natives that broke fieldwork under pip. They resolve libgdal-core
+  # 3.13.3, proj 9.8.1 and geos 3.14.1.
+  #
+  # Note the GDAL version, which is AHEAD of the four geo envs (3.12.4 there). Those are
+  # held back by conda-forge/imagecodecs-feedstock#166 via the Python gdal/rasterio
+  # chain; r-sf and r-terra link libgdal directly and never touch imagecodecs. Useful
+  # evidence that the blocker is in the Python bindings layer, not GDAL on arm64.
+  - r-sf
+  - r-terra
+  # --- modelling ---------------------------------------------------------------
+  - r-glmnet
+  - r-randomforest
+  - r-caret
+  # --- reporting + interop -----------------------------------------------------
+  # `pandoc` is NOT an r-* package and nothing here pulls it, which is exactly why it
+  # has to be named. Without it `knitr::knit()` still works (.Rmd -> .md) but
+  # `rmarkdown::render()` cannot produce HTML or PDF at all — it shells out to pandoc.
+  # Shipping rmarkdown without pandoc would be shipping the half that looks installed.
+  # conda-forge has pandoc 3.11 for linux-aarch64, so this costs one non-R package.
+  - r-knitr
+  - r-rmarkdown
+  - pandoc
+  # `r-ragg` for raster output. r-base's own `png()` depends on how the build was
+  # configured; ragg is a self-contained AGG device that does not, so a plot written
+  # from a headless container is predictable. Same reasoning as `viz` shipping Xvfb:
+  # the image should carry what "save a figure" actually needs.
+  - r-ragg
+  - r-jsonlite
+  # Rcpp is here deliberately: it is how a large fraction of CRAN gets its speed, and an
+  # R image where `Rcpp::sourceCpp()` cannot compile is a trap on any platform. D3
+  # compiles a C++ function through it, which also proves the image's toolchain works
+  # on aarch64 rather than merely that the package installed.
+  - r-rcpp
