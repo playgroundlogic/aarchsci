@@ -125,12 +125,27 @@ wins on price/perf. (The pip-arm64-wheel gap is a CPU-stack problem anyway.)
   `cpu_h2fc08b2_1` (21 MB) to `cuda_heee54e4_0` (631 MB), and the `mpi_openmpi_*` →
   `nompi_*` slide that the build-string pins in `envs/md.yaml` and `envs/dft.yaml` exist
   to prevent. In both cases `envs/*.lock.txt` would read identically before and after.
-  D3 covers the MPI case (the smoke tests assert the engines really are parallel) but
-  nothing covers the CUDA case, because nothing about it is broken. Recording the build
-  string would fix this properly; it changes every existing lock and every lock-hash, so
-  it is a deliberate migration rather than a quick edit. Until then the mitigation is
-  explicit build-string pins in the spec plus reading solve diffs by hand — see
-  [GAPS.md](GAPS.md), "Bugs D3 caught that are *not* arm64 gaps."
+
+  **This stopped being hypothetical on 2026-09-04, and two claims above needed
+  correcting.** `gpaw` was pinned on version only, and its `py314_nompi_omp_3` and
+  `py314_mpi_openmpi_omp_3` builds are **both build number 3** — so the choice was a tie
+  the resolver could break either way, and by that date it broke toward nompi. The
+  published image had the OpenMPI build; a rebuild would have produced a *serial* `dft`
+  with an identical lock and an identical lock-hash, and OQ4 would have reported no drift.
+  Worse, the sentence "D3 covers the MPI case" was not true for gpaw: a nompi gpaw under
+  `mpiexec -n 2` runs two independent serial calculations, each of which thinks it is rank
+  0 of a 1-rank world, and both print the same energy — so `dft.smoke.py`'s
+  "parallel agrees with serial" assertion passed vacuously. D3 covers it *now*: the child
+  leg asserts `world.size > 1`, and a new check reads the **build strings out of
+  `conda-meta` inside the finished image** and asserts the pinned flavour, which is the
+  one place that identity is still recorded when the lock cannot hold it. Nothing covers
+  the CUDA case, because nothing about it is broken.
+
+  Recording the build string in the lock would fix this properly; it changes every
+  existing lock and every lock-hash, so it is a deliberate migration rather than a quick
+  edit. Until then the mitigation is explicit build-string pins in the spec, the
+  conda-meta assertion in D3, and reading solve diffs by hand — see [GAPS.md](GAPS.md),
+  "Bugs D3 caught that are *not* arm64 gaps."
 - **OQ3 — registry/org: SETTLED.** Naming rule: brand is **aarchsci** everywhere
   it's a free choice; `.science` only in the domain (no `.sci` TLD exists).
   → domain **aarch.science** (secured), registry **quay.io/aarchsci/<env>** (org

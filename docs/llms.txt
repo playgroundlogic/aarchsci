@@ -43,10 +43,13 @@ a GeoJSON through fiona). The smoke test is baked into the image:
   - `comp-chem` (210 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, xtb-python, vina; cheminformatics + MD + quantum chemistry
     + docking).
-  - `dft` (225 pkgs — gpaw, siesta, psi4, ase, libxc, libvdwxc, elpa, scalapack, fftw,
-    openmpi, mpi4py, spglib, phonopy, pymatgen; plane-wave/LCAO density-functional
-    theory, MPI-parallel. Run in parallel with
-    `docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python script.py`).
+  - `dft` (237 pkgs — gpaw, siesta, psi4, nwchem, ase, libxc, libvdwxc, elpa, scalapack,
+    fftw, openmpi, mpi4py, spglib, phonopy, pymatgen; plane-wave/LCAO density-functional
+    theory plus Gaussian-basis quantum chemistry, MPI-parallel. Run in parallel with
+    `docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python script.py`.
+    nwchem is pinned to the `mpi_ts` (two-sided) ARMCI network, which works on 1, 2 and 4
+    ranks with a container's default 64 MB `/dev/shm`; the `mpi_pr` progress-ranks variant
+    aborts on 1 rank and exhausts `/dev/shm` on 3).
   - `md` (227 pkgs — gromacs, lammps, ambertools, openmpi, mpi4py, mdanalysis, mdtraj,
     parmed; classical molecular dynamics, MPI-parallel. Two caveats: the gromacs binary
     is `gmx_mpi`, not `gmx`, and conda-forge builds it `ARM_NEON_ASIMD`, so it uses NEON
@@ -73,10 +76,15 @@ apptainer run geospatial.sif python /opt/aarchsci/smoke.py
 - Use `run`, not `exec`: `run` goes through the image entrypoint, which sources conda's
   `etc/conda/activate.d/*.sh`. `exec` skips it, which costs seven variables
   (`CONDA_PREFIX`, `CONDA_DEFAULT_ENV`, `CONDA_SHLVL`, `CONDA_PROMPT_MODIFIER`,
-  `GSETTINGS_SCHEMA_DIR` + backup, `XML_CATALOG_FILES`) and one `PATH` entry. None of
-  those mattered to the three envs tested — `geospatial`, `dft` and `md` pass under
+  `GSETTINGS_SCHEMA_DIR` + backup, `XML_CATALOG_FILES`) and one `PATH` entry. When first
+  measured (2026-09-04) none of those mattered — `geospatial`, `dft` and `md` passed under
   `exec`, `run` and `run --cleanenv`, including the 2-rank MPI legs. The other six envs
   are untested under Apptainer.
+- **`dft` no longer works under `exec`, as of the nwchem addition.** conda-forge's nwchem
+  has the feedstock build directory compiled in as its default basis-set path and depends
+  on `activate.d/nwchem_env.sh` to set `NWCHEM_BASIS_LIBRARY` from `$CONDA_PREFIX`;
+  unactivated it exits 255 looking for `sto-3g` under `/home/conda/feedstock_root/...`.
+  So `run` is now required for `dft`, not just recommended.
 - The runtime itself is `envs/apptainer.yaml` (apptainer 1.5.3, conda-forge
   linux-aarch64). Install it with conda; it is deliberately not published as an image.
 - `--writable-tmpfs` (fuse-overlayfs) works. A successful run may still print

@@ -5,6 +5,60 @@ versioned per-image (date + content-hash tags); this records project-level miles
 
 ## 2026-09-04
 
+### Added — `nwchem` in `dft`, a fourth ab-initio engine (issue #7)
+- **`dft` goes 225 → 237 packages** and gains NWChem 7.3.1. It joins the existing env
+  rather than getting its own because all 30 of its `linux-aarch64` builds are
+  OpenMPI-flavoured and it needs `openmpi >=5.0.8`, `scalapack >=2.2.0,<2.3`,
+  `libxc >=7 cpu_*` and py314 — every one of which `dft` already resolved to. Joint solve
+  moved not a single existing pin.
+- Unlike siesta, nwchem ships its own data (607 basis-set files), so it gets the full
+  functional treatment: D3 runs a real H2O RHF/STO-3G SCF serially **and** on 2 ranks and
+  requires the two to agree. Measured: −74.963023 Hartree, identical to 9 decimal places
+  across 1, 2 and 4 ranks.
+- **The `_ts` vs `_pr` ARMCI-network choice was settled by measurement, not preference.**
+  With a container's default 64 MB `/dev/shm`: `mpi_ts` is clean on 1/2/4 ranks;
+  `mpi_pr` **aborts on 1 rank** (`ranks per node, must be at least (2)`), reports only
+  `nproc = 1` on 2 ranks because one becomes a data server, and dies on 3 with
+  `check_devshm: /dev/shm out of space`. `_pr` therefore cannot satisfy a
+  serial-vs-parallel contract at all. Pinned `mpi_ts`; the honest tradeoff (upstream
+  prefers `_pr` for large multi-node runs) is recorded in the spec.
+- **`plumed` needed a pin nobody asked for.** It arrives as a required nwchem dependency,
+  and its `mpi_nompi_*` build carries build number 103 against the openmpi build's 3 — so
+  an unpinned solve drops a *serial* plumed into an all-OpenMPI env. Same trap as siesta,
+  one level down and on a package this repo never named. Now `plumed=*=mpi_openmpi*`.
+
+### Fixed — `dft` was one resolver tie away from shipping a serial gpaw
+- Found while joint-solving for nwchem, and it is the more important half of that work.
+  `gpaw >=25.7` was unpinned on build string, and gpaw's `py314_nompi_omp_3` and
+  `py314_mpi_openmpi_omp_3` are **both build number 3**. The published image has the
+  OpenMPI one; a solve today picks the nompi one. Since this repo's lock records
+  `name version` only (DESIGN OQ2's known limitation), that flip does not move the
+  lock-hash — so the daily reconciler would have rebuilt `dft` around a **serial** gpaw
+  and reported no drift. Now pinned `gpaw >=25.7 py*_mpi_openmpi_*`.
+- The smoke test could not have caught it either, and that hole is closed too. A nompi
+  gpaw under `mpiexec -n 2` does not fail: it runs two independent serial calculations,
+  each believing it is rank 0 of a 1-rank world, and both print the same energy — so
+  "parallel agrees with serial" passed while nothing parallel happened. The child leg now
+  asserts `world.size > 1`, and three new checks assert `gpaw.mpi.have_mpi`, that `world`
+  is not a `SerialCommunicator`, and that the **build strings in `conda-meta`** carry the
+  flavour the spec asked for (gpaw/elpa/fftw/libvdwxc/siesta/plumed OpenMPI, nwchem
+  `mpi_ts`) — reading the one piece of identity the lock file cannot record.
+- Corrected a claim in `envs/dft.yaml` while there: `mpi=*=openmpi` does **not** force
+  elpa/fftw/libvdwxc to follow the flavour. gpaw's own openmpi build does, via
+  `elpa * mpi_openmpi_*` and friends. The whole parallel chain hangs off which *gpaw*
+  build gets chosen, which is why that is where the pin belongs.
+
+### Corrected — `apptainer exec` now genuinely breaks one env, and it is `dft`
+- Yesterday's Apptainer measurement said the seven variables lost by `exec` cost nothing
+  in the three envs tested. Adding nwchem changed that, so the docs change with it:
+  conda-forge's nwchem has the **feedstock build directory compiled into the binary** as
+  its default basis-set path and depends on `activate.d/nwchem_env.sh` to set
+  `NWCHEM_BASIS_LIBRARY` from `$CONDA_PREFIX`. Unactivated it exits 255 looking for
+  `sto-3g` under `/home/conda/feedstock_root/build_artifacts/…`. `run` is now *required*
+  for `dft`, not merely the safer default — which is what `run` was documented as
+  future-proofing against, arriving one day later. `README.md` and `docs/llms.txt` say so,
+  and D3 asserts the variable so it cannot regress silently.
+
 ### Added — two envs, taking the catalog to 9 (issues #1–#4)
 - **`md` (227 pkgs)** — classical molecular dynamics: gromacs, lammps and ambertools,
   all OpenMPI, plus mdanalysis/mdtraj/parmed. D3 runs every engine for real: gromacs

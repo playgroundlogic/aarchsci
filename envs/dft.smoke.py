@@ -5,7 +5,8 @@
 # the density-functional-theory stack. The risky natives here are the compiled `_gpaw`
 # extension, libxc/libvdwxc (exchange-correlation), and the parallel layer —
 # OpenMPI + ELPA + ScaLAPACK + FFTW — all of which can solve and import yet fail to
-# actually compute. So we drive real SCF calculations, not just imports.
+# actually compute. So we drive real SCF calculations, not just imports — three
+# independent ones, through gpaw, psi4 and nwchem, which share no integral or SCF code.
 #
 # This env is the first in the catalog whose headline capability is PARALLEL, so D3
 # here also runs the same DFT calculation under `mpiexec -n 2` and asserts the answer
@@ -69,6 +70,16 @@ def si_energy():
 # on stdout from rank 0 so the parent can compare it against the serial result.
 if CHILD:
     from gpaw.mpi import world
+    # This assertion is the whole reason the parallel leg means anything. A nompi gpaw
+    # under `mpiexec -n 2` does not fail — it runs TWO independent serial calculations,
+    # each of which believes it is rank 0 of a 1-rank world, and both print the same
+    # energy. The parent's "parallel matches serial" check would then pass while nothing
+    # parallel had happened. Refusing to proceed unless the communicator is actually
+    # larger than 1 is what closes that hole.
+    assert world.size > 1, (
+        f"child sees world.size={world.size} under mpiexec -n 2 — gpaw is not an MPI "
+        "build (the nompi variant ties on build number; see the pin in dft.yaml)"
+    )
     e = si_energy()
     if world.rank == 0:
         print(f"{e:.6f}")
@@ -87,6 +98,26 @@ HEADLINE = [
     # This line is what the `psi4 >=1.11` floor in dft.yaml protects.
     "psi4",
 ]
+
+# Packages whose conda BUILD STRING carries meaning this repo's lock file cannot record.
+# The lock is `name version` only (DESIGN OQ2), so an MPI-flavor flip does not move the
+# lock-hash and the reconciler cannot see it. Asserting the build string here is the
+# direct mitigation: the check runs inside the built image, against conda-meta, so a
+# resolver that quietly swapped a parallel build for a serial one fails the build.
+# Measured 2026-09-04: `gpaw` really does flip to `py314_nompi_omp_3` unpinned, and
+# `plumed` to a `nompi_*` build, so neither of these is hypothetical.
+BUILD_STRING_MUST_CONTAIN = {
+    "gpaw": "mpi_openmpi",
+    "elpa": "mpi_openmpi",
+    "fftw": "mpi_openmpi",
+    "libvdwxc": "mpi_openmpi",
+    "siesta": "mpi_openmpi",
+    "plumed": "mpi_openmpi",
+    # nwchem's ARMCI network lives in the build string and nowhere else — it is not in
+    # the version, and the binary does not print it. `_pr` cannot run on one rank at
+    # all, so shipping it would break the serial/parallel comparison below.
+    "nwchem": "mpi_ts",
+}
 print("[smoke] 1. imports")
 for mod in HEADLINE:
     @check(f"import {mod}")
@@ -106,6 +137,43 @@ def _native():
     # was the wrong variant, this symbol is the first thing to go missing.
     assert hasattr(_gpaw, "libvdwxc_create"), "libvdwxc not linked into _gpaw"
     print(f"       ({os.path.basename(_gpaw.__file__)}, world.size={world.size})")
+
+
+@check("gpaw is the MPI build, not the nompi one")
+def _gpaw_is_mpi():
+    import gpaw.mpi
+    # Two independent statements of the same fact: the compile-time flag, and the type
+    # of the world communicator (a nompi gpaw hands out a SerialCommunicator).
+    assert getattr(gpaw.mpi, "have_mpi", False), \
+        "gpaw.mpi.have_mpi is False — this is a nompi gpaw and this env's whole premise"
+    assert type(gpaw.mpi.world).__name__ != "SerialCommunicator", \
+        f"gpaw world communicator is {type(gpaw.mpi.world).__name__}, not an MPI one"
+
+
+@check("MPI-flavor build strings are what the spec pinned (conda-meta, not the lock)")
+def _build_strings():
+    import json
+    meta = Path(sys.prefix) / "conda-meta"
+    assert meta.is_dir(), f"no conda-meta at {meta}"
+    seen = {}
+    for pkg, want in sorted(BUILD_STRING_MUST_CONTAIN.items()):
+        recs = []
+        for f in meta.glob(f"{pkg}-*.json"):
+            try:
+                rec = json.loads(f.read_text())
+            except Exception:  # noqa: BLE001
+                continue
+            if rec.get("name") == pkg:
+                recs.append(rec)
+        assert recs, f"{pkg} not installed (no conda-meta record)"
+        build = recs[0].get("build", "")
+        assert want in build, (
+            f"{pkg} build string is {build!r}, expected it to contain {want!r} — the "
+            "resolver swapped the variant and the lock-hash cannot see that"
+        )
+        seen[pkg] = build
+    for pkg in ("gpaw", "nwchem"):
+        print(f"       ({pkg} {seen[pkg]})")
 
 
 @check("PAW datasets resolve from gpaw-data on disk (no runtime download)")
@@ -335,10 +403,123 @@ def _siesta_mpi():
     print(f"       (siesta: Running on {m.group(1)} nodes in parallel)")
 
 
-# --- 6. parallel: the same DFT calculation on 2 ranks -----------------------------
+# --- 6. nwchem ---------------------------------------------------------------------
+# nwchem gets the FULL treatment that siesta cannot get, because unlike siesta it ships
+# its own data: 607 basis-set files under $NWCHEM_BASIS_LIBRARY. So there is a real SCF
+# here, serially and on 2 ranks, with the two answers compared.
+print("[smoke] 6. nwchem (real SCF, serial + 2-rank)")
+
+# H2O at its experimental geometry. RHF/STO-3G on this geometry is -74.963023 Hartree —
+# a small, fast, completely determined number that comes out of an integral/SCF stack
+# with nothing in common with gpaw's or psi4's.
+NWCHEM_INPUT = """echo
+start h2o
+memory total 400 mb
+geometry units angstrom
+  O  0.00000  0.00000  0.11730
+  H  0.00000  0.75720 -0.46920
+  H  0.00000 -0.75720 -0.46920
+end
+basis
+  * library sto-3g
+end
+task scf energy
+"""
+
+NWCHEM_SERIAL = {}
+
+
+def _run_nwchem(argv):
+    """Run nwchem on NWCHEM_INPUT in a fresh directory; return (rc, output).
+
+    nwchem writes its database, movecs and scratch files into the working directory, so
+    each leg gets its own. Output is read as bytes and decoded loosely: nwchem's stdout
+    is not reliably valid UTF-8 when a rank aborts.
+    """
+    d = Path(tempfile.mkdtemp())
+    (d / "h2o.nw").write_text(NWCHEM_INPUT)
+    proc = subprocess.run(argv + ["h2o.nw"], cwd=str(d), capture_output=True,
+                          env=_mpi_env(), timeout=900)
+    out = (proc.stdout + proc.stderr).decode("utf-8", "replace")
+    return proc.returncode, out
+
+
+def _nwchem_energy(out):
+    m = re.search(r"Total SCF energy\s*=\s*(-?\d+\.\d+)", out)
+    assert m, f"no 'Total SCF energy' in nwchem output:\n{out[-1500:]}"
+    return float(m.group(1))
+
+
+def _nwchem_nproc(out):
+    """nwchem's own count of its ranks, from its job banner."""
+    m = re.search(r"^\s*nproc\s*=\s*(\d+)", out, re.M)
+    assert m, f"nwchem printed no nproc line:\n{out[-1500:]}"
+    return int(m.group(1))
+
+
+@check("nwchem basis libraries come from activation, not from the binary's build path")
+def _nwchem_basis():
+    lib = os.environ.get("NWCHEM_BASIS_LIBRARY")
+    # This is not a formality. conda-forge's nwchem has the FEEDSTOCK BUILD DIRECTORY
+    # compiled into the binary as its default basis path, and sets the real one in
+    # etc/conda/activate.d/nwchem_env.sh from $CONDA_PREFIX. Unactivated, nwchem exits
+    # 255 looking for basis sets under /home/conda/feedstock_root/... (measured).
+    # Consequence recorded in README: `apptainer exec` skips activate.d, so `dft` is now
+    # the first env in this catalog where `exec` genuinely breaks and `run` is required.
+    assert lib, ("NWCHEM_BASIS_LIBRARY is unset — activate.d did not run, and nwchem "
+                 "will fall back to the feedstock build path baked into the binary")
+    d = Path(lib)
+    assert d.is_dir(), f"NWCHEM_BASIS_LIBRARY points at nothing: {d}"
+    assert (d / "sto-3g").is_file(), f"no sto-3g basis under {d}"
+    assert os.environ.get("NWCHEM_NWPW_LIBRARY"), "NWCHEM_NWPW_LIBRARY is unset"
+    print(f"       ({sum(1 for _ in d.iterdir())} basis files at {d})")
+
+
+@check("nwchem runs RHF/STO-3G on H2O (serial)")
+def _nwchem_serial():
+    nwchem = shutil.which("nwchem")
+    assert nwchem, "nwchem not on PATH"
+    rc, out = _run_nwchem([nwchem])
+    assert rc == 0, f"nwchem exited {rc}:\n{out[-1500:]}"
+    # The package is 7.3.1 but the binary's own banner says 7.3.0 (upstream's internal
+    # version string lags the feedstock's), so match on the series, not the point release.
+    ver = re.search(r"\(NWChem\)\s+(\d+\.\d+)", out)
+    assert ver and ver.group(1) == "7.3", f"unexpected nwchem series: {ver and ver.group(1)!r}"
+    assert _nwchem_nproc(out) == 1, "serial run did not report nproc = 1"
+    e = _nwchem_energy(out)
+    # Range rather than the exact -74.963023, per this file's convention; tight enough
+    # that a broken integral or SCF path cannot land inside it.
+    assert -75.05 < e < -74.85, f"H2O RHF/STO-3G energy off: {e} Hartree"
+    NWCHEM_SERIAL["energy"] = e
+    print(f"       (NWChem {ver.group(1)}, H2O RHF/STO-3G = {e:.6f} Hartree)")
+
+
+@check("nwchem on 2 MPI ranks reproduces the serial energy")
+def _nwchem_parallel():
+    mpiexec = shutil.which("mpiexec")
+    assert mpiexec, "mpiexec not on PATH"
+    serial = NWCHEM_SERIAL.get("energy")
+    assert serial is not None, "serial nwchem check did not run; nothing to compare"
+    rc, out = _run_nwchem([mpiexec, "-n", "2", "--oversubscribe", shutil.which("nwchem")])
+    assert rc == 0, f"mpiexec -n 2 nwchem exited {rc}:\n{out[-1500:]}"
+    # nwchem's own rank count, not our assumption about mpiexec. With the `_pr` variant
+    # this reads 1 even under -n 2, because a rank is spent as a data server — which is
+    # the measurement behind the `mpi_ts` build-string pin in dft.yaml.
+    nproc = _nwchem_nproc(out)
+    assert nproc == 2, f"nwchem saw {nproc} compute ranks under -n 2, expected 2"
+    par = _nwchem_energy(out)
+    delta = abs(par - serial)
+    assert delta < 1e-6, (
+        f"2-rank energy {par:.9f} disagrees with serial {serial:.9f} "
+        f"(delta {delta:.2e} Hartree)")
+    print(f"       (nproc=2, serial {serial:.9f} vs 2-rank {par:.9f} Hartree, "
+          f"delta {delta:.1e})")
+
+
+# --- 7. parallel: the same DFT calculation on 2 ranks -----------------------------
 # The whole point of this env. If OpenMPI/ELPA/ScaLAPACK link but do not compute, a
 # serial run cannot tell — the numbers only diverge (or the job hangs) under ranks>1.
-print("[smoke] 6. parallel gpaw (2-rank MPI)")
+print("[smoke] 7. parallel gpaw (2-rank MPI)")
 
 
 @check("mpiexec -n 2 reproduces the serial bulk-Si energy")

@@ -144,7 +144,36 @@ three cases. All three are fixed in-spec (or in the builder) and none is skip-li
   This is the same hazard already noted for `lammps` in `envs/md.yaml` — three
   feedstocks now, so it is a pattern rather than an oddity.
 
-**Two of these three are invisible to both of the project's automated gates**, which is
+### A fourth, found 2026-09-04 adding `nwchem`, and this one was ours
+
+Recorded separately because it is not a feedstock bug at all — conda-forge did nothing
+wrong. It is the same class as the CUDA leak (a build-string flip the lock cannot see),
+except that here the flip *was* breaking and one of our two gates was **asserting it
+away**.
+
+- **`gpaw` could flip to its nompi build on a build-number tie, and D3 would still
+  pass.** `envs/dft.yaml` pinned `gpaw >=25.7` with no build string. gpaw 25.7.0's
+  `py314_nompi_omp_3` and `py314_mpi_openmpi_omp_3` are **both build number 3**, so which
+  one you get is a tie-break, and on 2026-09-04 it went to nompi. The published image had
+  the OpenMPI build; a reconciler rebuild would have shipped a *serial* `dft` under a
+  byte-identical lock and an identical lock-hash. gpaw's openmpi build is also what pins
+  `elpa`/`fftw`/`libvdwxc` to `mpi_openmpi_*`, so the whole parallel chain follows this
+  one choice.
+- **The smoke test could not catch it, which is the part worth internalising.** A nompi
+  gpaw run under `mpiexec -n 2` does not error: MPI starts two processes, each imports a
+  serial gpaw, each sees `world.size == 1` and `world.rank == 0`, each does the entire
+  calculation, and both print the same number. `dft.smoke.py` then compared "the parallel
+  energy" against the serial one, found them equal, and reported the parallel path
+  verified. A test whose success condition is *agreement* can be satisfied by doing the
+  work twice. Fixed by asserting the precondition (`world.size > 1` in the child) instead
+  of only the result, plus asserting build strings from `conda-meta` in the image.
+- **`plumed` is the transitive version of the same trap.** It arrives as a required
+  `nwchem` dependency — a package this repo never named — and its `mpi_nompi_*` build
+  carries build number **103** against the openmpi build's **3**. An unpinned solve puts a
+  serial plumed into an all-OpenMPI env, and nothing in the spec was there to stop it.
+  Dependencies you did not ask for need flavour pins too.
+
+**Two of the first three are invisible to both of the project's automated gates**, which is
 the finding that should change how specs get reviewed. A solve cannot see them (nothing
 conflicts) and D3 cannot see them (nothing is broken); the CUDA leak and the
 python-ABI collision are only detectable by *reading the lock diff*. That is now part
@@ -239,8 +268,12 @@ completeness of the search behind it.)
 So the verification objection holds for `siesta`, `dftbplus`, `lammps` and `elk`, but
 **not** for `nwchem` or `psi4` — both have their basis sets on disk and so clear exactly
 the bar `gpaw` cleared (`nwchem` on arm64 + OpenMPI, `psi4` on arm64 serial/threaded).
-Both stay out of `dft` on domain grounds instead: they are molecular quantum chemistry,
-not plane-wave/PAW DFT, so they belong in a future molecular-QC env rather than this one.
+**Both are now in `dft`** — `psi4` via issue #2 and `nwchem` via issue #7 — and the
+"domain grounds" rationale this section used to give for keeping them out (molecular QC
+rather than plane-wave/PAW, so a future molecular-QC env) is retired. It did not survive
+contact with the cost: a separate molecular-QC env would need its own duplicate OpenMPI /
+ScaLAPACK / libxc / python stack, and both engines resolve against the one `dft` already
+has. Shared MPI flavour beat taxonomic tidiness.
 Note that the two *are* the ones that ship data, which is not a coincidence — molecular QC
 basis sets are small text files that fit in a package, whereas pseudopotential and
 Slater-Koster libraries are large, licence-encumbered, or curated out-of-band (which is

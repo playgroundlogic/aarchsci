@@ -317,12 +317,13 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                 </div>
                 <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
                   <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">dft</span><br>
-                  <strong>225 packages</strong> — plane-wave &amp; LCAO density-functional theory, MPI-parallel
+                  <strong>237 packages</strong> — plane-wave &amp; LCAO density-functional theory, MPI-parallel
                 </p>
                 <div class="catalog">
                     <span class="chip">gpaw</span>
                     <span class="chip">siesta</span>
                     <span class="chip">psi4</span>
+                    <span class="chip">nwchem</span>
                     <span class="chip">ase</span>
                     <span class="chip">libxc</span>
                     <span class="chip">libvdwxc</span>
@@ -337,9 +338,14 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                 <p class="footer-note" style="margin-top:0.75rem;">
                   The first MPI-parallel env — its verification runs the same bulk-silicon DFT
                   calculation serially and under <code>mpiexec -n 2</code>, and fails unless the
-                  two energies agree. <code>siesta</code> is the one documented exception to the
+                  two energies agree. <code>nwchem</code> gets the same treatment on an H2O SCF
+                  (&minus;74.963023 Hartree, identical across 1, 2 and 4 ranks).
+                  <code>siesta</code> is the one documented exception to the
                   functional standard: conda-forge ships no pseudopotentials, so it is verified as
                   an aarch64 MPI binary parsing a real input across 2 ranks, not as an SCF.
+                  On HPC, run this image with <code>apptainer run</code> — not
+                  <code>exec</code>, which skips conda activation and leaves nwchem hunting for
+                  basis sets under its feedstock build path.
                 </p>
                 <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
                   <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">md</span><br>

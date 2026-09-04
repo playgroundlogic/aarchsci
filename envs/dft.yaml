@@ -4,6 +4,9 @@
 # supplies the exchange-correlation functionals, libvdwxc the van der Waals ones;
 # ELPA + ScaLAPACK + FFTW + OpenMPI are the parallel eigensolver/FFT/transport layer;
 # spglib/phonopy/pymatgen are the structure, symmetry and phonon tooling around it.
+# siesta, psi4 and nwchem ride along as second/third/fourth ab-initio engines (issues
+# #1, #2, #7) — they share this env's OpenMPI flavor and python, so each is close to
+# free here and would need a duplicate MPI stack anywhere else.
 #
 # This is the strongest Graviton case in the catalog so far: DFT is CPU-bound,
 # MPI + OpenMP parallel, and memory-bandwidth hungry, and gpaw's GPU path is CUDA —
@@ -21,20 +24,38 @@ dependencies:
   - scipy
   # --- MPI flavor lock: LOAD-BEARING, do not remove ---
   # conda-forge permits exactly one MPI implementation per env, so the flavor is an
-  # env-wide decision, not a per-package one. Pinning it at the `mpi` metapackage
-  # (rather than on gpaw's build string) forces elpa, fftw and libvdwxc to follow the
-  # same flavor. Measured cost of letting it drift to MPICH: the whole stack regresses
-  # to gpaw 23.9.1 / python 3.12 / libxc 6.2.2 / elpa 2021.11.002 — about two years
-  # old — because gpaw's current arm64 MPICH builds don't line up with the rest.
-  # This is also why `abinit` is not here: its arm64 build is MPICH-only and cannot
-  # coexist with OpenMPI-flavored gpaw. See GAPS.md + farm/skip-list.tsv.
+  # env-wide decision, not a per-package one. Measured cost of letting it drift to
+  # MPICH: the whole stack regresses to gpaw 23.9.1 / python 3.12 / libxc 6.2.2 /
+  # elpa 2021.11.002 — about two years old — because gpaw's current arm64 MPICH builds
+  # don't line up with the rest. This is also why `abinit` is not here: its arm64 build
+  # is MPICH-only and cannot coexist with OpenMPI-flavored gpaw. See GAPS.md +
+  # farm/skip-list.tsv.
+  #
+  # What this metapackage lock does NOT do, corrected 2026-09-04: it does not exclude
+  # `nompi_*` builds. A nompi build declares no mpi dependency at all, so it never
+  # contradicts `mpi=*=openmpi` — the same trap already documented for siesta below.
+  # This spec used to claim the lock "forces elpa, fftw and libvdwxc to follow the same
+  # flavor". That happens, but it is gpaw's doing, not this line's: gpaw's openmpi build
+  # itself requires `elpa * mpi_openmpi_*`, `fftw * mpi_openmpi_*` and
+  # `libvdwxc * mpi_openmpi_*`. So the whole parallel chain hangs off which gpaw build
+  # is chosen — which is exactly why the pin below is on gpaw.
   - mpi=*=openmpi
   - openmpi
   - mpi4py
   # --- DFT engine + its native math stack ---
   # Floors, in the same spirit as climate's `xesmf >=0.8.4`: each keeps the resolver
   # off an older line that solves and imports but is not what we mean to ship.
-  - gpaw >=25.7
+  #
+  # gpaw's build string is pinned for the same reason siesta's is, and it was NOT
+  # cosmetic: measured 2026-09-04, an unpinned `gpaw >=25.7` resolves to
+  # `py314_nompi_omp_3` — a serial gpaw — because the nompi and openmpi builds are both
+  # build number 3 and the tie does not go our way. The published image (built when the
+  # tie went the other way) has `py314_mpi_openmpi_omp_3`, and this repo's lock records
+  # `name version` only, so the flip would not move the lock-hash: the reconciler would
+  # have rebuilt this env with a serial gpaw and reported no drift (DESIGN OQ2's known
+  # limitation, hit for real). dft.smoke.py now also asserts the MPI build directly, so
+  # a future slip fails the build instead of shipping.
+  - gpaw >=25.7 py*_mpi_openmpi_*
   - ase
   - libxc >=7
   - libvdwxc
@@ -58,6 +79,37 @@ dependencies:
   # The >=1.11 floor is load-bearing: psi4 1.10 installs against libxc-c 7.1.2 and
   # then dies on `import psi4` with "Could not find required LibXC functional".
   - psi4 >=1.11
+  # nwchem: a fourth engine — Gaussian-basis and plane-wave quantum chemistry, and the
+  # one code here built to scale across nodes rather than within one (issue #7). It
+  # lands in `dft` rather than a new env because every one of its 30 linux-aarch64
+  # builds of 7.3.1 is OpenMPI-flavored (checked all 30: no mpich, no nompi) and it
+  # needs `openmpi >=5.0.8,<6.0a0`, `scalapack >=2.2.0,<2.3.0a0`, `libxc >=7 cpu_*` and
+  # py314 — all of which this env already resolves to. Joint solve confirmed: 225 -> 237
+  # packages, and not one existing pin moves.
+  #
+  # The build string pins the ARMCI network, and that choice is measured, not stylistic.
+  # conda-forge ships two runtime variants for arm64, `_ts` (MPI two-sided) and `_pr`
+  # (MPI progress ranks). On a c8g-class box with a container's default 64 MB /dev/shm:
+  #   MPI-TS: 1, 2 and 4 ranks all clean, `nproc` = the rank count, identical energy.
+  #   MPI-PR: 1 rank ABORTS ("ranks per node, must be at least (2)"); 2 ranks run but
+  #           report `nproc = 1`, because one rank becomes a data server; 3 ranks die on
+  #           "check_devshm: /dev/shm out of space".
+  # So `_pr` cannot satisfy this env's D3 contract at all — dft.smoke.py compares a
+  # serial answer against a 2-rank one, and `_pr` has no serial mode. `_ts` is also the
+  # variant that works in a container with no `--shm-size` tuning. Honest tradeoff:
+  # upstream recommends `_pr` for large multi-node runs, so a future EFA/multi-node
+  # image may want the other variant — that would be a deliberate second build, not a
+  # silent resolver choice. `_ts` happens to win on build number today (1002 vs 2), so
+  # unlike siesta this pin confirms the default rather than overriding it.
+  - nwchem=*=py*_mpi_ts_*
+  # plumed arrives as a REQUIRED nwchem dependency, and it is the siesta trap again,
+  # one level down: plumed 2.10.1's `mpi_nompi_*` build carries build number 103 against
+  # the openmpi build's 3, so an unpinned solve takes the serial plumed into an
+  # otherwise-OpenMPI env (measured: `plumed 2.9.2 nompi_hcfdbc3a_101`). Pinning the
+  # flavor is what keeps the free-energy/metadynamics path on the same MPI as everything
+  # else. This is a transitive dependency we did not ask for, which is precisely why it
+  # needs the explicit pin — nothing else in this spec constrains it.
+  - plumed=*=mpi_openmpi*
   # --- structure / symmetry / phonons ---
   - spglib
   - phonopy

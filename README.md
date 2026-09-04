@@ -54,21 +54,28 @@ a date (`2026.06.26`), and a content-addressed `s<lock-hash>`.
 | [`climate`](envs/climate.yaml) | 249 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy |
 | [`pointcloud`](envs/pointcloud.yaml) | 245 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
 | [`comp-chem`](envs/comp-chem.yaml) | 210 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb, vina |
-| [`dft`](envs/dft.yaml) | 225 | gpaw, siesta, psi4, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
+| [`dft`](envs/dft.yaml) | 237 | gpaw, siesta, psi4, nwchem, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 227 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
 | [`viz`](envs/viz.yaml) | 245 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
 
 `dft` and `md` are the MPI-parallel envs, so their verification goes further than the
 others': the smoke tests run the same calculation serially and again under
-`mpiexec -n 2` and fail unless the answers agree (`dft` on bulk-silicon DFT, `md` on a
-LAMMPS Lennard-Jones melt). Run them in parallel the same way:
+`mpiexec -n 2` and fail unless the answers agree (`dft` on bulk-silicon DFT *and* on an
+NWChem H2O SCF, `md` on a LAMMPS Lennard-Jones melt). Run them in parallel the same way:
 
 ```bash
 docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python your_script.py
 ```
 
-Two caveats worth knowing before you use them, both measured rather than assumed:
+Three caveats worth knowing before you use them, all measured rather than assumed:
 
+- **`dft`, on NWChem's ARMCI network:** conda-forge ships two arm64 runtime variants and
+  this image pins the two-sided one (`mpi_ts`). Measured on a container's default 64 MB
+  `/dev/shm`: `mpi_ts` runs clean on 1, 2 and 4 ranks with identical energies, whereas
+  `mpi_pr` (progress ranks) *aborts* on 1 rank, reports only `nproc = 1` on 2 (one rank
+  becomes a data server), and dies on 3 with `check_devshm: /dev/shm out of space`.
+  Upstream recommends `mpi_pr` for large multi-node runs, so that would be a deliberate
+  second image, not something to hope the resolver picks.
 - **`md`:** conda-forge's gromacs for linux-aarch64 is built `ARM_NEON_ASIMD`, so it
   uses NEON and leaves SVE/SVE2 idle on Graviton 3 and later. The binary is `gmx_mpi`
   (not `gmx`), and `bin/gmx_mpi` is a wrapper that picks the SIMD build at run time.
@@ -93,16 +100,23 @@ apptainer run geospatial.sif python /opt/aarchsci/smoke.py
 ```
 
 Use `run`, not `exec`. `run` goes through the image's entrypoint, which sources conda's
-`etc/conda/activate.d/*.sh`; `exec` skips it. Measured on 2026-09-04, that difference costs
-seven variables — `CONDA_PREFIX`, `CONDA_DEFAULT_ENV`, `CONDA_SHLVL`,
+`etc/conda/activate.d/*.sh`; `exec` skips it. When this was first measured (2026-09-04)
+that difference cost seven variables — `CONDA_PREFIX`, `CONDA_DEFAULT_ENV`, `CONDA_SHLVL`,
 `CONDA_PROMPT_MODIFIER`, `GSETTINGS_SCHEMA_DIR` (+ its backup) and `XML_CATALOG_FILES` —
-and one `PATH` entry (`/opt/conda/condabin`). Three envs were tested — `geospatial`, `dft`
-and `md`, chosen because the last two carry the most `activate.d` scripts (13 for `md`) —
-and all three pass under `exec`, `run` **and** `run --cleanenv`, including `dft`/`md`'s
+plus one `PATH` entry (`/opt/conda/condabin`), and none of it mattered: `geospatial`, `dft`
+and `md` all passed under `exec`, `run` **and** `run --cleanenv`, including `dft`/`md`'s
 2-rank MPI legs (`dft` reproduced its serial bulk-Si energy to 6e-08 eV under Apptainer).
-The other six are untested under Apptainer. `run` is the documented default because it is
-the mode that holds regardless — including if a future package puts something load-bearing
-in `activate.d`.
+The other six are untested under Apptainer.
+
+**That "none of it mattered" no longer holds for `dft`, and the reason is worth stating
+plainly:** adding `nwchem` made `run` load-bearing rather than merely advisable.
+conda-forge's nwchem binary has the *feedstock build directory* compiled in as its default
+basis-set path and relies on `etc/conda/activate.d/nwchem_env.sh` to set
+`NWCHEM_BASIS_LIBRARY`/`NWCHEM_NWPW_LIBRARY` from `$CONDA_PREFIX`. Skip activation and
+nwchem exits 255 hunting for `sto-3g` under
+`/home/conda/feedstock_root/build_artifacts/...` (measured, not inferred). So `dft` under
+`apptainer exec` now genuinely breaks — the smoke test asserts that variable precisely so
+this cannot regress unnoticed. Use `run`.
 
 Also measured on that host, so you don't have to find out the hard way:
 
