@@ -7,7 +7,7 @@ Sister project to [aarchbio](https://github.com/playgroundlogic/aarchbio) (which
 does this for bioinformatics / BioContainers). aarch.science covers the layer
 aarchbio scopes out: the **conda-forge** scientific stack.
 
-> **Status:** live. **7 verified, signed, public env images** on
+> **Status:** live. **9 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -53,20 +53,48 @@ a date (`2026.06.26`), and a content-addressed `s<lock-hash>`.
 | [`geo-ml`](envs/geo-ml.yaml) | 378 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader |
 | [`climate`](envs/climate.yaml) | 247 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy |
 | [`pointcloud`](envs/pointcloud.yaml) | 287 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
-| [`comp-chem`](envs/comp-chem.yaml) | 195 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb |
-| [`dft`](envs/dft.yaml) | 191 | gpaw, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
+| [`comp-chem`](envs/comp-chem.yaml) | 210 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb, vina |
+| [`dft`](envs/dft.yaml) | 225 | gpaw, siesta, psi4, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
+| [`md`](envs/md.yaml) | 227 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
+| [`viz`](envs/viz.yaml) | 245 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
 
-`dft` is the first MPI-parallel env, so its verification goes further than the
-others': the smoke test runs the same bulk-silicon DFT calculation serially and again
-under `mpiexec -n 2`, and fails unless the two energies agree. Run it in parallel the
-same way:
+`dft` and `md` are the MPI-parallel envs, so their verification goes further than the
+others': the smoke tests run the same calculation serially and again under
+`mpiexec -n 2` and fail unless the answers agree (`dft` on bulk-silicon DFT, `md` on a
+LAMMPS Lennard-Jones melt). Run them in parallel the same way:
 
 ```bash
 docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python your_script.py
 ```
 
+Two caveats worth knowing before you use them, both measured rather than assumed:
+
+- **`md`:** conda-forge's gromacs for linux-aarch64 is built `ARM_NEON_ASIMD`, so it
+  uses NEON and leaves SVE/SVE2 idle on Graviton 3 and later. The binary is `gmx_mpi`
+  (not `gmx`), and `bin/gmx_mpi` is a wrapper that picks the SIMD build at run time.
+  `pmemd` is not included — it ships only under the paid Amber licence.
+- **`viz`:** ParaView needs a display even though it needs no GPU. conda-forge has no
+  OSMesa at all and EGL has no device to bind to, so rendering goes through GLX against
+  a virtual X server. `Xvfb` is in the image; start it and set `DISPLAY` (see
+  [`envs/viz.smoke.py`](envs/viz.smoke.py) for the exact recipe the tests use).
+
 Want another? [Request an env](https://github.com/playgroundlogic/aarchsci/issues/new?template=request-env.yml).
 Known arm64 gaps and why: [GAPS.md](GAPS.md).
+
+### On HPC, without a Docker daemon
+
+There is also an [`apptainer`](envs/apptainer.yaml) env (42 pkgs) — the Apptainer runtime
+itself, pinned to an exact build and verified to build and read back a native arm64 SIF.
+It exists because clusters have no Docker daemon, and because a future check that these
+images run under `apptainer exec` needs a known runtime to run them with.
+
+It is **not published, and there are no consumption instructions here yet, on purpose.**
+Converting an image to SIF works and the `geospatial` smoke test passes under
+`apptainer exec` on aarch64 — but that was measured on Apple silicon, not Graviton, and
+Apptainer does **not** run conda's `activate.d` hooks, so some envs lose environment
+variables their packages expect. Publishing a recipe before that is settled on real
+hardware would be exactly the unearned "verified" this project refuses elsewhere. Progress
+and measurements: [issue #6](https://github.com/playgroundlogic/aarchsci/issues/6).
 
 ## How it will differ from aarchbio
 

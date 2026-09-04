@@ -1,0 +1,67 @@
+# aarch.science — md environment
+# Classical molecular dynamics: the three engines people actually run on clusters
+# (DESIGN D2). gromacs for biomolecular MD, lammps for materials/coarse-grained MD,
+# ambertools for system preparation + sander MD + trajectory analysis. mdanalysis and
+# mdtraj read what they produce.
+#
+# A strong Graviton case (D4): all three engines have CUDA paths that Graviton cannot
+# use, but all three are also mature, well-vectorised CPU codes that scale over MPI,
+# and MD is overwhelmingly run on CPU partitions. Note what this env does NOT get:
+# conda-forge's gromacs for linux-aarch64 is built `SIMD instructions: ARM_NEON_ASIMD`
+# and ships exactly one SIMD binary directory (`bin.ARM_NEON_ASIMD`), so it uses NEON
+# and leaves SVE/SVE2 unused on Graviton 3 and later. That is a packaging choice, not
+# a hardware limit — see the SIMD sweep in CHANGELOG.md.
+#
+# Verified to solve AND assemble native arm64 on conda-forge, including real MD runs
+# and 2-rank MPI (see md.smoke.py).
+name: md
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  # --- MPI flavor lock: LOAD-BEARING, do not remove ---
+  # conda-forge permits exactly one MPI implementation per env, so the flavor is an
+  # env-wide decision. Pinning it at the `mpi` metapackage makes every dependent
+  # follow. See envs/dft.yaml for the measured cost of letting this drift.
+  - mpi=*=openmpi
+  - openmpi
+  - mpi4py
+  # --- engines ---
+  # The build-string pins below are MANDATORY, not stylistic, and for a reason that
+  # is easy to get wrong: `mpi=*=openmpi` does NOT exclude a package's nompi builds.
+  # A nompi build declares no mpi dependency at all, so it never contradicts the
+  # lock — and conda-forge's nompi variants here carry HIGHER build numbers than the
+  # openmpi ones (gromacs 2026.3: nompi bn=100 vs mpi_openmpi bn=0). The solver
+  # prefers the higher build number and silently hands back a serial engine. Pinning
+  # the build string is the only thing that prevents that.
+  #
+  # gromacs: the binary is `gmx_mpi`; plain `gmx` does not exist in this build. What
+  # IS on PATH at `bin/gmx_mpi` is not the executable but a small bash dispatcher that
+  # reads `uname -m` and execs the matching SIMD directory — here
+  # `bin.ARM_NEON_ASIMD/gmx_mpi`. That matters for consumers: because the dispatch
+  # happens inside the wrapper, `gmx_mpi` works with NO conda activation at all
+  # (measured under `apptainer exec`, which runs no activation hooks — see the
+  # Apptainer section of README.md).
+  #
+  # Separately, this env needs a patch in `builder/Dockerfile`, for the activation
+  # hook rather than the wrapper: as shipped, `GMXRC.bash` aborts under the image
+  # entrypoint's `set -ef` and takes EVERY command in the container down with it.
+  # See the comment there.
+  - gromacs=*=mpi_openmpi*
+  # lammps: the `cpu_*` half of this pin matters independently of MPI. LAMMPS CUDA
+  # builds depend on `cuda-version >=13.0,<14`, which is a freely-installable noarch
+  # metapackage — NOT the `__cuda` virtual package — so nothing about running on a
+  # GPU-less Graviton host causes the solver to rule them out.
+  - lammps=*=cpu_*mpi_openmpi*
+  # ambertools: only nompi builds exist on linux-aarch64, which is fine — a nompi
+  # build coexists with the openmpi lock (that is the same property that makes the
+  # pins above necessary). `sander` is serial here; `pmemd`, Amber's fast engine, is
+  # not in AmberTools at all and never will be — it ships only under the paid Amber
+  # licence, so this row can only ever be half-complete regardless of architecture.
+  - ambertools
+  # --- trajectory analysis ---
+  - mdanalysis
+  - mdtraj
+  - parmed

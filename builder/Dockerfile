@@ -37,6 +37,33 @@ COPY ${ENV_FILE} /opt/aarchsci/env.yaml
 RUN micromamba install -y -n base -f /opt/aarchsci/env.yaml \
     && micromamba clean --all --yes
 
+# Repair conda-forge gromacs's activation script, which otherwise BRICKS THE IMAGE.
+#
+# This is not a nicety. micromamba-docker's `_entrypoint.sh` runs `set -ef -o pipefail`
+# and then sources every `etc/conda/activate.d/*.sh` before `exec "$@"`. The `-f` turns
+# OFF pathname expansion. gromacs ships a GMXRC.bash containing
+#
+#     for cfile in $GMXBIN/gmx-completion-*.bash ; do source $cfile ; done
+#
+# with no existence test, so with globbing disabled `source` receives the literal
+# pattern, fails, and `-e` aborts the entrypoint before it ever reaches the command.
+# The result is an image where EVERY invocation dies — `python`, `ls`, the smoke test,
+# all of it — with only a confusing "gmx-completion-*.bash: No such file or directory".
+# (The completion files do exist; the glob is simply never expanded.) The builder's
+# lock step caught it, and the D3 gate held, but nothing about the failure said "gromacs
+# activation".
+#
+# Guarding the loop is also the correct upstream fix — `source $cfile` in a loop over a
+# glob is unsafe regardless of who disabled globbing, since a build shipping no
+# completion files would fail the same way. Arch-independent: linux-64 has identical
+# code under `bin.AVX2_256`. The `for`/`test` wrapper makes this a no-op in the eight
+# envs that don't install gromacs.
+RUN for rc in /opt/conda/bin.*/GMXRC.bash; do \
+      [ -f "$rc" ] || continue; \
+      sed -i 's|^\( *\)source \$cfile *$|\1if test -f "$cfile"; then source "$cfile"; fi|' "$rc"; \
+      echo "[builder] patched unsafe completion glob in $rc"; \
+    done
+
 # Make the env's binaries the default PATH.
 ENV PATH=/opt/conda/bin:$PATH
 

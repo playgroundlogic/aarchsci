@@ -34,6 +34,7 @@ HEADLINE = [
     "rdkit", "rdkit.Chem", "openbabel",
     "openmm", "MDAnalysis", "mdtraj", "parmed", "pdbfixer",
     "ase", "pyscf", "xtb",
+    "vina",
 ]
 print("[smoke] 1. imports")
 for mod in HEADLINE:
@@ -141,6 +142,44 @@ def _xtb():
     res = calc.singlepoint()
     e = res.get_energy()
     assert e < 0, f"xtb energy should be negative, got {e}"
+
+
+# --- 5. docking -----------------------------------------------------------------
+print("[smoke] 5. docking")
+
+# PDBQT is a fixed-column format and the `vina` package ships no example data (17
+# files: the module, plus bin/vina and bin/vina_split), so the test system is built
+# here. Column positions matter: partial charge at 69-76, AutoDock type at 78-79.
+_PDBQT = ("ATOM  %5d %-4s %3s %1s%4d    %8.3f%8.3f%8.3f%6.2f%6.2f    %6.3f %-2s")
+
+
+def _atom(serial, res, chain, x, y, z, kind="C"):
+    return _PDBQT % (serial, kind, res, chain, 1, x, y, z, 1.0, 0.0, 0.0, kind)
+
+
+@check("vina scores a ligand against a receptor (native scoring + grid)")
+def _vina():
+    from vina import Vina
+    tmp = Path(tempfile.mkdtemp())
+    # Six carbons on the axes form a crude pocket centred on the origin; a single
+    # carbon sits in it. Chemically meaningless, but it drives the real code path:
+    # receptor parse, affinity-map computation, scoring-function evaluation.
+    rec = "\n".join(_atom(i + 1, "ALA", "A", x, y, z) for i, (x, y, z) in enumerate(
+        [(-4, 0, 0), (4, 0, 0), (0, -4, 0), (0, 4, 0), (0, 0, -4), (0, 0, 4)]))
+    (tmp / "rec.pdbqt").write_text(rec + "\nTER\n")
+    lig = _atom(1, "UNL", " ", 0.0, 0.0, 0.0)
+    (tmp / "lig.pdbqt").write_text("ROOT\n" + lig + "\nENDROOT\nTORSDOF 0\n")
+
+    v = Vina(sf_name="vina", verbosity=0)
+    v.set_receptor(str(tmp / "rec.pdbqt"))
+    v.set_ligand_from_file(str(tmp / "lig.pdbqt"))
+    v.compute_vina_maps(center=[0, 0, 0], box_size=[20, 20, 20])
+    energies = v.score()
+    total = float(energies[0])
+    # A carbon in a carbon cage must be net attractive, and Vina's scoring
+    # function is bounded well inside this range for any physical pose.
+    assert -50.0 < total < 0.0, f"vina total score implausible: {total}"
+    print(f"       (vina total score: {total:.3f} kcal/mol)")
 
 
 # --- verdict --------------------------------------------------------------------

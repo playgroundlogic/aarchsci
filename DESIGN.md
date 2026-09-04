@@ -117,6 +117,20 @@ wins on price/perf. (The pip-arm64-wheel gap is a CPU-stack problem anyway.)
   resolved set, short — content-addressed + idempotent), and `latest`. The
   resolved set is read from the **finished image**, never predicted (aarchbio #16),
   and committed to `envs/<env>.lock.txt`.
+
+  **Known limitation, found 2026-09: the lock records `name version` only, not the
+  build string.** So a *variant* flip at the same version is invisible to both the lock
+  diff and the lock-hash — and therefore to OQ4's "changed?" test. Two flips that
+  actually happened or were guarded against: `libxc-c 7.1.2` moving from
+  `cpu_h2fc08b2_1` (21 MB) to `cuda_heee54e4_0` (631 MB), and the `mpi_openmpi_*` →
+  `nompi_*` slide that the build-string pins in `envs/md.yaml` and `envs/dft.yaml` exist
+  to prevent. In both cases `envs/*.lock.txt` would read identically before and after.
+  D3 covers the MPI case (the smoke tests assert the engines really are parallel) but
+  nothing covers the CUDA case, because nothing about it is broken. Recording the build
+  string would fix this properly; it changes every existing lock and every lock-hash, so
+  it is a deliberate migration rather than a quick edit. Until then the mitigation is
+  explicit build-string pins in the spec plus reading solve diffs by hand — see
+  [GAPS.md](GAPS.md), "Bugs D3 caught that are *not* arm64 gaps."
 - **OQ3 — registry/org: SETTLED.** Naming rule: brand is **aarchsci** everywhere
   it's a free choice; `.science` only in the domain (no `.sci` TLD exists).
   → domain **aarch.science** (secured), registry **quay.io/aarchsci/<env>** (org

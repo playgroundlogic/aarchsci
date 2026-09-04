@@ -20,10 +20,13 @@
 #
 # Pure stdlib + the env's own packages. Exit 0 = functionally sound.
 import os
+import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import traceback
+from pathlib import Path
 
 FAILURES = []
 
@@ -78,6 +81,11 @@ HEADLINE = [
     "ase", "gpaw", "_gpaw",
     "mpi4py", "mpi4py.MPI",
     "spglib", "phonopy", "pymatgen",
+    # `import psi4` is a genuine check, not a formality: psi4 1.10 installs cleanly
+    # against libxc-c 7.1.2 and then dies right here, during import, building its
+    # functional table — "Fatal Error: Could not find required LibXC functional".
+    # This line is what the `psi4 >=1.11` floor in dft.yaml protects.
+    "psi4",
 ]
 print("[smoke] 1. imports")
 for mod in HEADLINE:
@@ -156,6 +164,25 @@ def _si():
     print(f"       (Si bulk PW({PW_CUTOFF})/LDA, kpts={SI_KPTS} = {e:.4f} eV)")
 
 
+@check("psi4 Hartree-Fock on H2 (independent ab-initio kernel)")
+def _psi4():
+    import psi4
+    scratch = Path(tempfile.mkdtemp())
+    # psi4 writes an output file and scratch files relative to cwd by default; the
+    # image runs as an unprivileged user, so point both at a temp dir.
+    os.environ.setdefault("PSI_SCRATCH", str(scratch))
+    psi4.core.set_output_file(str(scratch / "psi4.out"), False)
+    psi4.set_memory("500 MB")
+    psi4.geometry("0 1\nH 0.0 0.0 0.0\nH 0.0 0.0 0.74\nunits angstrom\n")
+    e = psi4.energy("scf/sto-3g")
+    # H2 at 0.74 A in a minimal basis: the textbook RHF/STO-3G total energy is
+    # -1.1167 Hartree. This is a tight, well-known number, so unlike the gpaw checks
+    # it can be asserted narrowly — psi4 computes it through an entirely separate
+    # native integral/SCF stack from gpaw's, which is what makes it worth having here.
+    assert -1.15 < e < -1.09, f"H2 RHF/STO-3G energy off: {e} Hartree"
+    print(f"       (H2 RHF/STO-3G = {e:.6f} Hartree)")
+
+
 # --- 4. structure / symmetry / phonons --------------------------------------------
 print("[smoke] 4. structure / symmetry / phonons")
 
@@ -198,10 +225,120 @@ def _pymatgen():
     assert back.composition.reduced_formula == "Si", "CIF round-trip lost the formula"
 
 
-# --- 5. parallel: the same DFT calculation on 2 ranks -----------------------------
+# --- 5. siesta ---------------------------------------------------------------------
+# READ THIS BEFORE STRENGTHENING THESE CHECKS. siesta gets weaker verification than
+# gpaw, deliberately and for a reason that cannot be engineered around here: siesta
+# needs a pseudopotential per element, and conda-forge's siesta ships NONE. The
+# package is 359 files — binaries, libpsml and the psml2psf converter — with no .psf,
+# .vps or .psml data and no example inputs. (Issue #1 assumed a bundled example
+# exists; measured, it does not.) The obvious source, conda-forge `pseudo_dojo`, is
+# 0.2 MB of code with no tables, and pins numpy <1.25 / pymatgen <=2023.9.10, so it
+# would wreck this env twice over. Fetching pseudopotentials at run time is what made
+# `whitebox` a wontfix (GAPS.md), so that is off the table too.
+#
+# So there is no SCF here. What IS verified is everything up to the point where the
+# missing data stops it: the binary is aarch64, it is the MPI build, it parses a real
+# fdf input, it initialises OpenMPI, it distributes over 2 ranks, and it runs its full
+# setup path. That is a real process executing real work — much stronger than an
+# import, and honestly weaker than gpaw's. Do not let the README claim otherwise.
+print("[smoke] 5. siesta (binary + MPI; no SCF — see comment)")
+
+SIESTA_FDF = """SystemName      si-probe
+SystemLabel     si-probe
+NumberOfAtoms   1
+NumberOfSpecies 1
+%block ChemicalSpeciesLabel
+ 1 14 Si
+%endblock ChemicalSpeciesLabel
+LatticeConstant 5.43 Ang
+%block LatticeVectors
+ 0.0 0.5 0.5
+ 0.5 0.0 0.5
+ 0.5 0.5 0.0
+%endblock LatticeVectors
+AtomicCoordinatesFormat Fractional
+%block AtomicCoordinatesAndAtomicSpecies
+ 0.0 0.0 0.0 1
+%endblock AtomicCoordinatesAndAtomicSpecies
+"""
+
+
+def _mpi_env():
+    env = dict(os.environ)
+    # Container images commonly run as root, and CI boxes may have fewer slots than
+    # ranks; Open MPI refuses to launch on both counts unless told.
+    env["OMPI_ALLOW_RUN_AS_ROOT"] = "1"
+    env["OMPI_ALLOW_RUN_AS_ROOT_CONFIRM"] = "1"
+    env["OMPI_MCA_rmaps_base_oversubscribe"] = "yes"
+    env["OMP_NUM_THREADS"] = "1"
+    return env
+
+
+def _run_siesta(argv, cwd, stdin=None):
+    """Run siesta (optionally under mpiexec) and return its combined output.
+
+    The return code is deliberately not asserted: with no pseudopotential shipped,
+    siesta correctly calls MPI_ABORT, so a nonzero exit is the expected outcome and
+    the evidence lives in the output.
+    """
+    proc = subprocess.run(argv, cwd=str(cwd), input=stdin, capture_output=True,
+                          text=True, env=_mpi_env(), timeout=900)
+    return proc.stdout + proc.stderr
+
+
+@check("siesta reports an aarch64, MPI-parallel build")
+def _siesta_version():
+    siesta = shutil.which("siesta")
+    assert siesta, "siesta not on PATH — check the mpi_openmpi build-string pin"
+    out = _run_siesta([siesta, "--version"], cwd=tempfile.mkdtemp())
+    ver = re.search(r"^Version\s*:\s*(\S+)", out, re.M)
+    arch = re.search(r"^Architecture\s*:\s*(\S+)", out, re.M)
+    par = re.search(r"^Parallelisations\s*:\s*(.+)$", out, re.M)
+    assert ver, f"could not parse siesta version from:\n{out[:400]}"
+    assert int(ver.group(1).split(".")[0]) >= 5, f"expected siesta >=5, got {ver.group(1)}"
+    # The binary self-reporting its architecture is a stronger arm64 statement than
+    # any subdir label: it is what the compiler actually targeted.
+    assert arch and arch.group(1) == "aarch64", \
+        f"siesta reports architecture {arch and arch.group(1)!r}, expected aarch64"
+    assert par and "MPI" in par.group(1), \
+        f"siesta is not an MPI build ({par and par.group(1)!r}) — the nompi variant " \
+        "has a higher build number and wins unless the build string is pinned"
+    print(f"       (siesta {ver.group(1)}, {arch.group(1)}, {par.group(1).strip()})")
+
+
+@check("siesta parses a real fdf input and runs its setup path")
+def _siesta_run():
+    d = Path(tempfile.mkdtemp())
+    out = _run_siesta([shutil.which("siesta")], cwd=d, stdin=SIESTA_FDF)
+    # Reaching pseudo_read means the fdf was parsed, the species/lattice/coordinates
+    # blocks were accepted and the whole initialisation ran. It stops here only
+    # because no pseudopotential ships — see the section comment.
+    assert "pseudo_read" in out, (
+        f"siesta did not reach pseudopotential reading; output:\n{out[-1200:]}")
+    assert "Si.{vps,psf,psml}" in out or "Pseudopotential file not found" in out, (
+        "siesta failed before the pseudopotential stage, which means something other "
+        f"than the missing data is wrong:\n{out[-1200:]}")
+
+
+@check("siesta distributes over 2 MPI ranks")
+def _siesta_mpi():
+    mpiexec = shutil.which("mpiexec")
+    assert mpiexec, "mpiexec not on PATH"
+    d = Path(tempfile.mkdtemp())
+    out = _run_siesta([mpiexec, "-n", "2", "--oversubscribe", shutil.which("siesta")],
+                      cwd=d, stdin=SIESTA_FDF)
+    # siesta announces its rank count itself, so this is siesta's own view of the
+    # communicator rather than our assumption about what mpiexec did.
+    m = re.search(r"Running on\s+(\d+)\s+nodes in parallel", out)
+    assert m, f"siesta printed no parallel banner:\n{out[-1200:]}"
+    assert int(m.group(1)) == 2, f"siesta saw {m.group(1)} ranks, expected 2"
+    print(f"       (siesta: Running on {m.group(1)} nodes in parallel)")
+
+
+# --- 6. parallel: the same DFT calculation on 2 ranks -----------------------------
 # The whole point of this env. If OpenMPI/ELPA/ScaLAPACK link but do not compute, a
 # serial run cannot tell — the numbers only diverge (or the job hangs) under ranks>1.
-print("[smoke] 5. parallel (2-rank MPI)")
+print("[smoke] 6. parallel gpaw (2-rank MPI)")
 
 
 @check("mpiexec -n 2 reproduces the serial bulk-Si energy")

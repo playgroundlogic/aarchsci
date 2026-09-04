@@ -40,12 +40,22 @@ a GeoJSON through fiona). The smoke test is baked into the image:
     esmpy, netcdf4, zarr; atmospheric/climate analysis with GRIB + regridding).
   - `pointcloud` (287 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
-  - `comp-chem` (195 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
-    pdbfixer, ase, pyscf, xtb-python; cheminformatics + MD + quantum chemistry).
-  - `dft` (191 pkgs — gpaw, ase, libxc, libvdwxc, elpa, scalapack, fftw, openmpi,
-    mpi4py, spglib, phonopy, pymatgen; plane-wave/LCAO density-functional theory,
-    MPI-parallel. Run in parallel with
+  - `comp-chem` (210 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
+    pdbfixer, ase, pyscf, xtb-python, vina; cheminformatics + MD + quantum chemistry
+    + docking).
+  - `dft` (225 pkgs — gpaw, siesta, psi4, ase, libxc, libvdwxc, elpa, scalapack, fftw,
+    openmpi, mpi4py, spglib, phonopy, pymatgen; plane-wave/LCAO density-functional
+    theory, MPI-parallel. Run in parallel with
     `docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python script.py`).
+  - `md` (227 pkgs — gromacs, lammps, ambertools, openmpi, mpi4py, mdanalysis, mdtraj,
+    parmed; classical molecular dynamics, MPI-parallel. Two caveats: the gromacs binary
+    is `gmx_mpi`, not `gmx`, and conda-forge builds it `ARM_NEON_ASIMD`, so it uses NEON
+    and leaves SVE/SVE2 idle on Graviton 3+. `pmemd` is not included — paid Amber
+    licence only).
+  - `viz` (245 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
+    headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
+    need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
+    rendering goes via GLX against Xvfb, which ships in the image).
 - Tags: `latest`, a date tag (e.g. `2026.06.25`), and a content-addressed
   `s<lock-hash>` tag (the hash of the resolved package set).
 - Works on Apple Silicon and AWS Graviton (linux/arm64).
@@ -77,12 +87,20 @@ packaging one), bioinformatics (that's aarch.bio), and compiling from source
 
 ## Facts
 
-- 7 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
-  comp-chem, dft) — native arm64, verified (assemble+import+functional) + signed
-  + public.
-- `dft` (gpaw, ase, libxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen) is
-  MPI-parallel; its verification also runs the calculation under `mpiexec -n 2` and
-  requires the parallel and serial energies to agree.
+- 9 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+  comp-chem, dft, md, viz) — native arm64, verified (assemble+import+functional) +
+  signed + public.
+- `dft` (gpaw, siesta, psi4, ase, libxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy,
+  pymatgen) and `md` (gromacs, lammps, ambertools) are MPI-parallel; their verification
+  also runs the calculation under `mpiexec -n 2` and requires the parallel and serial
+  answers to agree.
+- Verification means real work, not imports: `md` conserves energy to 0.0109 kcal/mol
+  over an in-vacuo NVE run, and `viz` renders a PNG with no GPU and then reads it back
+  with pillow to prove the frame contains geometry rather than being blank.
+- One documented exception to that standard, stated rather than hidden: `siesta` in
+  `dft` runs no SCF, because conda-forge's siesta ships no pseudopotentials. Its
+  verification covers the aarch64 MPI binary parsing a real input and distributing over
+  2 ranks, and stops where the missing data stops it.
 - Kept current by a daily reconciler that re-solves each env spec and rebuilds
   when the resolved package set (its lock-hash) changes.
 - Maintained by Playground Logic. Apache-2.0. Unofficial — not affiliated with or

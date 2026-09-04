@@ -41,6 +41,23 @@ dependencies:
   - elpa >=2025
   - scalapack
   - fftw
+  # --- second and third ab-initio engines (issues #1, #2) ---
+  # siesta: LCAO pseudopotential DFT, complementary to gpaw's PAW/plane-wave modes.
+  # The build-string pin is MANDATORY, not stylistic. The `mpi=*=openmpi` lock above
+  # does NOT exclude siesta's nompi builds, because a nompi build declares no mpi
+  # dependency at all and so never contradicts the lock — and conda-forge's nompi
+  # siesta carries build number 1003 against the openmpi build's 3, so the solver
+  # picks nompi on build number and silently drops the parallelism this env exists
+  # for. Pinning the build string is the only thing that prevents that.
+  - siesta=*=mpi_openmpi*
+  # psi4: Gaussian-basis molecular quantum chemistry. Requested for comp-chem
+  # (issue #2) and lives here instead — psi4 1.11 has linux-aarch64 builds for
+  # py310/311/312/314 but not py313, and comp-chem's `xtb-python` has no py314
+  # build, so the only python satisfying both is 3.11, which would downgrade 13 of
+  # comp-chem's packages. This env already runs py314, so psi4 joins for free.
+  # The >=1.11 floor is load-bearing: psi4 1.10 installs against libxc-c 7.1.2 and
+  # then dies on `import psi4` with "Could not find required LibXC functional".
+  - psi4 >=1.11
   # --- structure / symmetry / phonons ---
   - spglib
   - phonopy

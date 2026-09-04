@@ -1,0 +1,64 @@
+# aarch.science — apptainer environment
+# The HPC consumption path. Every other env in this catalog answers "can the science
+# stack run native on arm64"; this one answers the question that follows immediately
+# on a shared cluster: "can I run those images at all, as an unprivileged user, with
+# no Docker daemon?" On HPC that runtime is Apptainer, and conda-forge has a
+# linux-aarch64 build of it (issue #6 — the absence of a gap is the finding).
+#
+# This env exists for two distinct reasons, and the second is the load-bearing one:
+#
+#  1. It is a useful artifact on its own — a verified arm64 Apptainer runtime.
+#  2. It makes the runtime a PINNED, VERIFIED dependency of this repo rather than an
+#     assumption. Extending D3 to "the published image also runs under `apptainer
+#     exec` on a Graviton host" needs a known-good apptainer to run it with; pinning
+#     it here is what stops that future check from silently testing a different
+#     runtime than the one we measured. See issue #6, step 1.
+#
+# Not a science env, so it is deliberately minimal: the runtime, its declared
+# dependencies (which conda-forge resolves), and nothing else.
+name: apptainer
+channels:
+  - conda-forge
+dependencies:
+  # Not a science dependency: the D3 harness runs the smoke test as
+  # `docker run <image> python /opt/aarchsci/smoke.py` (builder/build-env.sh), so an
+  # env with no python cannot be verified at all. It is the test harness, nothing more —
+  # the smoke test imports only the standard library.
+  - python >=3.11
+  # --- the runtime, pinned to an exact build (NOT just a version) ---
+  # The build string is pinned on purpose, and it is not stylistic. Two reasons:
+  #
+  #  a) The variant matters here and is invisible to a version pin. conda-forge
+  #     configures this build `--without-suid` (`./mconfig -P release --without-suid`),
+  #     so it installs `libexec/apptainer/bin/starter` and NO `starter-suid`. That
+  #     makes it rootless-only by construction — which is the correct and safe default
+  #     on a shared machine, but it is a property of the BUILD, not of version 1.5.3.
+  #  b) This repo's lock format records `name version` only, not the build string
+  #     (see the known limitation under OQ2 in DESIGN.md), so a build-string flip in
+  #     this package would not move the lock-hash and the reconciler would not see it.
+  #     Pinning the build string in the spec is the direct mitigation for that.
+  #
+  # Content-addressed identity of this exact artifact, asserted by the smoke test
+  # against `conda-meta` so the claim is checked rather than trusted:
+  #   linux-aarch64/apptainer-1.5.3-h990128b_0.conda
+  #   sha256 6f901be0d24192f8639805b9d6d21adb584ae67a49fe83245a80743e092cf148
+  - apptainer=1.5.3=h990128b_0
+  # --- runtime dependencies, listed explicitly rather than left implicit ---
+  # conda-forge's apptainer declares all ten of these, so naming them changes nothing
+  # about the solve. They are here because the interesting ones are easy to lose to a
+  # future dependency trim, and losing them is not a clean failure:
+  #   squashfuse      — mounts a SIF's squashfs payload with no privilege. Without it
+  #                     a SIF can still be BUILT but not mounted rootlessly.
+  #   squashfs-tools  — `unsquashfs`, which is how the smoke test reads a SIF back
+  #                     without needing to mount (or exec) anything at all.
+  #   fuse-overlayfs  — the writable-overlay path (`apptainer exec --writable-tmpfs`).
+  #   cni-plugins     — network isolation for `--net`.
+  # Note what is NOT needed: `fusermount3`. Apptainer does not use fusermount in any
+  # mode, so its absence is not a gap (issue #6).
+  - squashfuse
+  - squashfs-tools
+  - fuse-overlayfs
+  - cni-plugins
+  - libseccomp
+  - libarchive
+  - openssl

@@ -1,0 +1,46 @@
+# apptainer — resolved conda-forge package set (linux-aarch64)
+# Source spec: envs/apptainer.yaml   Built: 2026.09.04   Builder: bcd04ee
+# lock-hash: c81555c63739   packages: 42
+# Regenerate with: ./builder/build-env.sh apptainer
+_openmp_mutex 4.5
+apptainer 1.5.3
+bzip2 1.0.8
+ca-certificates 2026.7.22
+cni 1.0.1
+cni-plugins 1.3.0
+fuse-overlayfs 1.17
+icu 78.3
+jq 1.8.2
+ld_impl_linux-aarch64 2.46.1
+libarchive 3.8.9
+libexpat 2.8.1
+libffi 3.7.0
+libfuse3 3.18.2
+libgcc 16.2.0
+libgcc-ng 16.2.0
+libgomp 16.2.0
+libiconv 1.18
+liblzma 5.8.3
+libmpdec 4.0.0
+libpython 3.14.7
+libseccomp 2.6.1
+libsqlite 3.53.4
+libstdcxx 16.2.0
+libuuid 2.42.3
+libxml2 2.15.3
+libxml2-16 2.15.3
+libzlib 1.3.2
+lz4-c 1.10.0
+lzo 2.10
+ncurses 6.6
+oniguruma 6.9.10
+openssl 3.6.4
+pip 26.2.1
+python 3.14.7
+python_abi 3.14
+readline 8.3
+squashfs-tools 4.7.5
+squashfuse 0.6.3
+tk 8.6.13
+tzdata 2026c
+zstd 1.5.7

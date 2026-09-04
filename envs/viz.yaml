@@ -1,0 +1,53 @@
+# aarch.science — viz environment
+# Headless scientific visualisation: ParaView driven from Python, rendering to image
+# files with no GUI, no display of its own and no GPU (DESIGN D2, D4). The entry
+# points are `pvbatch` and the importable `paraview.simple` module.
+#
+# This env is the clearest assemble-gap case in the catalog, and the reason D3 exists.
+# Everything below solves; a bare `conda install paraview` then produces a ParaView
+# that CANNOT START. Both pins are load-bearing and neither is discoverable from the
+# metadata — only from running it.
+name: viz
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  # --- ParaView + the hdf5 pin that keeps it alive ---
+  # MANDATORY PIN. conda-forge's paraview 6.1.1 links libhdf5 directly but declares
+  # NO hdf5 dependency at all (verified: every linux-aarch64 build of 6.1.1 lists
+  # only vtk-base and vtk-io-ffmpeg). Its binaries want `libhdf5.so.310` = hdf5
+  # 1.14.x. Meanwhile `vtk-base 9.6.2` exists in two build-7 variants, one migrated
+  # to hdf5 >=2.2 (soname 320); paraview's `vtk-base >=9.6.2,<9.6.3` pin is happy
+  # with either, so the solver picks the hdf5-2.2 one and pvbatch, pvpython AND
+  # `import paraview.simple` all die with "libhdf5.so.310: cannot open shared object
+  # file". Pinning hdf5 to the 1.14 line selects the matching vtk-base and fixes it.
+  #
+  # This is NOT an arm64 gap: linux-64 breaks identically, same missing soname. It is
+  # an underlinking/run-export bug in the paraview feedstock affecting all platforms,
+  # so it belongs upstream rather than in GAPS.md. See GAPS.md for the writeup.
+  - paraview >=6.1
+  - hdf5=1.14.*
+  # --- software rendering, and why it needs BOTH of these ---
+  # There is no GPU, so rendering must be done in software on the CPU. `mesalib`
+  # supplies that (it brings mesa-llvmpipe, the LLVM software rasteriser).
+  #
+  # But llvmpipe alone is not enough, and the usual headless recipe does not work
+  # here. ParaView's three offscreen paths, measured on arm64 in a container:
+  #   - OSMesa  — unavailable. conda-forge has no libOSMesa at ALL: `mesalib` ships
+  #               zero osmesa files and no `osmesa`/`libosmesa` package exists on any
+  #               subdir. ParaView says "libOSMesa not found ... install it from your
+  #               distribution's package manager", which conda users cannot do.
+  #   - EGL     — fails. There is no GPU device node, and EGL_PLATFORM=surfaceless
+  #               still wants EGL_EXT_device_base / EGL_EXT_platform_device, which
+  #               are absent. ParaView: "Could not initialize a device. Exiting..."
+  #   - GLX     — WORKS, against a virtual X server. So we ship one.
+  # Hence xorg-xvfb-server (note the name: `xorg-xvfb` does not exist on conda-forge,
+  # and the package provides `Xvfb` but NOT the `xvfb-run` wrapper script). The smoke
+  # test starts Xvfb itself and sets DISPLAY; so must any consumer.
+  - mesalib
+  - xorg-xvfb-server
+  # pillow is not decoration — it is how the smoke test verifies the render, reading
+  # the PNG back with a library that had nothing to do with producing it and checking
+  # the image actually contains geometry rather than a blank frame.
+  - pillow

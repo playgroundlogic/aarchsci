@@ -3,6 +3,147 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-09-04
+
+### Added — two envs, taking the catalog to 9 (issues #1–#4)
+- **`md` (227 pkgs)** — classical molecular dynamics: gromacs, lammps and ambertools,
+  all OpenMPI, plus mdanalysis/mdtraj/parmed. D3 runs every engine for real: gromacs
+  integrates 216 SPC waters (−9627.9 kJ/mol, −44.6/water) on force-field data the package
+  itself ships, LAMMPS runs the Lennard-Jones melt serially and on 2 ranks with the
+  energies agreeing to 1e-4, and tleap+sander build a capped alanine and conserve energy
+  to **0.0109 kcal/mol** over 20 fs of in-vacuo NVE — a statement about the Fortran
+  kernels' numerical correctness on aarch64, not merely that they load.
+- **`viz` (245 pkgs)** — headless ParaView: `pvbatch`, vtk, mesa/llvmpipe, Xvfb, pillow.
+  D3 renders a filtered Wavelet volume to a PNG with no GPU, then reads the PNG back with
+  pillow — a library with no part in producing it — and asserts the frame contains real
+  geometry (796 distinct colours, background 79.8% of frame) rather than being blank.
+
+### Added — three engines the v1 `dft`/`comp-chem` scoping had declined
+- **`psi4` → `dft`** (H2 RHF/STO-3G = −1.116759 Hartree, an independent native SCF stack
+  beside gpaw's). Requires `psi4 >=1.11`: 1.10 installs cleanly and then dies during
+  `import psi4` with `Could not find required LibXC functional`.
+- **`siesta` → `dft`**, with **deliberately weaker verification than anything else in the
+  catalog** and that fact recorded at the point someone would try to "fix" it. conda-forge
+  siesta ships no pseudopotentials (359 files, none of them data), so there is no SCF: D3
+  asserts the binary self-reports `Architecture: aarch64` and MPI parallelisation, parses
+  a real `.fdf`, runs full initialisation, and distributes over 2 ranks.
+- **`vina` → `comp-chem`** (AutoDock Vina; scores a ligand against a receptor). Note the
+  name — conda-forge `vina`, *not* bioconda `autodock-vina`; only the former has an
+  aarch64 build, so searching the obvious name concludes AutoDock has no arm64 route and
+  is wrong.
+
+### Added — a pinned, verified Apptainer runtime (issue #6, step 1)
+- **`apptainer` (42 pkgs)** — not a science env but the HPC *consumption* path: on a
+  shared cluster there is no Docker daemon, and the runtime that replaces it is Apptainer.
+  conda-forge has a `linux-aarch64` build, so there is no gap here — the absence of one is
+  the finding. This makes the runtime a pinned, verified dependency instead of an
+  assumption, which is what a future "the published image also runs under `apptainer
+  exec` on Graviton" check needs in order to test a known runtime.
+- Pinned to an exact build, `apptainer=1.5.3=h990128b_0`, and D3 **asserts the sha256**
+  (`6f901be0…`) out of `conda-meta` against the spec, so the identity is checked rather
+  than trusted. The build string is pinned deliberately: conda-forge configures this
+  `--without-suid`, which is a property of the build and not of the version — and our lock
+  format cannot see a build-string flip (see the OQ2 limitation above).
+- Verification does real work rather than importing: it packs a directory into a SIF,
+  asserts the container header records an **arm64 squashfs** payload, then dumps that
+  payload back out and compares the bytes. It also asserts the non-suid variant (`starter`
+  present, `starter-suid` absent) and that the unprivileged-mount helpers are all there.
+  Not yet published to Quay.
+- **What it deliberately does not claim: that `apptainer exec` works.** Running a SIF
+  needs a user namespace and Docker's default seccomp profile denies `CLONE_NEWUSER`, so
+  the builder cannot exercise it. The smoke test probes it and reports the outcome as a
+  *note*, never as a pass — claiming otherwise would be the unearned "verified" D3 exists
+  to prevent. That check is issue #6 step 2 and needs a real Graviton host.
+
+### Notable — what happens to a conda image when Apptainer flattens it
+Measured on the published `quay.io/aarchsci/geospatial:latest`, converted with the
+runtime above (aarch64 Linux, so the right ISA; on Apple-silicon Docker Desktop rather
+than Graviton, so not the final word):
+- **SIF conversion works and needs no privileges** — the 1.48 GB OCI image becomes a
+  340 MB SIF, and `apptainer build` runs with no `/dev/fuse` and no seccomp changes.
+- **The full geospatial D3 smoke test passes under `apptainer exec`** — every import, the
+  PROJ reprojection, the GEOS ops and the rasterio/GDAL round-trip. `PATH` survives
+  because Apptainer translates Docker `ENV` into `/.singularity.d/env/10-docker2singularity.sh`.
+- **But conda `activate.d` hooks do not run**, under `exec` *or* under a plain
+  `apptainer run`: `PROJ_DATA` and `GDAL_DATA` are empty where `docker run` sets them, and
+  PROJ prints `Open of /opt/conda/share/proj failed`. The tests still pass, which is the
+  hazard — this is silent degradation, the same class as the gromacs bug below, not a
+  clean failure. Two paths were measured to restore the full activation environment and
+  pass the whole smoke test: `apptainer exec <img> /usr/local/bin/_entrypoint.sh <cmd>`,
+  and `APPTAINER_NO_EVAL=1 apptainer run <img> <cmd>`.
+- **`md`'s engines are unaffected** — gromacs, LAMMPS on 2 ranks, and tleap+sander (energy
+  conserved to 0.0109 kcal/mol) all work under `apptainer exec` with `AMBERHOME` and
+  `GMXBIN` unset, because they locate their data relative to the binary.
+- No consumption instructions are being published yet: that is issue #6 step 3, gated on
+  step 2 passing on real hardware.
+
+### Fixed — a shipped-broken image, caught before publication
+- **conda-forge gromacs's activation script bricks the entire container.** Not an import
+  error: *every* command — `python`, `ls`, the smoke test — exited 1 with only
+  `gmx-completion-*.bash: No such file or directory`. `GMXRC.bash` does
+  `for cfile in $GMXBIN/gmx-completion-*.bash ; do source $cfile ; done` with no
+  existence test, and micromamba-docker's entrypoint runs `set -ef`; `-f` disables
+  globbing, so `source` receives the literal pattern, fails, and `-e` aborts the
+  entrypoint before `exec "$@"`. The completion files exist and are never expanded.
+  Guarded the loop in `builder/Dockerfile` (a no-op for the eight envs without gromacs);
+  that is also the correct upstream fix. Arch-independent — linux-64 has identical code.
+- **`comp-chem` had drifted onto ~800 MB of unreachable CUDA (D4 leak).** `libxc-c` 7.1.2
+  resolved to `cuda_heee54e4_0` (631 MB) where `cpu_h2fc08b2_1` (21 MB) exists, and openmm
+  8.6.0 to a CUDA build pulling `cuda-nvrtc` + `libcufft` (189 MB) — on hardware with no
+  NVIDIA GPU. Root cause is a missing `__cuda` declaration: libxc-c's build-number-**1**
+  CUDA builds declare it (and are correctly excluded here), its build-number-**0** ones
+  declare only `cuda-version >=13.0,<14`, a freely-installable noarch metapackage. Fixed
+  with `libxc-c=*=cpu_*` plus an env-wide `cuda-version <12` backstop, since openmm's
+  build strings carry no cpu/cuda marker to pin against. Download drops 1179 MB → 379 MB.
+  `pyscf` consequently resolves to 2.13.1, the `cpu_*`-flavored build; 2.14.0 *requires*
+  `libxc-c ... cuda_*` and has no CPU-flavored aarch64 build.
+- **`paraview` cannot start as packaged.** conda-forge paraview 6.1.1 links `libhdf5` but
+  declares no hdf5 dependency, so the solver is free to pick the `vtk-base` variant
+  migrated to hdf5 ≥2.2 — after which `pvbatch`, `pvpython` and `import paraview.simple`
+  all die on `libhdf5.so.310: cannot open shared object file`. Fixed in-spec with
+  `hdf5=1.14.*`. Also arch-independent: linux-64 fails identically.
+
+### Notable — a fourth kind of gap, and two blind spots in our own gates
+- **New gap category: python-ABI collision**, and it is the quietest of the four —
+  *nothing fails*. `psi4` 1.11 has aarch64 builds for py310/311/312/**314 but not 313**,
+  and `comp-chem`'s `xtb-python` has no py314 build, so adding psi4 there would have
+  silently moved the whole env to python 3.11 and downgraded 13 packages. The solve
+  succeeds and D3 passes either way; only a lock diff shows it. psi4 went to `dft`
+  (already py314) instead, at zero cost.
+- **Two of this batch's three real bugs are invisible to both automated gates.** A solve
+  can't see them (nothing conflicts) and D3 can't see them (nothing is broken). Reading
+  the lock diff is now part of reviewing a spec change, not a by-product of it.
+- **`envs/*.lock.txt` records `name version` only, so a build-string flip is invisible**
+  to the lock, the lock-hash, and therefore the reconciler's "changed?" test —
+  `cpu_*`→`cuda_*` and `mpi_openmpi_*`→`nompi_*` both leave the lock byte-identical.
+  Recorded as a known limitation under DESIGN OQ2; fixing it properly rewrites every
+  existing lock and hash, so it is a deliberate migration, not a quick edit.
+
+### Corrected (2026-09-04)
+- **"Adding `vina` costs nothing: no package changes version" was wrong.** Measured by
+  solving `comp-chem` with and without it: vina adds one package but *downgrades* four —
+  libboost and libboost-python 1.90.0→1.86.0, rdkit/librdkit 2026.03.5→2026.03.1,
+  eigen-abi 5.0.1.100→3.4.0.100 — because vina 1.2.7's only aarch64 build links boost 1.86
+  and rdkit must follow it down. Still worth shipping; the claim was just unearned.
+- **"psi4 1.11 has aarch64 builds for py310 through py314" was wrong** — py313 is missing,
+  which is the whole reason the collision above exists.
+- **A reported sander drift of 0.011 kcal/mol was right for the wrong reason.** The
+  smoke test's regex was also matching sander's trailing `AVERAGES` and
+  `RMS FLUCTUATIONS` blocks, so `max-min` compared an RMS fluctuation (0.0044) against a
+  total energy (−13.3452) and reported a 13.3496 kcal/mol "drift". D3 caught it as a
+  failure. The parser now stops at the summary blocks and cross-checks against sander's
+  own reported RMS; real conservation is 0.0109.
+- **"`gmx_mpi` is not in `bin/`; the `activate.d` hook is what puts it on PATH" was wrong.**
+  `bin/gmx_mpi` does exist — as a bash dispatcher that reads `uname -m` and execs
+  `bin.ARM_NEON_ASIMD/gmx_mpi`. So `gmx_mpi` runs with no activation whatsoever, measured
+  under `apptainer exec`. Plain `gmx` still does not exist, and the activation hook still
+  bricks the image unpatched; only the reason `gmx_mpi` is reachable was wrong.
+- **Three claims in the env-request issues did not survive measurement**: siesta ships no
+  bundled example (359 files, no data of any kind); LAMMPS does not ship `bench/in.lj`
+  (42 files — two binaries and the Python module), so `md` writes the melt input itself;
+  and gromacs *does* ship its force fields and `spc216.gro`, the opposite of what was
+  assumed for it.
+
 ## 2026-08-19
 
 ### Notable (five-generation Graviton sweep: Graviton2 → Graviton5)

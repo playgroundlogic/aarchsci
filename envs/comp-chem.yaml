@@ -27,3 +27,57 @@ dependencies:
   - ase
   - pyscf
   - xtb-python
+  # --- CPU-only enforcement: BOTH lines are load-bearing (D4) ---
+  # Graviton has no NVIDIA GPU, so any CUDA package here is dead weight. conda-forge's
+  # mechanism for that is the `__cuda` virtual package: a CUDA build should declare it,
+  # and then a GPU-less host cannot select it. Two feedstocks in this env don't, and in
+  # 2026-09 the channel drifted such that the solver picked CUDA builds of both —
+  # adding ~800 MB of unreachable GPU code to a CPU image. Neither the solve nor the D3
+  # smoke test can see this: nothing is broken, it is just wrong. Measured:
+  #
+  #   libxc-c 7.1.2 cuda_heee54e4_0   631 MB   vs  cpu_h2fc08b2_1    21 MB
+  #   openmm  8.6.0 py313h37662f7_0   + cuda-nvrtc 38 MB + libcufft 151 MB
+  #
+  # libxc-c is the clearer bug: its build-NUMBER-1 CUDA builds DO declare `__cuda`
+  # (so they are correctly excluded here), but the build-number-0 ones declare only
+  # `cuda-version >=13.0,<14` — a freely-installable noarch metapackage — so they stay
+  # selectable on a GPU-less host. `pyscf` 2.14.0 *requires* `libxc-c ... cuda_*`, so
+  # the pin below is also why pyscf resolves to 2.13.1 (the `cpu_*`-flavored build,
+  # bn=100) rather than 2.14.0. That downgrade is the price of not shipping 610 MB of
+  # CUDA, and it is the right trade.
+  - libxc-c=*=cpu_*
+  # openmm needs the second line because its build strings carry NO cpu/cuda marker to
+  # pin (`py313hc0cd0fd_0` is the CPU build, `py313h37662f7_0` the CUDA one, same build
+  # number), so an exact pin would freeze both the openmm and the python version. This
+  # instead states the env-wide policy once: no CUDA runtime. It is deliberately a
+  # backstop as well as a fix — the regression above arrived by channel drift and will
+  # again, possibly in a package that has no flavor marker either.
+  #
+  # Consequence to expect: `cuda-version 11.8` DOES appear in comp-chem.lock.txt. It is
+  # a zero-payload noarch metapackage holding no CUDA code whatsoever — its only job is
+  # to be the version that no GPU build here can accept. `ocl-icd`/`ocl-icd-system`
+  # (0.1 MB) also remain: those are the OpenCL loader, which openmm's CPU build links
+  # unconditionally, not CUDA.
+  - cuda-version <12
+  # psi4 was requested here (issue #2) but lives in `dft` instead. It is not a
+  # packaging gap — psi4 1.11 is fine on arm64 — it is a python-version collision
+  # measured in this env: psi4 1.11 has linux-aarch64 builds for py310/311/312/314
+  # but NOT py313, and `xtb-python` has no py314 build, so the only python where
+  # both fit is 3.11. Forcing that here downgrades 13 packages (python 3.13->3.11,
+  # numpy 2.5->2.4, scipy 1.18->1.17, hdf5 2.2->1.14, rdkit, pyscf, libboost).
+  # `dft` already runs py314, so psi4 joins there for free. See envs/dft.yaml.
+  #
+  # --- docking ---
+  # AutoDock Vina. NOTE THE NAME: conda-forge `vina`, NOT bioconda `autodock-vina`.
+  # Different packages for the same program, and only `vina` has a linux-aarch64
+  # build — searching the obvious name concludes AutoDock has no arm64 route and is
+  # wrong (issue #2).
+  #
+  # It is not free, though. Measured by solving this env with and without it: vina adds
+  # exactly ONE package but downgrades four, because vina 1.2.7's only aarch64 build
+  # links boost 1.86 and rdkit has to follow it down:
+  #   libboost 1.90.0 -> 1.86.0, libboost-python likewise,
+  #   rdkit/librdkit 2026.03.5 -> 2026.03.1, eigen-abi 5.0.1.100 -> 3.4.0.100
+  # Two patch releases of rdkit is a fair price for a docking engine; recorded here so
+  # the next reader doesn't mistake it for unexplained staleness.
+  - vina

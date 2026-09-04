@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">7</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft</div>
+                    <div class="stat-num green">9</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -218,6 +218,8 @@ docker pull <span class="k">quay.io/aarchsci</span>/climate:latest
 docker pull <span class="k">quay.io/aarchsci</span>/pointcloud:latest
 docker pull <span class="k">quay.io/aarchsci</span>/comp-chem:latest
 docker pull <span class="k">quay.io/aarchsci</span>/dft:latest
+docker pull <span class="k">quay.io/aarchsci</span>/md:latest
+docker pull <span class="k">quay.io/aarchsci</span>/viz:latest
                 </div>
                 <div class="code">
 <span class="c"># re-run the verification yourself — it ships inside the image</span>
@@ -300,7 +302,7 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                 </div>
                 <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
                   <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">comp-chem</span><br>
-                  <strong>195 packages</strong> — cheminformatics, molecular dynamics &amp; quantum chemistry
+                  <strong>210 packages</strong> — cheminformatics, molecular dynamics, quantum chemistry &amp; docking
                 </p>
                 <div class="catalog">
                     <span class="chip">rdkit</span>
@@ -311,13 +313,16 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                     <span class="chip">ase</span>
                     <span class="chip">pyscf</span>
                     <span class="chip">xtb</span>
+                    <span class="chip">vina</span>
                 </div>
                 <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
                   <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">dft</span><br>
-                  <strong>191 packages</strong> — plane-wave &amp; LCAO density-functional theory, MPI-parallel
+                  <strong>225 packages</strong> — plane-wave &amp; LCAO density-functional theory, MPI-parallel
                 </p>
                 <div class="catalog">
                     <span class="chip">gpaw</span>
+                    <span class="chip">siesta</span>
+                    <span class="chip">psi4</span>
                     <span class="chip">ase</span>
                     <span class="chip">libxc</span>
                     <span class="chip">libvdwxc</span>
@@ -332,7 +337,53 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                 <p class="footer-note" style="margin-top:0.75rem;">
                   The first MPI-parallel env — its verification runs the same bulk-silicon DFT
                   calculation serially and under <code>mpiexec -n 2</code>, and fails unless the
-                  two energies agree.
+                  two energies agree. <code>siesta</code> is the one documented exception to the
+                  functional standard: conda-forge ships no pseudopotentials, so it is verified as
+                  an aarch64 MPI binary parsing a real input across 2 ranks, not as an SCF.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">md</span><br>
+                  <strong>227 packages</strong> &mdash; classical molecular dynamics, MPI-parallel
+                </p>
+                <div class="catalog">
+                    <span class="chip">gromacs</span>
+                    <span class="chip">lammps</span>
+                    <span class="chip">ambertools</span>
+                    <span class="chip">openmpi</span>
+                    <span class="chip">mpi4py</span>
+                    <span class="chip">mdanalysis</span>
+                    <span class="chip">mdtraj</span>
+                    <span class="chip">parmed</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  Every engine is run for real, on data the packages themselves ship: gromacs
+                  integrates 216 SPC waters, LAMMPS melts a Lennard-Jones lattice on 1 and 2 ranks
+                  with the energies agreeing, and <code>sander</code> conserves energy to
+                  <strong>0.0109&nbsp;kcal/mol</strong> &mdash; which says the Fortran kernels are
+                  numerically correct on aarch64, not merely that they load. Note the gromacs binary
+                  is <code>gmx_mpi</code>, and conda-forge builds it <code>ARM_NEON_ASIMD</code>, so
+                  it uses NEON and leaves SVE/SVE2 idle on Graviton&nbsp;3+.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">viz</span><br>
+                  <strong>245 packages</strong> &mdash; headless scientific visualisation, rendered on CPU
+                </p>
+                <div class="catalog">
+                    <span class="chip">paraview</span>
+                    <span class="chip">pvbatch</span>
+                    <span class="chip">vtk</span>
+                    <span class="chip">mesa / llvmpipe</span>
+                    <span class="chip">Xvfb</span>
+                    <span class="chip">pillow</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  The clearest case in the catalog for why &ldquo;verified&rdquo; means a functional
+                  test: a bare <code>conda install paraview</code> cannot even start, because
+                  paraview links <code>libhdf5</code> without declaring it. Here the smoke test
+                  renders a filtered volume to a PNG with no GPU, then reads that PNG back with
+                  pillow &mdash; which had no part in drawing it &mdash; and proves the frame contains
+                  real geometry rather than a blank background. No GPU needed; a display <em>is</em>
+                  (Xvfb ships in the image).
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

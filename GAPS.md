@@ -12,7 +12,7 @@ fixing the native-lib/ABI bug that makes a package solve-but-not-assemble. Our j
 is to surface, verify, and prioritize them. The daily reconciler re-checks and the
 skip-list (`farm/skip-list.tsv`) stops us looping on known dead-ends.
 
-## Three kinds of gap (and why the second is the one that matters here)
+## Four kinds of gap (and why the second is the one that matters here)
 
 Unlike aarchbio — whose gap is simply *"no arm64 build exists"* (a solve check
 suffices) — aarch.science has to distinguish several failure modes:
@@ -22,6 +22,7 @@ suffices) — aarch.science has to distinguish several failure modes:
 | **solve-gap** | the package has no `linux-aarch64` build on conda-forge, so the env won't even resolve | `builder/solve-hash.sh` fails to solve |
 | **assemble-gap** | the env *solves* but a package fails to **import / run** on arm64 (missing native lib, ABI mismatch, broken build) — the trap that bit fieldwork on pip | the D3 smoke test fails inside the built arm64 image |
 | **MPI-flavor conflict** | the package has an arm64 build and solves *standalone*, but only against an MPI implementation that conflicts with the rest of the env | the env solve fails while the package alone solves fine |
+| **python-ABI collision** | the package has arm64 builds, but the set of Python versions it was built for doesn't intersect what another env member needs, so adding it silently drags the whole env to an older Python | the env still solves — but the resolved set regresses; only a lock diff shows it |
 
 The **assemble-gap is the dangerous one** and the reason "verified" means a
 functional smoke test, not a green solve. A solve-gap is loud; an assemble-gap is
@@ -36,6 +37,22 @@ arm64. It looks like a solve-gap from inside the env and like no gap at all from
 outside it — which is why it needs its own name. `abinit` is the first instance; see
 Active gaps.
 
+The fourth kind was found in 2026-09 while adding `psi4` to `comp-chem`, and it is the
+**quietest of the four**: nothing fails. The solve succeeds, the smoke test passes, the
+image ships — it is just an older image than before. conda-forge builds compiled Python
+packages once per Python minor version, so a package effectively carries a *set* of
+Python ABIs, and adding a package intersects that set with every other member's. If the
+intersection excludes the Python the env was running, the solver does the only thing it
+can and moves the whole env back. `psi4` 1.11 has `linux-aarch64` builds for
+py310/311/312/**314 but not 313**, and `comp-chem`'s `xtb-python` has no py314 build, so
+the only Python satisfying both is 3.11 — which would have downgraded 13 packages
+(python 3.13→3.11, numpy 2.5→2.4, scipy 1.18→1.17, hdf5 2.2→1.14, plus rdkit, pyscf and
+libboost). Neither the D3 smoke test nor the solve can catch this, because neither is
+broken. **The only detector is reading the lock diff** — which is why a lock diff is now
+part of reviewing any spec change, not just an artifact of it. The fix here needed no
+upstream work at all: `dft` already runs py314, so psi4 went there instead and cost
+nothing. See `envs/dft.yaml`.
+
 ## Summary (as of 2026-08)
 
 | Kind | Count | Notes |
@@ -43,12 +60,13 @@ Active gaps.
 | **solve-gap** | 16 | No `linux-aarch64` build at all. Engines/potentials: `cp2k`, `sisl`, `asap3`, `kimpy`, `openkim-models`, `quippy`, `chgnet`, `m3gnet`. Phonons/transport: `phono3py`, `alamode`, `dynaphopy`, `boltztrap2`, `kwant`. DMFT: `triqs`, `triqs_dft_tools`, `edrixs`. All surfaced while scoping `dft` and probing its neighborhood; **none blocks a shipping env** — they are candidates we probed and declined. `cp2k` is the highest-value target, `phono3py` the cheapest. |
 | **assemble-gap** | 1 | `whitebox` — solves, imports, but fetches an amd64 binary at runtime (wontfix); see below |
 | **MPI-flavor conflict** | 1 | `abinit` — has an arm64 build, solves standalone, but MPICH-only (stuck); see below |
+| **python-ABI collision** | 1 | `psi4` in `comp-chem` — no py313 arm64 build; relocated to `dft` (py314) instead of downgrading 13 packages. Not a gap in any shipping image; see below |
 
 **The curated science head is near-complete on arm64.** This is still the real
 finding, and it's the inverse of the pip experience: the exact stack that fails
 `No matching distribution found for rasterio` on PyPI solves *and* assembles cleanly
-on conda-forge. Seven envs ship verified (geospatial, earth-observation, geo-ml,
-climate, pointcloud, comp-chem, dft), and every headline package in all seven
+on conda-forge. Nine envs ship verified (geospatial, earth-observation, geo-ml,
+climate, pointcloud, comp-chem, dft, md, viz), and every headline package in all nine
 assembles and does real work natively.
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
@@ -75,6 +93,65 @@ exists for — both would have shipped broken under a solve-only check:
   ESMF 8.4 module rename (`ESMF` → `esmpy`). Fixed by pinning `xesmf >=0.8.4` in
   the spec so the post-rename line is chosen. Not a gap — a version floor.
 - **`whitebox` (pointcloud)** — see Active gaps below.
+
+### Bugs D3 caught that are *not* arm64 gaps (2026-09, adding `md` and `viz`)
+
+The most useful thing this section records is a negative result. Scoping the `md` and
+`viz` envs turned up three packaging bugs severe enough to ship a broken image — and
+**none of them is an arm64 problem**. Each reproduces identically on `linux-64`. They
+are ordinary feedstock bugs that the arm64 route merely happened to walk into first,
+and saying so plainly matters: this project's credibility rests on not inflating its
+own findings, and "the arm64 build is broken" would have been the wrong claim in all
+three cases. All three are fixed in-spec (or in the builder) and none is skip-listed.
+
+- **`paraview` underlinks `libhdf5` (assemble-gap, arch-independent).** conda-forge
+  `paraview` 6.1.1 links `libhdf5` directly but declares **no hdf5 dependency at all**
+  — every `linux-aarch64` build of 6.1.1 lists only `vtk-base` and `vtk-io-ffmpeg`. Its
+  binaries want `libhdf5.so.310` (hdf5 1.14.x), but `vtk-base` 9.6.2 exists in two
+  build-7 variants, one migrated to hdf5 ≥2.2 (soname 320), and paraview's
+  `vtk-base >=9.6.2,<9.6.3` pin accepts either. The solver picks the hdf5-2.2 one and
+  then `pvbatch`, `pvpython` **and** `import paraview.simple` all die with
+  `libhdf5.so.310: cannot open shared object file`. A bare `conda install paraview`
+  cannot start. Fixed in-spec with `hdf5=1.14.*`; the real fix is a missing
+  run-export/dependency in
+  [`conda-forge/paraview-feedstock`](https://github.com/conda-forge/paraview-feedstock).
+  Verified identical on linux-64, same missing soname.
+- **`gromacs`'s activation script bricks the whole image (arch-independent).** The
+  worst of the three, because it fails *before* any of our checks: it is not an import
+  error, it is every command in the container exiting 1. `GMXRC.bash` does
+  `for cfile in $GMXBIN/gmx-completion-*.bash ; do source $cfile ; done` with no
+  existence test, and micromamba-docker's entrypoint runs `set -ef` — `-f` disables
+  globbing, so `source` gets the literal pattern, fails, and `-e` aborts the entrypoint
+  before `exec "$@"`. The completion files exist; the glob is simply never expanded.
+  Repaired in [`builder/Dockerfile`](builder/Dockerfile) by guarding the loop, which is
+  also the correct upstream fix (the loop is unsafe for any build that ships no
+  completion files, on any platform). Worth recording as a *class*: a package's
+  `activate.d` hook is executed by our entrypoint under flags the package never tested
+  against, so it is attack surface for image usability that no `import` check can see.
+- **`libxc-c` and `openmm` CUDA builds are installable on GPU-less hosts (D4 leak).**
+  Not a break — a silent 800 MB of unreachable GPU code in a CPU image, which is worse
+  in one respect: nothing fails, so neither the solve nor D3 can see it. conda-forge's
+  mechanism for this is the `__cuda` virtual package, and `libxc-c` 7.1.2 shows the bug
+  precisely: its **build-number-1** CUDA builds declare `__cuda` (correctly excluded on
+  a GPU-less host) while its **build-number-0** CUDA builds declare only
+  `cuda-version >=13.0,<14`, a freely-installable noarch metapackage. `pyscf` 2.14.0
+  *requires* `libxc-c ... cuda_*`, so `comp-chem` drifted onto a 631 MB libxc-c where a
+  21 MB one exists. `openmm` 8.6.0 has the same missing `__cuda` and, worse, no
+  cpu/cuda marker in its build string to pin against. Fixed in-spec (see
+  `envs/comp-chem.yaml`); upstream targets are
+  [`conda-forge/libxc-feedstock`](https://github.com/conda-forge/libxc-feedstock) and
+  [`conda-forge/openmm-feedstock`](https://github.com/conda-forge/openmm-feedstock).
+  This is the same hazard already noted for `lammps` in `envs/md.yaml` — three
+  feedstocks now, so it is a pattern rather than an oddity.
+
+**Two of these three are invisible to both of the project's automated gates**, which is
+the finding that should change how specs get reviewed. A solve cannot see them (nothing
+conflicts) and D3 cannot see them (nothing is broken); the CUDA leak and the
+python-ABI collision are only detectable by *reading the lock diff*. That is now part
+of reviewing a spec change. See also the lock-format limitation noted in
+[DESIGN.md](DESIGN.md) under OQ2: the lock records `name version` only, so a build-string
+flip — `cpu_*`→`cuda_*`, or `mpi_openmpi_*`→`nompi_*` — changes neither the lock nor the
+lock-hash, and is therefore invisible to the reconciler as well.
 
 ### Coverage probe (conda-forge linux-aarch64 dry-run solve)
 
@@ -109,10 +186,36 @@ The first probe to return real gaps. Resolving native arm64 on conda-forge:
 **Arm64 build exists but MPICH-only (MPI-flavor conflict):** `abinit`
 
 `siesta`, `dftbplus`, `lammps`, `nwchem` and `psi4` all co-solve with the shipped
-OpenMPI `dft` stack, so they are *available* — they're left out of the v1 spec for a
+OpenMPI `dft` stack, so they are *available* — they were left out of the v1 spec for a
 verification reason, not an arm64 one. `gpaw` is in precisely because `gpaw-data` ships
 its PAW setups in-package (559 files, resolved from disk with no runtime download —
 cf. `whitebox`), so D3 can do real work rather than merely `import`.
+
+**Three of those five have since shipped** (2026-09), and the v1 reasoning above survives
+in an amended form rather than intact:
+
+- **`psi4` → `dft`.** Ships basis sets (see the table below), so it clears the bar
+  outright: D3 runs H2 RHF/STO-3G = -1.116759 Hartree against an independent native
+  integral/SCF stack. It went to `dft` rather than `comp-chem` because of the
+  python-ABI collision described above, and it needs `psi4 >=1.11` — 1.10 installs
+  cleanly against `libxc-c` 7.1.2 and then dies during `import psi4` with
+  `Fatal Error: Could not find required LibXC functional`.
+- **`lammps` → `md`.** Ships no potential files, but the canonical Lennard-Jones melt
+  needs none, so D3 runs real MD (TotEng ≈ -2.30 reduced units) and checks 2-rank MPI
+  agrees. The data objection turned out to be avoidable rather than fatal — for this
+  engine, by choosing a physics problem whose potential is analytic.
+- **`siesta` → `dft`, and this one is a genuine compromise.** The v1 objection holds
+  exactly as written and could not be engineered around: siesta needs a pseudopotential
+  per element and conda-forge's package ships none. So `siesta` gets **weaker
+  verification than every other headline package in the catalog** — no SCF. D3 asserts
+  the binary self-reports `Architecture: aarch64` and an MPI parallelisation, parses a
+  real `.fdf`, runs its full initialisation, and distributes over 2 ranks; it stops at
+  `pseudo_read`, which is where the missing data stops it. That is a real process doing
+  real work and it is honestly weaker than `gpaw`'s. It is recorded in
+  `envs/dft.smoke.py` at the point where someone would otherwise "strengthen" the checks
+  and be puzzled.
+
+`dftbplus` and `elk` remain out on the unchanged v1 grounds.
 
 **Does each engine ship the data its calculations need?** This was first written up as a
 blanket "none of them does," which was wrong. Checked properly by extracting the arm64
@@ -121,9 +224,10 @@ packages and looking (2026-08-18):
 | Package | Ships its own data? | Evidence |
 |---|---|---|
 | `nwchem` | **yes** | 606 basis files in `share/nwchem/libraries`, 1339 more in `libraries.bse`, 8 pseudopotentials in `libraryps` |
-| `siesta` | no | ships only the `gen-basis` tool; no basis/pseudopotential data |
+| `siesta` | no | 359 files — the binaries, `libpsml` and the `psml2psf` converter. Zero `*.psf`, `*.vps` or `*.psml` data, and **no bundled example inputs either** (issue #1 assumed an example ships; measured, none does). The obvious source, conda-forge `pseudo_dojo`, is 0.2 MB of code with no tables and pins `numpy <1.25` / `pymatgen <=2023.9.10`, so it would wreck the env twice over |
 | `dftbplus` | no | zero `*.skf` files in the whole prefix; `share/` holds only toolchain/doc dirs plus the bundled `dftd4` and `s-dftd3` dispersion data. Upstream distributes Slater-Koster sets separately from the code |
-| `lammps` | no | no `potentials/` directory in the conda package |
+| `lammps` | no | 42 files total: `bin/lmp`, `bin/lmp_mpi` and the Python module. No `potentials/` directory, and **no `bench/in.lj`** — issue #3 assumed that input ships with the package; it does not, so `md`'s smoke test writes the melt input itself |
+| `gromacs` | **yes** | the opposite of what was assumed: ships `share/gromacs/top` with the full force-field set (`amber99sb-ildn.ff`, `tip3p.itp`) and reference structures including `spc216.gro`, so `md`'s D3 runs real solvated MD with nothing staged or downloaded |
 | `elk` | no | no species files anywhere in the prefix |
 | `psi4` | **yes** | `share/psi4/` ships `basis`, `databases`, `grids`, `quadratures` and `samples`, plus libint's 90 basis files in `share/libint/<ver>/basis`. Proven functionally: psi4 1.11 ran H2O SCF/cc-pVDZ = -76.026620 Eh offline on arm64, resolving the basis from `share/psi4/basis` |
 
