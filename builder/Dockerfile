@@ -39,8 +39,23 @@ USER root
 # The channel(s) come from the env YAML itself (conda-forge), so no -c flags here:
 # the spec is fully self-describing and stays the single source of truth.
 COPY ${ENV_FILE} /opt/aarchsci/env.yaml
+# The `rm -rf` is NOT redundant with `clean --all`, and the reason is worth stating so
+# nobody deletes it as belt-and-braces. `clean --all` drops tarballs and index cache but
+# deliberately keeps the EXTRACTED package directories under $MAMBA_ROOT_PREFIX/pkgs,
+# because the base env is using them — conda hardlinks from pkgs into the prefix, so
+# from clean's point of view they are all in use. Every package therefore appears twice
+# in the filesystem tree (measured on `r`: 329 pkgs entries for 328 packages).
+#
+# Removing the pkgs path drops ONE of the two links; the file survives at links=1 with
+# its blocks intact, which is why this is safe rather than clever. It must be in THIS
+# RUN layer — a later layer would only add a whiteout and save nothing.
+#
+# Honest accounting (issue #10): most of what `du` attributes to pkgs is shared with the
+# prefix and stored once in the layer tar, so the win is ~170MB per env, not the ~2.2GB
+# `du -sm /opt/conda/pkgs` suggests. Small, free, and applies to every env.
 RUN micromamba install -y -n base -f /opt/aarchsci/env.yaml \
-    && micromamba clean --all --yes
+    && micromamba clean --all --yes \
+    && rm -rf /opt/conda/pkgs
 
 # Repair conda-forge gromacs's activation script, which otherwise BRICKS THE IMAGE.
 #

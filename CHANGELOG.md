@@ -5,6 +5,35 @@ versioned per-image (date + content-hash tags); this records project-level miles
 
 ## 2026-09-04
 
+### Changed — drop the extracted package cache from every image (issue #10)
+- **`builder/Dockerfile` now `rm -rf /opt/conda/pkgs` in the install layer.** Measured on
+  `r`: **3.51GB → 3.22GB, 290MB saved**, with `/opt/conda` going 2413MB → 2195MB. Applies
+  to all ten envs. D3 re-run and passed, including `Rcpp::sourceCpp` — the check most
+  likely to notice, since it invokes the toolchain. Lock-hash unchanged
+  (`813f6d1c2008`, 328 pkgs), so the change is invisible to OQ2/OQ4 and churns no locks.
+- **Why `clean --all` wasn't already enough.** `micromamba clean --all --yes` drops
+  tarballs and index cache but deliberately keeps the *extracted* package directories,
+  because the base env is using them — conda hardlinks from `pkgs` into the prefix, so
+  from clean's point of view every one is in use. Every package therefore appeared twice
+  in the tree: 329 `pkgs` entries for 328 packages. The Dockerfile's expectation was
+  wrong, not micromamba's behaviour. Removing the `pkgs` path drops one of two links and
+  leaves the file at `links=1` with its blocks intact.
+- **The measurement went wrong twice before it went right, which is the part worth
+  keeping.** `du -sm /opt/conda/pkgs` reports 2241MB on a 3.51GB image, which reads like a
+  2.2GB win; it isn't, because ~1959MB of that is hardlinked into the prefix (same inode,
+  `links=2`) and stored once in the layer tar. Splitting `pkgs` by link count gave 170MB
+  of genuinely unshared file bytes — an *under*-estimate, because the real image saving
+  also includes `conda-meta`, cached repodata and directory entries. Only the before/after
+  image size settled it at 290MB. Neither `du` nor the link-count arithmetic was the
+  answer; building it and looking was. Same discipline D3 applies to packages, applied to
+  our own numbers.
+- **Not attempted: the toolchain.** For `r` the 290MB is a rounding error next to
+  `sysroot_linux-aarch64` (469MB) + `gcc_impl` (276MB) + `libstdcxx-devel` (117MB) ≈
+  860MB. That stays: `r-rcpp` needs a working compiler, an R image where `sourceCpp()`
+  fails is a trap, and D3 compiles C++ specifically to prove it doesn't. Splitting
+  runtime from devel images is a real question but it touches OQ1 (granularity) and is
+  not a size fix.
+
 ### Added — an `r` env, the catalog's 10th and its first non-Python one (issue #8)
 - **`r` — 328 packages, lock-hash `s813f6d1c2008`.** R 4.5.3 plus `r-recommended`, the
   tidyverse, `data.table`, `arrow`, `sf`/`terra`, `glmnet`/`randomForest`/`caret`,
