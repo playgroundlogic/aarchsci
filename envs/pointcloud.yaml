@@ -4,6 +4,10 @@
 # whitebox + richdem for terrain/hydrology on DEMs. PDAL's deep native-lib stack is
 # exactly the assemble-not-solve risk D3 exists for — a strong verification showcase.
 # Versions left to the channel's current; the reconciler pins + rebuilds on change.
+#
+# rasterio resolves to 1.5.0, not 1.5.1, for the same reason as `geospatial` — a
+# fiona/imagecodecs/giflib-6 interaction upstream, not an arm64 gap and not fixable by a
+# spec pin. The full measured chain is documented in envs/geospatial.yaml.
 name: pointcloud
 channels:
   - conda-forge

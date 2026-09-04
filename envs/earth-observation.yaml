@@ -4,6 +4,10 @@
 # stackstac/pystac-client/odc-stac for pulling STAC catalogs into xarray.
 # Versions left to the channel's current; the reconciler pins + rebuilds on change.
 # Headline packages get import + functional smoke tests (D3).
+#
+# rasterio resolves to 1.5.0, not 1.5.1, for the same reason as `geospatial` — a
+# fiona/imagecodecs/giflib-6 interaction upstream, not an arm64 gap and not fixable by a
+# spec pin. The full measured chain is documented in envs/geospatial.yaml.
 name: earth-observation
 channels:
   - conda-forge

@@ -219,6 +219,67 @@ than Graviton, so not the final word):
   catalog: **4 envs pair rasterio 1.5.0 with numpy 2.5.2** (`geospatial`,
   `earth-observation`, `geo-ml`, `pointcloud`). Belongs upstream in rasterio; not a
   `GAPS.md` entry, since nothing here is architecture-specific.
+- **Follow-up the same day: already fixed upstream, and we still cannot take the fix.**
+  rasterio [#3592](https://github.com/rasterio/rasterio/issues/3592) was opened 2026-07-21
+  and closed 2026-08-18 naming the identical root cause; [#3597](https://github.com/rasterio/rasterio/pull/3597)
+  replaced the `out.shape =` assignments with `np.expand_dims`/`np.squeeze`, merged into
+  `maint-1.5`, released in **1.5.1** (2026-08-07). Verified by diffing `_io.pyx` at both
+  tags, including line 660 — the exact frame traced above. So nothing should be filed.
+- But **no spec change can reach 1.5.1 today**, and finding out why took bisecting real
+  solves rather than reading pins. rasterio 1.5.1 needs `libgdal-core >=3.13.2`; `fiona`
+  1.10.1 has **no build against the 3.13.2 line** (its builds pin `>=3.12.1,<3.13`, then
+  jump to `>=3.13.3,<3.14` — that jump landed 2026-09-03), so fiona forces 3.13.3; gdal
+  from 3.13.2 build _3 onward requires **giflib >=6.1.3** after conda-forge's giflib 5→6
+  migration; and `scikit-image` → `tifffile` → `imagecodecs` still pins `giflib <5.3`
+  (newest build 2026.8.16). The only joint solution is gdal 3.12.4, which caps rasterio at
+  1.5.0. Dropping `fiona` alone solves to gdal 3.13.2 + rasterio 1.5.1 + scikit-image,
+  which is what isolates the cause. Adding a `rasterio >=1.5.1` or `gdal >=3.13.2` floor
+  makes the env **unsolvable**, not newer — so the correct action is to change nothing and
+  document it (done, in `envs/geospatial.yaml`). It clears itself when imagecodecs is
+  rebuilt for giflib 6, and the reconciler will notice.
+- Not a `GAPS.md` entry either: it reproduces on every subdir. The finding is that our
+  four geo envs are pinned to a stale rasterio by a **migration lag two packages away from
+  anything we ask for** — which is only visible if you bisect the solve.
+
+### Added — Apptainer verified on real Graviton, and the docs were wrong (issue #6, step 2 + 3)
+- Converted three published images to SIF and ran their in-image smoke tests on a **c8g
+  (Graviton4)** host — rootless, non-suid, using the exact pinned runtime from
+  `envs/apptainer.yaml`. **`geospatial`, `dft` and `md` pass under all three of
+  `apptainer exec`, `apptainer run`, and `run --cleanenv`**, including `dft`/`md`'s 2-rank
+  MPI legs; `dft` reproduced its serial bulk-Si energy to 6e-08 eV under Apptainer, the
+  same delta as under Docker. This is what earns the Apptainer consumption instructions
+  now in `README.md` (step 3, which was gated on this).
+- **The `activate.d` worry was real but not load-bearing.** Measured the difference
+  directly instead of assuming: `exec` loses exactly seven variables (`CONDA_PREFIX`,
+  `CONDA_DEFAULT_ENV`, `CONDA_SHLVL`, `CONDA_PROMPT_MODIFIER`, `GSETTINGS_SCHEMA_DIR` and
+  its backup, `XML_CATALOG_FILES`) plus one `PATH` entry. No env in this catalog needs any
+  of them. `run` is still documented as the default, because it is the mode that survives a
+  future package putting something important in `activate.d`.
+- **Corrects an upstream documentation claim.** Apptainer's admin guide states it "does not
+  use `fusermount` in any mode". On a host with no `fusermount3`, every successful run
+  still ends in `Cleanup error: ... Failed to call 'fusermount3'` — true of mounting, false
+  of unmounting. Cosmetic (all exit codes were 0) but it reads as a failure; `--unsquash`
+  avoids it. Verified `fusermount3`/`fusermount` were absent from both the conda prefix and
+  the host.
+- Also closed two items issue #6 listed as unexercised: the **writable-overlay path works**
+  (`--writable-tmpfs` via `fuse-overlayfs`), and **provenance survives conversion** —
+  `apptainer inspect` still reports `org.opencontainers.image.revision` and `.source`.
+- `envs/apptainer.yaml` stays unpublished, but for a **new and permanent** reason rather
+  than the old gate: it is a runtime you install with conda, not a stack you pull.
+  Publishing the tool that runs containers *as* a container is a circle.
+
+### Notable — every published image already declares its platform, verified on x86 hardware
+- Checked whether the catalog needs a `platform` key. It already has one: all nine tags are
+  OCI **image indexes** (`application/vnd.oci.image.index.v1+json`) with an explicit
+  `linux/arm64` entry plus a buildx attestation manifest. An earlier reading that said
+  otherwise was an artifact of `docker manifest inspect`, which resolves an index down to
+  the single matching manifest and hides the platform list; `imagetools inspect --raw`
+  shows it.
+- The consequence is the one that matters and it was confirmed on a real x86_64 host, not
+  inferred: `docker pull quay.io/aarchsci/geospatial:latest` on amd64 fails at the registry
+  with `no matching manifest for linux/amd64`, rather than pulling an arm64 image that dies
+  later with an exec-format error. For an arch-correctness project that clean failure is
+  the point, so no change is needed.
 
 ### Corrected (2026-09-04)
 - **"Adding `vina` costs nothing: no package changes version" was wrong.** Measured by

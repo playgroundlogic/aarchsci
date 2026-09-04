@@ -5,6 +5,10 @@
 # CPU-bound training/inference is the strongest Graviton price/perf case (D4: GPU
 # is out — this is deliberately the CPU ML stack).
 # Versions left to the channel's current; the reconciler pins + rebuilds on change.
+#
+# rasterio resolves to 1.5.0, not 1.5.1, for the same reason as `geospatial` — a
+# fiona/imagecodecs/giflib-6 interaction upstream, not an arm64 gap and not fixable by a
+# spec pin. The full measured chain is documented in envs/geospatial.yaml.
 name: geo-ml
 channels:
   - conda-forge

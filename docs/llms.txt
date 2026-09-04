@@ -59,6 +59,30 @@ a GeoJSON through fiona). The smoke test is baked into the image:
 - Tags: `latest`, a date tag (e.g. `2026.06.25`), and a content-addressed
   `s<lock-hash>` tag (the hash of the resolved package set).
 - Works on Apple Silicon and AWS Graviton (linux/arm64).
+- Each tag is an OCI image index declaring `linux/arm64` explicitly, so `docker pull` on
+  x86_64 fails at the registry (`no matching manifest for linux/amd64`) instead of
+  pulling an image that dies later with an exec-format error. Confirmed on x86_64.
+
+## On HPC, without a Docker daemon (Apptainer)
+
+Verified on a real Graviton4 (c8g) host, rootless and non-suid, on 2026-09-04:
+```
+apptainer build geospatial.sif docker://quay.io/aarchsci/geospatial:latest
+apptainer run geospatial.sif python /opt/aarchsci/smoke.py
+```
+- Use `run`, not `exec`: `run` goes through the image entrypoint, which sources conda's
+  `etc/conda/activate.d/*.sh`. `exec` skips it, which costs seven variables
+  (`CONDA_PREFIX`, `CONDA_DEFAULT_ENV`, `CONDA_SHLVL`, `CONDA_PROMPT_MODIFIER`,
+  `GSETTINGS_SCHEMA_DIR` + backup, `XML_CATALOG_FILES`) and one `PATH` entry. None of
+  those mattered to the three envs tested — `geospatial`, `dft` and `md` pass under
+  `exec`, `run` and `run --cleanenv`, including the 2-rank MPI legs. The other six envs
+  are untested under Apptainer.
+- The runtime itself is `envs/apptainer.yaml` (apptainer 1.5.3, conda-forge
+  linux-aarch64). Install it with conda; it is deliberately not published as an image.
+- `--writable-tmpfs` (fuse-overlayfs) works. A successful run may still print
+  `Cleanup error: ... Failed to call 'fusermount3'` on hosts without fusermount3 — that
+  is cosmetic (exit code 0) and `--unsquash` avoids it, despite upstream docs saying
+  Apptainer never uses fusermount.
 
 ## Verify (don't trust)
 

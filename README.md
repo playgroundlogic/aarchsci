@@ -83,18 +83,43 @@ Known arm64 gaps and why: [GAPS.md](GAPS.md).
 
 ### On HPC, without a Docker daemon
 
-There is also an [`apptainer`](envs/apptainer.yaml) env (42 pkgs) — the Apptainer runtime
-itself, pinned to an exact build and verified to build and read back a native arm64 SIF.
-It exists because clusters have no Docker daemon, and because a future check that these
-images run under `apptainer exec` needs a known runtime to run them with.
+Clusters have no Docker daemon, so the runtime there is Apptainer. That path is now
+verified on real Graviton hardware — a c8g (Graviton4) host, using the pinned runtime
+from the [`apptainer`](envs/apptainer.yaml) env (42 pkgs), rootless, no suid:
 
-It is **not published, and there are no consumption instructions here yet, on purpose.**
-Converting an image to SIF works and the `geospatial` smoke test passes under
-`apptainer exec` on aarch64 — but that was measured on Apple silicon, not Graviton, and
-Apptainer does **not** run conda's `activate.d` hooks, so some envs lose environment
-variables their packages expect. Publishing a recipe before that is settled on real
-hardware would be exactly the unearned "verified" this project refuses elsewhere. Progress
-and measurements: [issue #6](https://github.com/playgroundlogic/aarchsci/issues/6).
+```bash
+apptainer build geospatial.sif docker://quay.io/aarchsci/geospatial:latest
+apptainer run geospatial.sif python /opt/aarchsci/smoke.py
+```
+
+Use `run`, not `exec`. `run` goes through the image's entrypoint, which sources conda's
+`etc/conda/activate.d/*.sh`; `exec` skips it. Measured on 2026-09-04, that difference costs
+seven variables — `CONDA_PREFIX`, `CONDA_DEFAULT_ENV`, `CONDA_SHLVL`,
+`CONDA_PROMPT_MODIFIER`, `GSETTINGS_SCHEMA_DIR` (+ its backup) and `XML_CATALOG_FILES` —
+and one `PATH` entry (`/opt/conda/condabin`). Three envs were tested — `geospatial`, `dft`
+and `md`, chosen because the last two carry the most `activate.d` scripts (13 for `md`) —
+and all three pass under `exec`, `run` **and** `run --cleanenv`, including `dft`/`md`'s
+2-rank MPI legs (`dft` reproduced its serial bulk-Si energy to 6e-08 eV under Apptainer).
+The other six are untested under Apptainer. `run` is the documented default because it is
+the mode that holds regardless — including if a future package puts something load-bearing
+in `activate.d`.
+
+Also measured on that host, so you don't have to find out the hard way:
+
+- **The writable-overlay path works** (`--writable-tmpfs`, via `fuse-overlayfs`).
+- **`fusermount3` is not required to run, but Apptainer does try to call it on cleanup.**
+  Upstream's admin guide says Apptainer "does not use `fusermount` in any mode"; that is
+  true of mounting and false of unmounting. With no `fusermount3` on the host you get a
+  loud `Cleanup error: ... Failed to call 'fusermount3'` after a **successful** run. It is
+  cosmetic — every exit code above was 0 — but it looks like a failure. `--unsquash`
+  avoids it entirely by unpacking to a sandbox instead of mounting squashfs.
+- **Provenance survives the conversion.** `apptainer inspect` still shows
+  `org.opencontainers.image.revision` and `.source`, so a SIF can be traced back to the
+  spec and builder commit it came from.
+
+The `apptainer` env itself is verified but **not published** — it is a runtime, not a
+science stack, and you install it with conda rather than pulling it. Full measurements:
+[issue #6](https://github.com/playgroundlogic/aarchsci/issues/6).
 
 ## How it will differ from aarchbio
 
