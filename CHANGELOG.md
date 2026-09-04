@@ -119,6 +119,66 @@ than Graviton, so not the final word):
   Recorded as a known limitation under DESIGN OQ2; fixing it properly rewrites every
   existing lock and hash, so it is a deliberate migration, not a quick edit.
 
+### Fixed — the reconciler could not see a spec edit, only channel drift
+- **All 9 envs are now published and signed, and every published image matches its
+  committed lock** (`s<lock-hash>` present for all nine). Getting there exposed a hole in
+  the reconciler worth more than the publish itself.
+- **`reconcile.yml` compared a fresh solve against the *committed* lock, which detects
+  channel drift and nothing else.** When a spec edit lands together with its matching lock
+  — the normal way to ship one — the re-solve reproduces the hash already in the file, the
+  env reports `up to date`, and the *published* image stays the one built from the old
+  spec. Not a hypothetical: on 2026-09-04 `dft` and `comp-chem` both read "up to date"
+  while quay held **no image at all** for their committed lock-hash, and `md`/`viz` had
+  never been pushed despite being in the README table since the morning. The catalog
+  advertised contents no consumer could pull, and the daily reconciler would never have
+  noticed — the images were stale *because* the specs and locks agreed.
+- **Fix: a second, independent check.** Because `build-env.sh` tags every image
+  `s<lock-hash>`, "does an image exist for the committed lock?" is one unauthenticated
+  registry call per env — no pull, no solve, and unauthenticated on purpose, because that
+  is a consumer's view. The two checks catch different failures and neither subsumes the
+  other: `solve != committed` means the channel moved; `s<committed>` absent means the
+  registry is behind the repo.
+- **The check reports four states, not two, and the extra two exist because a dry-run of
+  the first draft was wrong.** Draft version collapsed "missing" into one bucket and
+  promptly queued `md` and `viz` — which *are* pushed and signed, but private, so the
+  unauthenticated call 401s. That would have rebuilt two large envs every morning forever
+  and fixed nothing, because a rebuild re-creates the repo private and scheduled runs pass
+  `set_public=false`. So:
+  `yes` (public, tag present) → no-op; `stale` (repo public, no image for this lock) →
+  rebuild, which genuinely fixes it and is the `dft`/`comp-chem` case; `unreadable`
+  (401/404, private or absent) → **warn, never queue**, because the fix is an admin-scoped
+  token and not a build; `unknown` (5xx/timeout) → assume published, so a registry outage
+  cannot dispatch a catalog-wide rebuild. Verified against the live registry: all four
+  states reached, and the steady state queues nothing.
+- **New spec marker `# aarchsci-unpublished: <reason>`.** Required by the above, not
+  cosmetic: dispatching `publish.yml` always pushes (it sets `PUSH=1`), so the registry
+  check would have found no image for `apptainer` and published it every morning —
+  overriding the deliberate decision not to ship a consumption path before issue #6 step 2.
+  Distinct from `farm/skip-list.tsv`, which records arm64 dead-ends; this records a policy
+  choice about an env that builds and verifies fine.
+
+### Known — `set_public` still fails, and it now costs visibility
+- **`md` and `viz` are published, signed, and PRIVATE.** In all four builds steps 6–7
+  (build + D3 + push + keyless-sign, then the lock commit) succeeded and only step 8, *set
+  repo public*, failed 403: `QUAY_OAUTH_TOKEN` lacks `repo:admin` for the aarchsci org.
+  Previously this was harmless because the affected repos already existed public; it is not
+  harmless for a *new* repo, because Quay creates repos private. **README's "9 verified,
+  signed, public env images" is therefore not true yet — 7 are public.** The images are
+  built and signed, so the fix is to re-mint the secret with admin scope and re-flip, not
+  to rebuild anything.
+
+### Notable — rasterio 1.5.0 will break on a future NumPy, on every platform
+- The `DeprecationWarning` in `geospatial`'s smoke output is **not ours and not arm64**.
+  It is attributed to `geospatial.smoke.py:122` (`src.read(1)`) only because Cython reports
+  the caller's frame; the actual origin is `rasterio/_io.pyx:660` in
+  `DatasetReaderBase.read`, which sets `.shape` on a NumPy array — deprecated in NumPy
+  2.5. Confirmed by raising the warning to an error and reading the traceback.
+- Worth recording rather than silencing, because when the deprecation becomes an error
+  `rasterio.read()` stops working outright, and that is the single most-used call in this
+  catalog: **4 envs pair rasterio 1.5.0 with numpy 2.5.2** (`geospatial`,
+  `earth-observation`, `geo-ml`, `pointcloud`). Belongs upstream in rasterio; not a
+  `GAPS.md` entry, since nothing here is architecture-specific.
+
 ### Corrected (2026-09-04)
 - **"Adding `vina` costs nothing: no package changes version" was wrong.** Measured by
   solving `comp-chem` with and without it: vina adds one package but *downgrades* four —

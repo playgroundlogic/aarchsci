@@ -16,6 +16,14 @@
 #
 # Not a science env, so it is deliberately minimal: the runtime, its declared
 # dependencies (which conda-forge resolves), and nothing else.
+#
+# This env is verified but intentionally NOT pushed to the registry, because a
+# published image is a consumption promise and the promise is not earned yet: running
+# a SIF has only been measured on Apple silicon, not on Graviton, and Apptainer does
+# not run conda `activate.d` hooks (issue #6, step 2). The marker below is read by
+# .github/workflows/reconcile.yml, which would otherwise notice there is no image for
+# this lock and helpfully publish one every morning.
+# aarchsci-unpublished: verified, but gated on issue #6 step 2 (SIF exec on a real Graviton host)
 name: apptainer
 channels:
   - conda-forge

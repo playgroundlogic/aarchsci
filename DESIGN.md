@@ -135,10 +135,26 @@ wins on price/perf. (The pip-arm64-wheel gap is a CPU-stack problem anyway.)
   it's a free choice; `.science` only in the domain (no `.sci` TLD exists).
   → domain **aarch.science** (secured), registry **quay.io/aarchsci/<env>** (org
   created), repo **playgroundlogic/aarchsci**, robot `aarchsci+robot`.
-- **OQ4 — reconciler trigger: SETTLED.** "Changed" = the lock-hash differs. The
-  reconciler re-solves each spec inside an arm64 image, builds, and compares the
-  new `s<lock-hash>` against the committed `envs/<env>.lock.txt`. Differs → publish
-  a new dated tag + commit the lock; matches → no-op.
+- **OQ4 — reconciler trigger: SETTLED, then amended (2026-09-04).** "Changed" = the
+  lock-hash differs. The reconciler re-solves each spec inside an arm64 image, builds,
+  and compares the new `s<lock-hash>` against the committed `envs/<env>.lock.txt`.
+  Differs → publish a new dated tag + commit the lock; matches → no-op.
+
+  The amendment: that comparison answers *"did the channel move under the spec?"* and
+  only that. It cannot see a **deliberate spec edit**, because a spec edit lands with its
+  matching lock, so the re-solve reproduces the committed hash and the env reports `up to
+  date` while the *published* image is still the one built from the old spec. Measured, not
+  theorised: `dft` and `comp-chem` both read "up to date" on 2026-09-04 with no image on
+  quay for their committed lock-hash at all. "Changed" is therefore **two** independent
+  questions, and the second is about the registry rather than the solver: *does an image
+  exist tagged `s<committed-lock-hash>`?* One unauthenticated registry call per env
+  answers it. A registry error is reported as `unknown` and deliberately not treated as
+  missing, so an outage cannot trigger a catalog-wide rebuild.
+
+  Consequence worth stating plainly: the reconciler now closes the loop on *what we
+  claim* as well as *what the channel serves*. It also required an opt-out
+  (`# aarchsci-unpublished:` in a spec) because dispatching `publish.yml` always pushes,
+  which would otherwise auto-publish `apptainer` against the decision in issue #6.
 
 ## Non-goals (v1)
 

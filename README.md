@@ -7,9 +7,14 @@ Sister project to [aarchbio](https://github.com/playgroundlogic/aarchbio) (which
 does this for bioinformatics / BioContainers). aarch.science covers the layer
 aarchbio scopes out: the **conda-forge** scientific stack.
 
-> **Status:** live. **9 verified, signed, public env images** on
+> **Status:** live. **9 verified, signed env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
+>
+> 7 of the 9 are public and pullable with no account. `md` and `viz` are built, verified
+> and signed but still **private**: Quay creates new repos private, and the CI step that
+> flips them public fails 403 because the registry token lacks org admin scope. Nothing
+> needs rebuilding — see CHANGELOG.
 
 ## Why
 

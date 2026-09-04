@@ -7,6 +7,22 @@
 # committed envs/<name>.lock.txt. If they differ, the channel moved underneath the
 # spec -> dispatch a rebuild via publish.yml. If they match, no-op.
 #
+# That solve comparison alone is NOT sufficient, and the gap is easy to miss because
+# nothing fails: it only ever detects CHANNEL drift, never a deliberate SPEC EDIT.
+# When a spec change is committed together with its matching lock (which is the normal
+# way to land one), a fresh solve reproduces the hash already in the file, the
+# reconciler reports "up to date", and the PUBLISHED image silently stays the one
+# built from the old spec — indefinitely, while the README advertises the new
+# contents. Measured on 2026-09-04: dft and comp-chem both read "up to date" while
+# quay carried no image for their committed lock-hash at all.
+#
+# So the reconciler asks a second, independent question: does an image actually exist
+# for the committed lock? Because build-env.sh tags every image `s<lock-hash>`, that
+# is one unauthenticated registry call per env — no pull, no solve. The two checks
+# catch different failures and neither subsumes the other:
+#   solve  != committed  -> the channel moved (rebuild to catch up)
+#   s<committed> absent  -> the registry is behind the repo (publish what we claim)
+#
 # Runs on hosted arm64 runners (no farm dependency) — it only ever handles the
 # delta, and the solve is just an API/solver call, so hosted speed is fine and it
 # survives the farm being offline.
@@ -64,7 +80,7 @@ jobs:
           INCLUDE_STUCK: ${{ inputs.include_stuck }}
         run: |
           set -uo pipefail
-          drifted=(); skipped=0
+          drifted=(); unpullable=(); skipped=0
 
           # Read the skip-list (farm/skip-list.tsv): map an "env:<name>" or a plain
           # env name to its tier. We skip a whole env if it (or a package it needs)
@@ -78,9 +94,56 @@ jobs:
               '!/^#/ && NF>=2 && ($1==e || $1==p){print $2; exit}' farm/skip-list.tsv
           }
 
+          # A spec may declare itself deliberately unpublished with a marker line
+          # `# aarchsci-unpublished: <reason>` in its header. This is NOT a skip-list
+          # entry: the skip-list records arm64 dead-ends (a gap), whereas this records
+          # a policy choice about an env that builds and verifies fine. It has to be
+          # honoured here because dispatching publish.yml means PUSHING (publish.yml
+          # sets PUSH=1), so without it the registry check below would flag every
+          # unpublished env as missing and publish it on the next daily run — the exact
+          # opposite of what the marker asks for. `apptainer` is the first instance:
+          # verified, but gated on issue #6 step 2 before it gets a consumption path.
+          unpublished_reason() {
+            sed -n 's/^# *aarchsci-unpublished: *//p' "envs/$1.yaml" | head -1
+          }
+
+          # Does the registry actually hold a PULLABLE image built from this lock?
+          # build-env.sh tags every image `s<lock-hash>`, so one unauthenticated call
+          # answers it — unauthenticated on purpose, because that is a consumer's view.
+          #
+          # Echoes one of four states, and the distinctions all earn their keep:
+          #   yes        - the tag is there and public. Nothing to do.
+          #   stale      - repo is public but has no image for this lock. A rebuild FIXES
+          #                this, so dispatch. (dft and comp-chem, 2026-09-04.)
+          #   unreadable - 401/404: private, or no such repo. A rebuild does NOT fix this:
+          #                Quay creates repos private and the set-public step needs an
+          #                admin-scoped token, so republishing would leave it exactly as
+          #                unpullable as before — and the condition would still be true
+          #                tomorrow, rebuilding a large env daily forever. Warn instead.
+          #   unknown    - 5xx/timeout. Never treated as missing, or a registry outage
+          #                would dispatch a catalog-wide rebuild.
+          published_has_hash() {
+            local env="$1" want="s$2" body code
+            body="$(mktemp)"
+            code="$(curl -sS -m 20 -o "$body" -w '%{http_code}' \
+              "https://quay.io/api/v1/repository/aarchsci/${env}/tag/?specificTag=${want}&onlyActiveTags=true" \
+              2>/dev/null || echo 000)"
+            case "$code" in
+              200)
+                if grep -q "\"name\": *\"${want}\"" "$body"; then echo yes; else echo stale; fi ;;
+              401|403|404) echo unreadable ;;
+              *) echo unknown ;;
+            esac
+          }
+
           # The tracked set = every committed env spec. The catalog tracks itself.
           for spec in envs/*.yaml; do
             env_name="$(basename "$spec" .yaml)"
+            reason="$(unpublished_reason "$env_name")"
+            if [ -n "$reason" ]; then
+              echo "$env_name skipped (spec declares itself unpublished: $reason)"
+              skipped=$((skipped+1)); continue
+            fi
             tier="$(skip_tier "$env_name")"
             if [ "$tier" = "wontfix" ]; then
               echo "$env_name skipped (skip-list: wontfix)"; skipped=$((skipped+1)); continue
@@ -103,13 +166,34 @@ jobs:
             if [ "$current" != "$committed" ]; then
               echo "::notice::$env_name DRIFTED: committed=$committed current=$current -> rebuild"
               drifted+=("$env_name")
-            else
-              echo "$env_name up to date ($committed)"
+              continue
             fi
+            # The spec and the channel agree. Now the independent question: did the
+            # image built from this lock ever reach the registry? A spec edit landed
+            # together with its lock lands here, looking identical to "nothing to do".
+            case "$(published_has_hash "$env_name" "$committed")" in
+              yes)
+                echo "$env_name up to date ($committed, published)" ;;
+              stale)
+                echo "::notice::$env_name STALE IMAGE: solve matches committed=$committed but quay has no s$committed -> publish"
+                drifted+=("$env_name") ;;
+              unreadable)
+                # Deliberately NOT queued: see published_has_hash. A rebuild cannot make a
+                # private repo pullable, so queueing here would rebuild a large env every
+                # morning and change nothing. This needs a human with admin scope.
+                echo "::warning::$env_name NOT PULLABLE: quay/aarchsci/$env_name is private or absent. The image for $committed may well be pushed and signed already — but nobody can pull it. Rebuilding will not fix this: flip the repo public (needs QUAY_OAUTH_TOKEN with repo:admin)."
+                unpullable+=("$env_name") ;;
+              unknown)
+                echo "::warning::$env_name — could not reach quay to confirm s$committed is published; assuming it is (not republishing on a registry error)" ;;
+            esac
           done
           echo "envs=${drifted[*]}" >> "$GITHUB_OUTPUT"
           echo "count=${#drifted[@]}" >> "$GITHUB_OUTPUT"
+          echo "unpullable=${unpullable[*]:-}" >> "$GITHUB_OUTPUT"
           echo "::notice::reconcile drift = ${#drifted[@]} env(s): ${drifted[*]:-none} (skip-list skipped: ${skipped})"
+          if [ "${#unpullable[@]}" -gt 0 ]; then
+            echo "::warning::${#unpullable[@]} env(s) built but NOT PULLABLE: ${unpullable[*]} — needs a repo:admin token, not a rebuild"
+          fi
 
       - name: Dispatch rebuilds for the drifted envs
         if: ${{ steps.drift.outputs.count != '0' && inputs.dry_run != 'true' }}
@@ -124,7 +208,19 @@ jobs:
 
       - name: Summary
         run: |
-          echo "Reconcile run: ${{ steps.drift.outputs.count }} env(s) drifted" >> "$GITHUB_STEP_SUMMARY"
+          echo "Reconcile run: ${{ steps.drift.outputs.count }} env(s) queued for rebuild" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
           echo "${{ steps.drift.outputs.envs }}" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
+          if [ -n "${{ steps.drift.outputs.unpullable }}" ]; then
+            {
+              echo ""
+              echo "### Built but not pullable"
+              echo "These have an image for their committed lock, but the repo is private"
+              echo "or absent, so no consumer can pull them. A rebuild will not fix it —"
+              echo "flip the repo public with a \`repo:admin\`-scoped \`QUAY_OAUTH_TOKEN\`."
+              echo '```'
+              echo "${{ steps.drift.outputs.unpullable }}"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
