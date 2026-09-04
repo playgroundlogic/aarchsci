@@ -157,15 +157,24 @@ than Graviton, so not the final word):
   Distinct from `farm/skip-list.tsv`, which records arm64 dead-ends; this records a policy
   choice about an env that builds and verifies fine.
 
-### Known — `set_public` still fails, and it now costs visibility
-- **`md` and `viz` are published, signed, and PRIVATE.** In all four builds steps 6–7
-  (build + D3 + push + keyless-sign, then the lock commit) succeeded and only step 8, *set
-  repo public*, failed 403: `QUAY_OAUTH_TOKEN` lacks `repo:admin` for the aarchsci org.
-  Previously this was harmless because the affected repos already existed public; it is not
-  harmless for a *new* repo, because Quay creates repos private. **README's "9 verified,
-  signed, public env images" is therefore not true yet — 7 are public.** The images are
-  built and signed, so the fix is to re-mint the secret with admin scope and re-flip, not
-  to rebuild anything.
+### Fixed — `set_public` 403, and the diagnosis was wrong for weeks
+- **All four builds published cleanly and only the visibility flip failed.** Steps 6–7
+  (build + D3 + push + keyless-sign, then the lock commit) succeeded in every job; step 8,
+  *set repo public*, returned 403. Previously harmless, because the affected repos already
+  existed public — **not** harmless for a *new* repo, since Quay creates repos private. So
+  `md` and `viz` were published, signed, and unpullable.
+- **The standing diagnosis — "`QUAY_OAUTH_TOKEN` needs re-minting with `repo:admin`" — was
+  wrong**, and it had been carried as a deferred to-do since `dft`'s first publish. The
+  token in the local `.env` flipped both repos public on the first try (`{"success": true}`),
+  so an admin-scoped token already existed; what is stale is the **GitHub Actions secret**,
+  which holds an older token. The fix is to update the secret from the working credential,
+  not to mint anything. Worth recording because the wrong diagnosis is the more expensive
+  one: it framed a 30-second secret update as a Quay administration task.
+- **Verified, not assumed:** both repos now report `is_public` unauthenticated, both
+  `latest` manifests resolve with `docker logout`, and `cosign verify` passes on both
+  against `--certificate-identity-regexp github.com/playgroundlogic/aarchsci` with subject
+  `.../publish.yml@refs/heads/main`. All 9 envs now have a published `s<lock-hash>` matching
+  their committed lock, so "9 verified, signed, public" is earned.
 
 ### Notable — rasterio 1.5.0 will break on a future NumPy, on every platform
 - The `DeprecationWarning` in `geospatial`'s smoke output is **not ours and not arm64**.
