@@ -176,6 +176,24 @@ than Graviton, so not the final word):
   `.../publish.yml@refs/heads/main`. All 9 envs now have a published `s<lock-hash>` matching
   their committed lock, so "9 verified, signed, public" is earned.
 
+### Fixed — five envs' advertised package counts had silently drifted
+- The README table and `docs/llms.txt` still carried the counts from each env's *first*
+  publish, while the daily reconciler has been rebuilding them against a moving channel
+  ever since. Nothing recomputes those numbers, so they quietly decayed:
+  `geospatial` 123→**125**, `earth-observation` 236→**261**, `geo-ml` 378→**381**,
+  `climate` 247→**249**, and `pointcloud` advertised **287 against an actual 245** — 42
+  packages that have not been in the image for some time. Corrected from the locks, and
+  cross-checked against the counts `build-env.sh` writes into its own lock commit messages
+  (`geo-ml -> 381`, `pointcloud -> 245`, `geospatial -> 125`), which agree.
+- **Left alone deliberately:** the "123 packages" in `DESIGN.md`, `CLAUDE.md`, the README
+  thesis paragraph and the site's *Why* section. Those are not live counts — they record
+  the founding validated solve, and `envs/_validated-geo-solve.txt` really does contain
+  exactly 123 entries. Overwriting them would falsify a dated measurement to match today.
+  The one site number that *did* describe the shipping image (geospatial's headline) is now
+  125.
+- Worth noting as a class: this is the same failure as the stale-image bug above — a
+  derived fact committed by hand, with nothing checking it against the artifact.
+
 ### Notable — rasterio 1.5.0 will break on a future NumPy, on every platform
 - The `DeprecationWarning` in `geospatial`'s smoke output is **not ours and not arm64**.
   It is attributed to `geospatial.smoke.py:122` (`src.read(1)`) only because Cython reports

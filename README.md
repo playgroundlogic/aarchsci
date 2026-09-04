@@ -48,11 +48,11 @@ a date (`2026.06.26`), and a content-addressed `s<lock-hash>`.
 
 | Env | Pkgs | What's in it |
 |-----|-----:|--------------|
-| [`geospatial`](envs/geospatial.yaml) | 123 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
-| [`earth-observation`](envs/earth-observation.yaml) | 236 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr |
-| [`geo-ml`](envs/geo-ml.yaml) | 378 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader |
-| [`climate`](envs/climate.yaml) | 247 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy |
-| [`pointcloud`](envs/pointcloud.yaml) | 287 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
+| [`geospatial`](envs/geospatial.yaml) | 125 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
+| [`earth-observation`](envs/earth-observation.yaml) | 261 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr |
+| [`geo-ml`](envs/geo-ml.yaml) | 381 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader |
+| [`climate`](envs/climate.yaml) | 249 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy |
+| [`pointcloud`](envs/pointcloud.yaml) | 245 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
 | [`comp-chem`](envs/comp-chem.yaml) | 210 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb, vina |
 | [`dft`](envs/dft.yaml) | 225 | gpaw, siesta, psi4, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 227 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |

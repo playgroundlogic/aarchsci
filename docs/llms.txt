@@ -30,15 +30,15 @@ a GeoJSON through fiona). The smoke test is baked into the image:
 
 - Direct pull: `docker pull quay.io/aarchsci/<env>:latest`
 - Available envs (all native arm64, verified, signed, public):
-  - `geospatial` (123 pkgs — gdal, proj, geos, rasterio, fiona, shapely, pyproj,
+  - `geospatial` (125 pkgs — gdal, proj, geos, rasterio, fiona, shapely, pyproj,
     scikit-image, numpy, scipy).
-  - `earth-observation` (236 pkgs — geospatial base + xarray, dask, rioxarray,
+  - `earth-observation` (261 pkgs — geospatial base + xarray, dask, rioxarray,
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
-  - `geo-ml` (378 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
+  - `geo-ml` (381 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (247 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+  - `climate` (249 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr; atmospheric/climate analysis with GRIB + regridding).
-  - `pointcloud` (287 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
+  - `pointcloud` (245 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
   - `comp-chem` (210 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, xtb-python, vina; cheminformatics + MD + quantum chemistry
