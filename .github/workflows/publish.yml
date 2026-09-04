@@ -151,9 +151,13 @@ jobs:
 
       # Last, because it is the only step that changes nothing about the artifact.
       # Quay creates repos private; going public stays a deliberate opt-in (SAFETY note
-      # at the top of this file). A 403 here means QUAY_OAUTH_TOKEN lacks `repo:admin`
-      # for the aarchsci org — the image is already built, pushed and signed, so the fix
-      # is to re-mint the secret with admin scope, not to rebuild.
+      # at the top of this file). Whatever this step reports, the image is already built,
+      # pushed and signed, so the fix is never to rebuild.
+      #
+      # This step's 403 hint used to say "re-mint the token in Quay", which was wrong and
+      # cost real time: when it fired on 2026-09-04 the org already had an admin-scoped
+      # token — the stale thing was the GitHub Actions SECRET, holding an older value.
+      # Check the cheap, likely cause before the expensive, unlikely one.
       - name: Set repo public (only if explicitly requested)
         if: ${{ inputs.set_public == 'true' }}
         env:
@@ -166,5 +170,11 @@ jobs:
             "https://quay.io/api/v1/repository/aarchsci/${{ matrix.env }}/changevisibility")"
           [ "$code" = "200" ] && { echo "public ✓"; exit 0; }
           echo "::error::changevisibility HTTP $code for ${{ matrix.env }} — image IS published+signed but still private."
-          [ "$code" = "403" ] && echo "::error::403 = QUAY_OAUTH_TOKEN is missing repo:admin scope on the aarchsci org; re-mint it in Quay (Applications -> Generate Token) and update the repo secret."
+          if [ "$code" = "403" ]; then
+            echo "::error::403 = the QUAY_OAUTH_TOKEN this workflow received is not admin-scoped on the aarchsci org. Check in this order:"
+            echo "::error::  1. Is the SECRET stale? Compare \`gh secret list\` against the working token in .env; if .env's token can flip a repo public locally, just re-set the secret from it. This was the actual cause on 2026-09-04."
+            echo "::error::  2. Does the secret have a trailing newline? Set it with --body \"\$(...)\", not a stdin redirect — a newline fails with this same 403."
+            echo "::error::  3. Only if both check out, re-mint in Quay (Applications -> Generate Token) with repo:admin."
+            echo "::error::In every case the image for ${{ matrix.env }} is published and signed already; flip visibility and move on, do not rebuild."
+          fi
           exit 1

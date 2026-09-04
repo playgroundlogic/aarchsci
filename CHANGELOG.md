@@ -175,6 +175,20 @@ than Graviton, so not the final word):
   against `--certificate-identity-regexp github.com/playgroundlogic/aarchsci` with subject
   `.../publish.yml@refs/heads/main`. All 9 envs now have a published `s<lock-hash>` matching
   their committed lock, so "9 verified, signed, public" is earned.
+- **The Actions secret is updated, and that was verified from CI rather than assumed.** A
+  refreshed `gh secret list` timestamp only proves *something* was written, and a secret
+  cannot be read back — so the fix was confirmed by exercising `publish.yml`'s exact failing
+  call (same endpoint, header, body and secret) against an **already-public** repo, where
+  `changevisibility` is an idempotent no-op. Result: token length 40 as seen by CI,
+  `HTTP 200`, `{"success": true}`. Cost: one ~20-second job and no rebuild. Two things
+  learned in passing: `workflow_dispatch` cannot be triggered on a non-default branch (a
+  push trigger can), and the scratch workflow/branch were deleted afterwards.
+- **The 403's own error message was the expensive part, so it now says something useful.**
+  It previously asserted "re-mint the secret with admin scope", which sent the diagnosis
+  straight past the actual cause. It now lists the checks cheapest-first: stale secret →
+  trailing newline in the secret (which fails with this *same* 403) → re-mint as the last
+  resort, and states plainly that the image is published and signed regardless, so nothing
+  should be rebuilt.
 
 ### Fixed — five envs' advertised package counts had silently drifted
 - The README table and `docs/llms.txt` still carried the counts from each env's *first*
