@@ -51,8 +51,9 @@ COPY ${ENV_FILE} /opt/aarchsci/env.yaml
 # RUN layer — a later layer would only add a whiteout and save nothing.
 #
 # Honest accounting (issue #10): most of what `du` attributes to pkgs is shared with the
-# prefix and stored once in the layer tar, so the win is ~170MB per env, not the ~2.2GB
-# `du -sm /opt/conda/pkgs` suggests. Small, free, and applies to every env.
+# prefix and stored once in the layer tar, so the win is NOT the ~2.2GB `du -sm
+# /opt/conda/pkgs` suggests. Measured on `r`: 3.51GB -> 3.22GB, i.e. 290MB. Small, free,
+# and applies to every env.
 RUN micromamba install -y -n base -f /opt/aarchsci/env.yaml \
     && micromamba clean --all --yes \
     && rm -rf /opt/conda/pkgs
