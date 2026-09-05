@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">10</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r</div>
+                    <div class="stat-num green">12</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -419,6 +419,61 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   arm64, but <strong>zero</strong> of conda-forge's 3162 <code>r-*</code> packages
                   have an r46 build, and <code>r-base=4.6.1 r-tidyverse</code> does not solve at
                   all. Newest is not always usable.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">astro</span><br>
+                  <strong>377 packages</strong> &mdash; the Astropy ecosystem, for astronomy and astrophysics
+                </p>
+                <div class="catalog">
+                    <span class="chip">astropy 8</span>
+                    <span class="chip">photutils</span>
+                    <span class="chip">sunpy</span>
+                    <span class="chip">healpy</span>
+                    <span class="chip">yt</span>
+                    <span class="chip">regions</span>
+                    <span class="chip">reproject</span>
+                    <span class="chip">specutils</span>
+                    <span class="chip">astroquery</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  Astronomy is unusually kind to a functional test, because so many of its numbers
+                  are <em>definitions</em> rather than measurements &mdash; so this env's checks are
+                  exact, not approximate. 1&nbsp;au is exactly 149597870700&nbsp;m by IAU
+                  resolution; TAI&minus;UTC in 2020 is exactly 37 leap seconds; a HEALPix map at
+                  <code>nside=64</code> has exactly 49152 pixels; an exact-overlap circular
+                  aperture on an image of ones sums to exactly &pi;r&sup2;. A wrong answer can't
+                  hide inside a tolerance that tight. The test also runs entirely
+                  <strong>offline</strong> on purpose: astropy would happily download IERS tables,
+                  and a smoke test that needs the internet fails on someone else's outage and
+                  passes for reasons it can't see.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">fem-cfd</span><br>
+                  <strong>130 packages</strong> &mdash; FEniCSx: finite-element PDE solving, MPI-parallel
+                </p>
+                <div class="catalog">
+                    <span class="chip">fenics-dolfinx</span>
+                    <span class="chip">basix</span>
+                    <span class="chip">ufl</span>
+                    <span class="chip">PETSc</span>
+                    <span class="chip">SLEPc</span>
+                    <span class="chip">OpenMPI</span>
+                    <span class="chip">mpi4py</span>
+                    <span class="chip">HDF5 / ADIOS2</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  The finite-element method hands you a way to test it exactly: if the PDE's true
+                  solution happens to lie in the element space, the computed solution <em>is</em>
+                  that solution, to round-off. So the smoke test solves
+                  &minus;&nabla;&sup2;u&nbsp;=&nbsp;&minus;6 for
+                  u&nbsp;=&nbsp;1&nbsp;+&nbsp;x&sup2;&nbsp;+&nbsp;2y&sup2; with quadratic elements
+                  and demands an L2 error of ~10<sup>&minus;14</sup> &mdash; then repeats it with
+                  linear elements, which <em>can't</em> represent that solution, and demands the
+                  error fall by a factor of 4 when the mesh is halved. Measured: 4.000. Both legs
+                  run again on 2 ranks and must agree. One thing to know before you use it: it
+                  <strong>compiles C at runtime</strong> &mdash; FFCx builds a C extension per
+                  variational form, which is why <code>gcc</code> is a runtime dependency, not a
+                  build-time one.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

@@ -67,6 +67,24 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
     rendering goes via GLX against Xvfb, which ships in the image).
+  - `astro` (377 pkgs — astropy, photutils, sunpy, healpy, yt, regions, reproject,
+    specutils, astroquery; astronomy/astrophysics analysis. Not an MPI env — this is
+    throughput work over many independent images/spectra/catalogs, which is the shape
+    that suits cheaper cores. Deliberately offline: the smoke test sets
+    `astropy.utils.iers.conf.auto_download = False` and verifies the bundled IERS tables
+    instead, so re-enable auto-download yourself if you need sub-ms UT1 for recent dates.
+    `astroquery` is the one package in the catalog verified by import alone, because its
+    job is querying remote archives).
+  - `fem-cfd` (130 pkgs — fenics-dolfinx, fenics-basix, fenics-ufl, petsc + petsc4py,
+    slepc + slepc4py, openmpi, mpi4py, hdf5/adios2; finite-element PDE solving,
+    MPI-parallel. Verified by solving Poisson on the unit square with an exact-in-the-
+    space quadratic: P2 must hit L2 error ~1e-14, and P1 must converge at the O(h^2) rate
+    (measured ratio 4.000), serially and again on 2 ranks. Two things to know: it
+    JIT-compiles C at runtime — FFCx builds a C extension per variational form, which is
+    why `gcc` is a *runtime* dependency, so don't strip the toolchain — and its BLAS is
+    NVPL (NVIDIA Performance Libraries, CPU-only Arm math), the only env here where that
+    is true. su2 is deliberately excluded: its arm64 builds stop at py311 and would cap
+    the whole env's interpreter).
 - Tags: `latest`, a date tag (e.g. `2026.06.25`), and a content-addressed
   `s<lock-hash>` tag (the hash of the resolved package set).
 - Works on Apple Silicon and AWS Graviton (linux/arm64).
@@ -127,16 +145,23 @@ packaging one), bioinformatics (that's aarch.bio), and compiling from source
 
 ## Facts
 
-- 10 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
-  comp-chem, dft, md, viz, r) — native arm64, verified (assemble+import+functional) +
-  signed + public.
+- 12 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+  comp-chem, dft, md, viz, r, astro, fem-cfd) — native arm64, verified
+  (assemble+import+functional) + signed + public.
 - `dft` (gpaw, siesta, psi4, ase, libxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy,
-  pymatgen) and `md` (gromacs, lammps, ambertools) are MPI-parallel; their verification
-  also runs the calculation under `mpiexec -n 2` and requires the parallel and serial
-  answers to agree.
+  pymatgen), `md` (gromacs, lammps, ambertools) and `fem-cfd` (fenics-dolfinx, PETSc,
+  SLEPc) are MPI-parallel; their verification also runs the calculation under
+  `mpiexec -n 2` and requires the parallel and serial answers to agree.
 - Verification means real work, not imports: `md` conserves energy to 0.0109 kcal/mol
-  over an in-vacuo NVE run, and `viz` renders a PNG with no GPU and then reads it back
-  with pillow to prove the frame contains geometry rather than being blank.
+  over an in-vacuo NVE run, `viz` renders a PNG with no GPU and then reads it back
+  with pillow to prove the frame contains geometry rather than being blank, and
+  `fem-cfd` solves Poisson with P2 elements on a problem whose exact solution lies in
+  the element space, so its L2 error must be ~1e-14 rather than merely small.
+- Where the physics defines a number, the tests assert it exactly rather than to a
+  tolerance loose enough to hide a wrong answer: `astro` checks 1 au = exactly
+  149597870700 m, TAI−UTC = exactly 37 s in 2020 (from bundled tables, offline), HEALPix
+  nside=64 → exactly 49152 pixels, and an exact-overlap circular aperture on a unit
+  image = exactly πr².
 - One documented exception to that standard, stated rather than hidden: `siesta` in
   `dft` runs no SCF, because conda-forge's siesta ships no pseudopotentials. Its
   verification covers the aarch64 MPI binary parsing a real input and distributing over

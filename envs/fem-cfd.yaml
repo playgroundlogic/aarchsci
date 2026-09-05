@@ -1,0 +1,145 @@
+# aarch.science — fem-cfd environment
+# Finite-element / PDE solving, built on FEniCSx (DESIGN D2). fenics-dolfinx is the FEM
+# engine, fenics-basix the finite-element tabulation library and ufl the variational
+# form language; PETSc (via petsc4py) supplies the linear algebra and Krylov solvers,
+# SLEPc the eigensolvers, and OpenMPI + mpi4py the parallel layer. HDF5/ADIOS2 are the
+# parallel I/O backends dolfinx links.
+#
+# Filed as issue #12. Twelfth env, and the first in the catalog that solves a PDE by
+# the finite-element method — the closest open substitute for commercial FEA/CFD.
+#
+# The Graviton case is the same as dft's and stronger than most: FEM assembly and Krylov
+# solves are CPU-bound, memory-bandwidth-hungry and MPI-parallel, and dolfinx's GPU
+# support is not something D4 costs us anything real on. It is also a genuine pip
+# failure mode, not just an inconvenience: dolfinx needs PETSc + MPI + HDF5 natives
+# assembled consistently, which is precisely what pip cannot do on arm64.
+#
+# Verified to solve AND assemble native arm64 on conda-forge, including 2-rank MPI
+# (see fem-cfd.smoke.py).
+name: fem-cfd
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  # --- MPI flavor lock ---
+  # As in `dft` and `md`: conda-forge permits one MPI implementation per env, so the
+  # flavor is env-wide. Measured 2026-09-05, an unpinned solve drifts to MPICH
+  # (`mpi 1.0.1 mpich`, `mpich 5.0.1`, `hdf5 * mpi_mpich_*`), because dolfinx 0.11.0
+  # ships 8 mpich and 8 openmpi aarch64 builds ALL AT BUILD NUMBER 101 and the tie does
+  # not go our way. MPICH would work in isolation; the lock is here for consistency with
+  # the other MPI envs in this catalog, so a consumer combining images is not mixing
+  # implementations.
+  #
+  # IMPORTANT and different from `dft`: this lock is SUFFICIENT here, where for gpaw and
+  # siesta it was not. Those needed build-string pins because a `nompi_*` build declares
+  # no mpi dependency at all and so never contradicts `mpi=*=openmpi`. Checked all 16
+  # linux-aarch64 builds of fenics-dolfinx 0.11.0: 8 mpich, 8 openmpi, and NO nompi
+  # variant exists. There is nothing for the solver to slip to, so dolfinx needs no
+  # build-string pin. fem-cfd.smoke.py still verifies the flavor from conda-meta rather
+  # than trusting this reasoning to stay true.
+  - mpi=*=openmpi
+  - openmpi
+  - mpi4py
+  # --- FEM engine ---
+  - fenics-dolfinx >=0.11
+  - fenics-basix
+  # --- linear algebra: these pins are REDUNDANT, and that is the honest description ---
+  # petsc 3.25.5 has 24 linux-aarch64 builds and SIXTEEN of them are CUDA
+  # (`cuda13_real_*` / `cuda13_complex_*`): 4 mpich, 8 mpich+cuda, 4 openmpi,
+  # 8 openmpi+cuda, every one at build_number 0. Graviton has no NVIDIA GPU (D4), so a
+  # CUDA petsc is pure dead weight — measured, it drags in `cuda-version`,
+  # `cuda-cudart`, `cuda-nvtx` and `libcublas` to sit unused in the image.
+  #
+  # BUT: read fenics-dolfinx 0.11.0's own dependency list and it already says
+  # `petsc * real_*` and `slepc * real_*` (alongside `openmpi >=5.0.10`,
+  # `hdf5 ... mpi_openmpi_*` and `mpi4py >=4.1.2`). Since `real_*` anchors at the start
+  # of the build string, `cuda13_real_*` does not match it either — so dolfinx already
+  # excludes both the CUDA and the complex builds without our help. An earlier draft of
+  # this file called these pins "load-bearing"; reading the metadata rather than
+  # assuming disproved that, and the comment is corrected rather than quietly reworded.
+  #
+  # They are kept anyway, for two narrow reasons: they state the requirement at the
+  # level where a reader looks for it, and they keep holding if a future dolfinx relaxes
+  # its own constraint. What they do NOT do is decide today's solve. fem-cfd.smoke.py
+  # asserts the outcome regardless, which is the check that actually matters.
+  #
+  # Also arriving via dolfinx, not requested here: petsc4py, slepc4py and mpi4py are all
+  # in dolfinx's runtime depends, as is `gcc` — FFCx JIT-compiles variational forms at
+  # RUNTIME, so this image needs a working C compiler in it the same way `r` needs one
+  # for `Rcpp::sourceCpp`. The smoke test's Poisson solve exercises that JIT path.
+  - petsc=*=real_*
+  - petsc4py
+  - slepc=*=real_*
+  #
+  # --- BLAS/LAPACK: this env gets NVPL, and it is deliberately left alone ---
+  # Measured 2026-09-05: this is the FIRST env in the catalog whose BLAS is not
+  # OpenBLAS. It resolves `libblas 3.11.0 10_*_nvpl` on top of `libnvpl-blas0` /
+  # `libnvpl-lapack0` — NVIDIA Performance Libraries, NVIDIA's CPU math library for
+  # Arm (Neoverse). All ten other envs resolve the openblas variant of the same
+  # `libblas 3.11.0`. Nothing here asks for it: every consumer (petsc, scipy, numpy,
+  # scalapack, mumps-mpi, hypre, superlu_dist, fenics-libbasix) depends only on generic
+  # `libblas >=3.9.0`, so the variant is a solver choice.
+  #
+  # Three things worth being precise about, because the obvious reactions are all wrong:
+  #  - It is NOT a D4 violation. NVPL is CPU-only Arm math; it is not CUDA and needs no
+  #    GPU. Being an NVIDIA product is not by itself a reason to refuse it.
+  #  - It is NOT invisible to the reconciler. The `libblas` line reads `libblas 3.11.0`
+  #    either way, but the openblas variant carries `libopenblas` and the nvpl variant
+  #    carries `libnvpl-blas0`/`libnvpl-lapack0` — different package NAMES, so the lock
+  #    hash moves and a flip is caught.
+  #  - It is NOT a microarchitecture gate that could strand older Graviton. NVPL depends
+  #    on `arm-variant * sbsa`, which looks alarming and isn't: `arm-variant` is a
+  #    contentless marker package (no files, no dependencies) whose build string names a
+  #    PLATFORM CLASS, and `sbsa` means "Arm Server Base System Architecture". Graviton2
+  #    through Graviton4 are all SBSA servers, so all of them satisfy it. It is how
+  #    conda-forge separates server Arm from embedded Arm, not an armv8.x/SVE level.
+  # So there is no pin here. Overriding the channel's choice would need a measurement
+  # showing OpenBLAS is faster on Graviton, and this project does not have one.
+  # fem-cfd.smoke.py instead (a) records which backend was chosen and (b) verifies
+  # dgemm and a symmetric eigensolve numerically, so "we got NVPL" is always
+  # accompanied by "and it computes correctly on aarch64".
+#
+# --- NOT included, and why: su2 -------------------------------------------------------
+# Issue #12 proposed su2 (finite-volume CFD) as a secondary engine and correctly
+# identified it as the droppable one. It is dropped — but for the reason the ISSUE gave,
+# not the more dramatic one an earlier draft of this file claimed.
+#
+# What su2 actually costs, measured 2026-09-05 against the exact spec above (130 pkgs ->
+# 134 pkgs). Six packages move, all downgrades, and nothing else changes:
+#
+#              without su2      with su2
+#   python        3.14.6         3.11.15
+#   numpy         2.5.2          2.4.6
+#   scipy         1.18.0         1.17.1
+#   dolfinx       0.11.0         0.11.0     <- unchanged
+#   petsc         3.25.5         3.25.5     <- unchanged
+#   slepc         3.25.1         3.25.1     <- unchanged
+#   su2           --             8.5.0      <- the current release, as requested
+#
+# An earlier draft of this file reported dolfinx falling to 0.9.0, petsc to 3.23.0 and
+# su2 stuck at 8.3.0. That was wrong, and worth recording as a method lesson: it came
+# from a solve run WITHOUT the pins above, which let the resolver wander into a far worse
+# corner. Re-measuring against the spec as written is what corrected it. The pins changed
+# the answer, so a measurement taken before them was measuring a different env.
+#
+# The mechanism is GAPS.md's FOURTH gap kind, python-ABI collision, and su2 is its second
+# instance after psi4. su2's 15 linux-aarch64 builds cover py39/py310/py311 and stop
+# there, each with a hard `python_abi 3.N.* *_cpNN` pin, so su2 caps the whole env at
+# python 3.11. Note what does NOT happen: dolfinx survives the cap, because
+# fenics-dolfinx declares `cpython >=3.12` + `_python_abi3_support` rather than a
+# `python_abi` pin — the nanobind stable ABI again — and 0.11.0 has a py311 build too.
+# It is NOT an MPI-flavor conflict: all 15 su2 aarch64 builds are OpenMPI (unlike
+# `abinit`).
+#
+# So the decision follows psi4's precedent exactly rather than needing new reasoning: the
+# regression is silent, nothing fails, and the only detector is the lock diff. Trading
+# python 3.14 -> 3.11 plus numpy and scipy across a whole env to add one solver is not
+# worth it, and su2 loses nothing by living in its own env where it can have python 3.11
+# to itself. That is an env-granularity question (DESIGN OQ1).
+#
+# One incidental finding from that diff, which is the tidiest available explanation of
+# why this env has NVPL at all: at python 3.11 the BLAS flips back to OpenBLAS
+# (`libnvpl-blas0`/`libnvpl-lapack0`/`arm-variant` drop out, `libopenblas` returns). The
+# nvpl variant is reachable only in the newer-python corner of the graph.

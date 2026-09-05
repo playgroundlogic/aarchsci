@@ -53,6 +53,27 @@ part of reviewing any spec change, not just an artifact of it. The fix here need
 upstream work at all: `dft` already runs py314, so psi4 went there instead and cost
 nothing. See `envs/dft.yaml`.
 
+**A second instance, 2026-09-05, adding `fem-cfd` (issue #12): `su2`.** Worth recording
+because it shows the category is a recurring shape rather than a psi4 quirk, and because
+it sharpens how to tell a real Python cap from a cosmetic one. su2's 15 `linux-aarch64`
+builds cover py39/py310/py311 and stop; each carries a hard `python_abi 3.N.* *_cpNN`
+dependency, so adding su2 caps the env at python 3.11. Measured cost against the shipped
+spec: **6 downgrades and nothing else** — python 3.14.6→3.11.15, numpy 2.5.2→2.4.6,
+scipy 1.18.0→1.17.1 (plus `cpython`/`python-gil`/`python_abi`), with dolfinx, petsc,
+slepc and openmpi all staying put and su2 arriving at its current 8.5.0. Declined on
+psi4's precedent: a whole-env interpreter regression to add one solver isn't worth it,
+and su2 loses nothing in an env of its own (OQ1).
+
+The sharpening: **`py3NN` in a build string is not what makes a Python cap — a
+`python_abi` dependency is.** In the same env `fenics-dolfinx 0.11.0` is tagged
+`py312hc2982a2_101` yet runs on python 3.14, because it declares `cpython >=3.12` and
+`_python_abi3_support` and *no* `python_abi` pin (it binds through nanobind's stable
+ABI). su2's builds, tagged the same way, declare the pin and really do cap. So the two
+look identical from the build string and behave oppositely; the only way to tell is to
+read `depends`. `envs/fem-cfd.smoke.py` asserts dolfinx's lack of a `python_abi` pin
+directly, so the distinction is checked rather than remembered. This is the same trap
+family as noarch-vs-subdir: a name that looks like a platform claim and isn't.
+
 ## Summary (as of 2026-08)
 
 | Kind | Count | Notes |
@@ -60,15 +81,15 @@ nothing. See `envs/dft.yaml`.
 | **solve-gap** | 16 | No `linux-aarch64` build at all. Engines/potentials: `cp2k`, `sisl`, `asap3`, `kimpy`, `openkim-models`, `quippy`, `chgnet`, `m3gnet`. Phonons/transport: `phono3py`, `alamode`, `dynaphopy`, `boltztrap2`, `kwant`. DMFT: `triqs`, `triqs_dft_tools`, `edrixs`. All surfaced while scoping `dft` and probing its neighborhood; **none blocks a shipping env** — they are candidates we probed and declined. `cp2k` is the highest-value target, `phono3py` the cheapest. |
 | **assemble-gap** | 1 | `whitebox` — solves, imports, but fetches an amd64 binary at runtime (wontfix); see below |
 | **MPI-flavor conflict** | 1 | `abinit` — has an arm64 build, solves standalone, but MPICH-only (stuck); see below |
-| **python-ABI collision** | 1 | `psi4` in `comp-chem` — no py313 arm64 build; relocated to `dft` (py314) instead of downgrading 13 packages. Not a gap in any shipping image; see below |
+| **python-ABI collision** | 2 | `psi4` in `comp-chem` — no py313 arm64 build; relocated to `dft` (py314) instead of downgrading 13 packages. `su2` in `fem-cfd` — arm64 builds stop at py311, which would cap the whole env; declined. Neither is a gap in any shipping image; see below |
 | **solve-gap (R/CRAN layer)** | 729 | Counted separately because it is a *coverage* measurement, not a list of probed candidates: 729 of the 3891 `r-*` packages installable on linux-64 have no arm64 build. 18.7%, and the `r` env ships anyway. See "The R layer" below |
 
 **The curated science head is near-complete on arm64.** This is still the real
 finding, and it's the inverse of the pip experience: the exact stack that fails
 `No matching distribution found for rasterio` on PyPI solves *and* assembles cleanly
-on conda-forge. Ten envs ship verified (geospatial, earth-observation, geo-ml,
-climate, pointcloud, comp-chem, dft, md, viz, r), and every headline package in all ten
-assembles and does real work natively.
+on conda-forge. Twelve envs ship verified (geospatial, earth-observation, geo-ml,
+climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd), and every headline
+package in all twelve assembles and does real work natively.
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
 changed: every solve-gap listed above is a **candidate we probed and declined**, not a

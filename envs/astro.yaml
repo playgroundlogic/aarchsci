@@ -1,0 +1,60 @@
+# aarch.science — astro environment
+# Astronomy / astrophysics analysis, built on the Astropy ecosystem (DESIGN D2).
+# astropy is the keystone (units, constants, WCS, time scales, FITS I/O, coordinate
+# frames); pyerfa and wcslib are its compiled cores. photutils does source detection
+# and aperture photometry, sunpy solar physics, healpy HEALPix spherical pixelization,
+# yt volumetric/AMR analysis, regions sky-region geometry, reproject WCS resampling,
+# and astroquery/specutils the archive-query and 1-D spectroscopy layers.
+#
+# Filed as issue #11. This is the eleventh env and the first covering astronomy at all —
+# checked all ten predecessors, none ship astropy or any astronomy package.
+#
+# The Graviton case here is different from dft's and md's, and worth stating honestly:
+# this is not an MPI code. It is throughput analysis — many independent images, spectra
+# or catalogs — which is exactly the shape that suits a cheaper core count. There is no
+# CUDA path being given up (D4 costs this env nothing), and no MPI flavor to lock.
+#
+# Verified to solve AND assemble native arm64 on conda-forge (see astro.smoke.py).
+# Versions are left to the channel's current except the floor below; the reconciler
+# pins the resolved set and rebuilds on change.
+name: astro
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  # --- keystone ---
+  # The floor is insurance, not a measured fix, and the distinction matters: nothing
+  # today drags astropy backwards. It is here because issue #11's dependency table
+  # claimed the newest linux-aarch64 astropy was 6.1.7 when the channel actually
+  # resolves 8.0.1 — the 6.x line is still present and installable, so a future
+  # python-version squeeze (the mechanism that put psi4 in `dft` rather than
+  # `comp-chem`) could quietly select it. astropy 8 vs 6 is two major versions of
+  # API, so that regression would be silent and expensive.
+  #
+  # Note `astropy` itself is a noarch metapackage; the compiled code lives in
+  # `astropy-base` (py*_0, native aarch64) and in `pyerfa`. astro.smoke.py asserts the
+  # native extensions directly rather than trusting either package's build string —
+  # see the comment there about why a py3NN tag proves nothing.
+  - astropy >=8
+  # --- imaging / photometry / geometry ---
+  - photutils
+  - regions
+  - reproject
+  # --- domain packages ---
+  - sunpy
+  - healpy
+  - yt
+  # --- spectroscopy + archive access ---
+  # Both are noarch, so they install on linux-aarch64 like any other platform. They
+  # are NOT arm64 gaps and should not be recorded as such — the noarch-vs-subdir trap
+  # this project has hit before (a package absent from the linux-aarch64 subdir listing
+  # may still be perfectly installable).
+  #
+  # astroquery is deliberately verified by import only: every other check in this
+  # catalog does real work, but astroquery's real work is a network call to a remote
+  # archive, and a smoke test that reaches the internet is not a smoke test. It would
+  # also make the build fail on someone else's outage. See astro.smoke.py.
+  - astroquery
+  - specutils

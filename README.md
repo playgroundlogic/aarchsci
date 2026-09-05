@@ -7,7 +7,7 @@ Sister project to [aarchbio](https://github.com/playgroundlogic/aarchbio) (which
 does this for bioinformatics / BioContainers). aarch.science covers the layer
 aarchbio scopes out: the **conda-forge** scientific stack.
 
-> **Status:** live. **10 verified, signed, public env images** on
+> **Status:** live. **12 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -58,17 +58,21 @@ a date (`2026.06.26`), and a content-addressed `s<lock-hash>`.
 | [`md`](envs/md.yaml) | 227 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
 | [`viz`](envs/viz.yaml) | 245 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
 | [`r`](envs/r.yaml) | 328 | R 4.5 + tidyverse, data.table, arrow, sf, terra, glmnet, randomForest, caret, knitr/rmarkdown + pandoc, Rcpp |
+| [`astro`](envs/astro.yaml) | 377 | astropy, photutils, sunpy, healpy, yt, regions, reproject, specutils, astroquery |
+| [`fem-cfd`](envs/fem-cfd.yaml) | 130 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), OpenMPI, mpi4py, HDF5/ADIOS2 |
 
-`dft` and `md` are the MPI-parallel envs, so their verification goes further than the
-others': the smoke tests run the same calculation serially and again under
+`dft`, `md` and `fem-cfd` are the MPI-parallel envs, so their verification goes further
+than the others': the smoke tests run the same calculation serially and again under
 `mpiexec -n 2` and fail unless the answers agree (`dft` on bulk-silicon DFT *and* on an
-NWChem H2O SCF, `md` on a LAMMPS Lennard-Jones melt). Run them in parallel the same way:
+NWChem H2O SCF, `md` on a LAMMPS Lennard-Jones melt, `fem-cfd` on a Poisson solve whose
+L2 error must match to 1e-10 across the domain decomposition). Run them in parallel the
+same way:
 
 ```bash
 docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python your_script.py
 ```
 
-Three caveats worth knowing before you use them, all measured rather than assumed:
+Five caveats worth knowing before you use them, all measured rather than assumed:
 
 - **`dft`, on NWChem's ARMCI network:** conda-forge ships two arm64 runtime variants and
   this image pins the two-sided one (`mpi_ts`). Measured on a container's default 64 MB
@@ -85,6 +89,22 @@ Three caveats worth knowing before you use them, all measured rather than assume
   OSMesa at all and EGL has no device to bind to, so rendering goes through GLX against
   a virtual X server. `Xvfb` is in the image; start it and set `DISPLAY` (see
   [`envs/viz.smoke.py`](envs/viz.smoke.py) for the exact recipe the tests use).
+- **`fem-cfd`, two things.** It **compiles C at runtime**: FFCx generates and builds a
+  C extension for every variational form on first use, which is why `gcc` is a runtime
+  dependency of `fenics-dolfinx` rather than a build-time one. Don't strip the toolchain,
+  and expect the first solve in a session to pay a JIT cost the rest don't. Separately,
+  its BLAS is **NVPL** (NVIDIA Performance Libraries), not OpenBLAS — the only env in the
+  catalog where that's true, and nothing in the spec asks for it; the solver picks it. It
+  is CPU-only Arm math, needs no GPU, and its `arm-variant * sbsa` dependency is a
+  platform-class marker that every Graviton satisfies. The smoke test checks dgemm and a
+  symmetric eigensolve against exact answers so the choice is verified, not assumed.
+- **`astro` is deliberately offline.** astropy will fetch IERS earth-orientation tables
+  over the network given the chance; the smoke test sets
+  `astropy.utils.iers.conf.auto_download = False` and proves the bundled tables are
+  correct instead (TAI−UTC = exactly 37 s in 2020). The image inherits nothing from that
+  setting, so if you need sub-millisecond UT1 for recent dates, re-enable auto-download
+  yourself. `astroquery` is included but is the one package verified by import alone —
+  its job is querying remote archives, and a smoke test that needs the internet isn't one.
 
 Want another? [Request an env](https://github.com/playgroundlogic/aarchsci/issues/new?template=request-env.yml).
 Known arm64 gaps and why: [GAPS.md](GAPS.md).
@@ -107,7 +127,7 @@ that difference cost seven variables — `CONDA_PREFIX`, `CONDA_DEFAULT_ENV`, `C
 plus one `PATH` entry (`/opt/conda/condabin`), and none of it mattered: `geospatial`, `dft`
 and `md` all passed under `exec`, `run` **and** `run --cleanenv`, including `dft`/`md`'s
 2-rank MPI legs (`dft` reproduced its serial bulk-Si energy to 6e-08 eV under Apptainer).
-The other six are untested under Apptainer.
+The other eight are untested under Apptainer.
 
 **That "none of it mattered" no longer holds for `dft`, and the reason is worth stating
 plainly:** adding `nwchem` made `run` load-bearing rather than merely advisable.

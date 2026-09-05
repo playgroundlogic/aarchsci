@@ -3,6 +3,113 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-09-05
+
+### Added — `astro`, the catalog's 11th env and its first astronomy one (issue #11)
+- **`astro` — 377 packages, lock-hash `sbbc5ae3f395d`.** astropy 8.0.1, photutils 3.0.0,
+  sunpy 8.0.0, healpy 1.20.0, yt 4.4.2, regions 0.12, reproject 0.21.0, specutils 2.4.0,
+  astroquery 0.4.11, on python 3.14.7. Every D3 check passed.
+- **The verification is exact rather than approximate, because astronomy lets it be.**
+  Many of the field's numbers are *definitions*: 1 au is exactly 149597870700 m (IAU 2012
+  B2), c is exactly 299792458 m/s, TAI−UTC in 2020 is exactly 37 leap seconds, HEALPix at
+  `nside=64` has exactly 12·64² = 49152 pixels, and the exact-overlap area of a circular
+  aperture on an image of ones is exactly πr². Where a value is defined, the smoke test
+  asserts it to machine precision instead of to a range a wrong answer could hide in.
+  Measured: aperture sum 490.8738521234 vs πr² 490.8738521234; a constant HEALPix map's
+  power at l ≥ 1 is 7.5e-20; yt integrates ∫ρ dV to 2.000000000000 g.
+- **Deliberately offline, and that is a design choice not a limitation.** astropy will
+  fetch IERS tables over the network if allowed, and astroquery's whole purpose is remote
+  archive access. The smoke test sets `iers.conf.auto_download = False` and then makes a
+  *positive* assertion that the bundled `astropy-iers-data` tables are correct (the 37 s
+  check). A smoke test that reaches the internet fails on someone else's outage and passes
+  for reasons it cannot see. `astroquery` is consequently the one package in the catalog
+  verified by import alone — stated plainly rather than papered over.
+- **Two corrections to issue #11, both from measuring instead of reading.** The issue's
+  dependency table claimed the newest `linux-aarch64` astropy was 6.1.7; the channel
+  actually resolves **8.0.1**. And `astropy` itself is a noarch metapackage — the compiled
+  code is in `astropy-base` and `pyerfa` — so its build string says nothing about the
+  platform. `astropy >=8` is in the spec as insurance against a future python squeeze
+  selecting the still-installable 6.x line, and is labelled as insurance, not as a fix for
+  anything currently broken.
+- **A `py3NN` build string is not a platform claim, and neither is an untagged one.** The
+  smoke test asserts the native extensions directly and found two conventions coexisting:
+  photutils and pyerfa ship `*.abi3.so` (limited API — filename encodes neither
+  interpreter nor platform), while yt ships `*.cpython-314-aarch64-linux-gnu.so`. The
+  latter is stronger evidence of a native arm64 build than `platform.machine()`, which
+  only reports the interpreter, so the test requires at least one aarch64-tagged extension.
+- **One assertion I wrote wrong, kept as a lesson.** The first draft asserted Sgr A* sits
+  at Galactic (0, 0). It does not: the Galactic frame's origin is fixed by the IAU 1958
+  convention, and Sgr A* is at l = 359.9442, b = −0.0462. The measured −0.0558/−0.0462 was
+  correct and the assertion was wrong. Fixed to check those two *nonzero* offsets, which is
+  a strictly stronger test — they fingerprint the correct frame definition, so a transform
+  built on the wrong convention now fails where a loose "near the centre" check would pass.
+
+### Added — `fem-cfd`, the 12th env: FEniCSx finite-element PDE solving (issue #12)
+- **`fem-cfd` — 130 packages, lock-hash `se3d42ac794b8`.** fenics-dolfinx 0.11.0,
+  fenics-basix 0.11.0, fenics-ufl 2026.1.0, PETSc 3.25.5 + petsc4py, SLEPc 3.25.1 +
+  slepc4py, OpenMPI 5.0.10, mpi4py 4.1.2, HDF5 1.14.6 and ADIOS2 2.12.1 (both
+  `mpi_openmpi_*`), on python 3.14.6. Every D3 check passed.
+- **The FEM gives an exact test, so D3 uses one.** If the PDE's true solution lies in the
+  element space, the discrete solution *is* it. So the smoke test solves −∇²u = −6 for
+  u = 1 + x² + 2y² on the unit square: with **P2 elements the L2 error must be ~1e-14**
+  (measured 5.09e-14), and with **P1 elements, which cannot represent a quadratic, the
+  error must fall by 4× on halving h** (measured 8.235e-03 → 2.059e-03, ratio **4.000**).
+  The second is the independent statement — P2 being exact could come from a degenerate
+  solve, but a correct convergence *rate* cannot. Both legs re-run under `mpiexec -n 2`
+  and must agree (3.42e-14 vs 5.09e-14).
+- **`mpi=*=openmpi` is load-bearing.** Unpinned, the solve drifts to MPICH, because
+  dolfinx 0.11.0 ships 8 mpich and 8 openmpi aarch64 builds *all at build number 101* and
+  the tie doesn't go our way. Unlike gpaw and siesta this needs no build-string pin: all 16
+  builds were checked and **no nompi variant exists**, so there is nothing for the solver to
+  slip to. The smoke test verifies that from `conda-meta` anyway, rather than trusting the
+  reasoning to stay true.
+- **The PETSc pins are redundant, and saying so is the point.** An earlier draft of
+  `envs/fem-cfd.yaml` called `petsc=*=real_*` "load-bearing". Reading dolfinx's own
+  metadata disproved it: `fenics-dolfinx` already declares `petsc * real_*`,
+  `slepc * real_*`, `openmpi >=5.0.10` and `hdf5 ... mpi_openmpi_*` itself — and since
+  `real_*` anchors at the start of the build string, `cuda13_real_*` doesn't match it
+  either, so dolfinx excludes the 16 CUDA builds without our help. The pins are kept for
+  explicitness and future-proofing, with the comment corrected rather than quietly reworded.
+- **Two things arrive that the spec never asks for, and both get verified anyway.**
+  dolfinx's runtime depends pull in `slepc4py` (now checked against the closed-form
+  spectrum of the tridiagonal Laplacian, max error 6e-15) and **`gcc`** — because FFCx
+  *JIT-compiles C for every variational form at run time*. An image that stripped the
+  toolchain to save space would import cleanly and fail on the first solve, exactly the trap
+  an `r` image without a working `Rcpp::sourceCpp()` would be. The smoke test asserts a C
+  compiler is on PATH.
+- **First env in the catalog whose BLAS is not OpenBLAS.** It resolves
+  `libblas 3.11.0 10_*_nvpl` over `libnvpl-blas0`/`libnvpl-lapack0` — NVIDIA Performance
+  Libraries — while all ten other envs get the openblas variant of the *same* `libblas
+  3.11.0`. Nothing in the spec asks for it; every consumer depends only on generic
+  `libblas >=3.9.0`. Three tempting conclusions are all wrong: it is **not** a D4 violation
+  (NVPL is CPU-only Arm math, no GPU); it is **not** invisible to the reconciler (the two
+  variants carry different *package names*, so the lock hash moves); and its
+  `arm-variant * sbsa` dependency is **not** a microarchitecture gate that could strand
+  older Graviton — `arm-variant` is a contentless marker whose build string names a platform
+  class, and `sbsa` (Arm Server Base System Architecture) covers Graviton2 through 4. Left
+  unpinned deliberately: overriding the channel would need a Graviton benchmark this project
+  doesn't have. Instead the smoke test records the backend and checks dgemm and a symmetric
+  eigensolve against exact answers.
+- **`su2` declined — and the first measurement of it was wrong.** An earlier draft reported
+  that adding su2 dragged dolfinx to 0.9.0, petsc to 3.23.0 and still only delivered su2
+  8.3.0. Re-measured against the spec *as written*: **6 downgrades and nothing else** —
+  python 3.14.6→3.11.15, numpy 2.5.2→2.4.6, scipy 1.18.0→1.17.1 (plus cpython/python-gil/
+  python_abi) — with dolfinx, petsc, slepc and openmpi unchanged and su2 arriving at its
+  current **8.5.0**. The bad numbers came from a solve run *without* the spec's pins, which
+  let the resolver wander into a far worse corner; the pins changed the answer, so the
+  earlier measurement was measuring a different env. Still declined, on psi4's precedent: a
+  whole-env interpreter regression to add one solver isn't worth it, and su2 loses nothing in
+  an env of its own (OQ1).
+- **GAPS.md: `su2` is the second instance of the python-ABI collision**, not a new category
+  — and it sharpens the rule. su2's 15 aarch64 builds stop at py311 and each carries a hard
+  `python_abi 3.N.* *_cpNN` pin, so it really does cap the env. `fenics-dolfinx` is tagged
+  `py312` in the *same env* and runs on python 3.14, because it declares `cpython >=3.12`
+  plus `_python_abi3_support` and **no** `python_abi` pin (nanobind stable ABI). Identical
+  build-string shape, opposite behaviour: **a `py3NN` tag is not what caps an interpreter, a
+  `python_abi` dependency is**, and the only way to tell them apart is to read `depends`.
+  The smoke test now asserts dolfinx's lack of that pin, so the distinction is checked rather
+  than remembered.
+
 ## 2026-09-04
 
 ### Changed — drop the extracted package cache from every image (issue #10)
