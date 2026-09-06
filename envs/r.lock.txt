@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.09.04   Builder: 6a20ed6
-# lock-hash: 813f6d1c2008   packages: 328
+# Source spec: envs/r.yaml   Built: 2026.09.06   Builder: 0508e1f
+# lock-hash: b8bcb8ad4c5b   packages: 328
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -128,9 +128,9 @@ libuuid 2.42.3
 libuv 1.52.1
 libwebp-base 1.6.0
 libxcb 1.17.0
-libxml2 2.15.3
-libxml2-16 2.15.3
-libxml2-devel 2.15.3
+libxml2 2.15.4
+libxml2-16 2.15.4
+libxml2-devel 2.15.4
 libzlib 1.3.2
 lz4-c 1.10.0
 lzo 2.10
