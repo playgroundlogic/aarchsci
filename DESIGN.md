@@ -124,11 +124,52 @@ wins on price/perf. (The pip-arm64-wheel gap is a CPU-stack problem anyway.)
 - **OQ1 — image granularity:** few broad domain images (easy to use, larger) vs
   many fine-grained ones (composable, more to maintain)? Lean broad for v1
   (`geospatial` is one broad image). Still open for the catalog as a whole.
-- **OQ2 — versioning scheme: SETTLED.** Three tags per build: `<date>`
-  (`2026.06.25` — human/reconciler-friendly), `s<lock-hash>` (sha256 of the
-  resolved set, short — content-addressed + idempotent), and `latest`. The
-  resolved set is read from the **finished image**, never predicted (aarchbio #16),
-  and committed to `envs/<env>.lock.txt`.
+- **OQ2 — versioning scheme: SETTLED, then amended twice (2026-09-04, 2026-09-07).**
+  **Four** tags per build: `<date>.<HHMMSS>` (immutable — unique per build, never
+  moves, the retention anchor), `<date>` (`2026.06.25` — human/reconciler-friendly),
+  `s<lock-hash>` (sha256 of the resolved set, short — content-addressed +
+  idempotent), and `latest`. The resolved set is read from the **finished image**,
+  never predicted (aarchbio #16), and committed to `envs/<env>.lock.txt`.
+
+  **The second amendment (2026-09-07) is a bug fix, and it cost us four images.**
+  It was three tags until issue #13 asked a policy question — *are prior digests
+  retained across a republish?* — and measuring the answer found that they are not,
+  because **all three of the original tags can move**. `latest` always moves;
+  `<date>` and `s<lock-hash>` both collide when the same env is republished on the
+  same UTC day with an unchanged resolved set. When all three move at once the prior
+  manifest is left holding zero tags, and Quay garbage-collects untagged manifests.
+  Measured across all 10 published repos: 4 of 416 image manifests were collected
+  exactly that way on 2026-08-18 — `dft@sha256:35a262bc4765…`,
+  `geospatial@sha256:c3b1c281c275…`, `pointcloud@sha256:6e6c12ef30f7…`,
+  `comp-chem@sha256:5a99158f6b69…` — and all four now return
+  `404 MANIFEST_UNKNOWN`. Any digest pin to them is dead permanently; the images
+  cannot be recovered, only rebuilt from their locks as *different* digests.
+
+  Two things that fall out of that and are worth stating because both are
+  counter-intuitive:
+
+  - **A cosign signature does not protect the image it signs.** The `.sig` manifest
+    carries its own tag (`sha256-<digest>.sig`), so it survives GC independently.
+    All four orphans still have *live* signature tags pointing at images that no
+    longer exist — dangling signatures, not protection.
+  - **`s<lock-hash>` is not an image identifier and must not be treated as a pin.**
+    It names a resolved package *set*, and two rebuilds of one set are different
+    images. `geospatial`'s `s615335b5a733` has pointed at four distinct digests.
+    Only `<date>.<HHMMSS>` and `@sha256:` are stable pointers.
+
+  The fix is the immutable tag, which makes orphaning structurally impossible rather
+  than merely unlikely: a tag unique per build can never be taken by a later push, so
+  every manifest keeps at least one tag forever. `build-env.sh` also now reads the
+  published digest *through* that tag and fails (exit 3) if it does not resolve, so
+  "pushed" is not reported unless retention is verified — the same don't-claim-what-
+  you-didn't-measure rule as D3. No registry backfill was needed for the manifests
+  built before the fix: a pre-fix manifest is only exposed during the UTC day it was
+  published (after that its date tag can no longer collide), and all 10 current
+  images were verified to hold a past date tag.
+
+  Consequence for consumers: a digest pin gives **reproducibility-of-record**
+  unconditionally, and now perpetual pullability too — but the four already lost are
+  lost. That distinction is answered in full in issue #13.
 
   **Known limitation, found 2026-09: the lock records `name version` only, not the
   build string.** So a *variant* flip at the same version is invisible to both the lock

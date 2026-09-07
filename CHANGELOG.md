@@ -3,6 +3,45 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-09-07
+
+### Fixed — published images could be garbage-collected; four already were (issue #13)
+- **Added a fourth, immutable tag per build: `<date>.<HHMMSS>`.** Unique per build, so
+  it can never be taken by a later push. This makes orphaning structurally impossible
+  instead of merely unlikely, and it is what guarantees a `@sha256:` pin stays pullable.
+- **The bug, and it was a real one.** A manifest survives Quay's GC only while it holds
+  at least one live tag, and *all three* of the previous tags can move: `latest` always
+  moves, and `<date>` + `s<lock-hash>` both collide when an env is republished on the
+  same UTC day with an unchanged resolved set. All three then move together and leave the
+  prior manifest with zero tags.
+- **Four images were lost this way on 2026-08-18** — measured, not theorised, by sweeping
+  all 10 published repos (416 image manifests): `dft@sha256:35a262bc4765…` (18:35 UTC),
+  `geospatial@sha256:c3b1c281c275…` (21:58), `pointcloud@sha256:6e6c12ef30f7…` (21:59),
+  `comp-chem@sha256:5a99158f6b69…` (22:00). Each had held exactly
+  `['2026.08.18', 'latest', 's<hash>']`. All four now return `404 MANIFEST_UNKNOWN`.
+  They are unrecoverable — rebuilding from their locks yields different digests.
+  Age was not the cause: a 72-day-old `geospatial` manifest that still holds tags pulls
+  fine, while these 19-day-old untagged ones do not.
+- **A cosign signature does not protect the image it signs.** The `.sig` manifest carries
+  its own tag and survives GC independently, so all four orphans still have *live*
+  signature tags pointing at images that no longer exist.
+- **`s<lock-hash>` is not an image pin and never was.** It names a resolved package set;
+  `geospatial`'s `s615335b5a733` has pointed at four distinct digests. Documented in
+  README, `docs/llms.txt` and DESIGN OQ2 so consumers stop treating it as one.
+- **`build-env.sh` now reads the published digest through the immutable tag and exits 3
+  if it does not resolve** — a push is not reported as successful unless retention is
+  verified, the same rule D3 applies to functionality. The tag also goes into the lock
+  header (`Built:`), so a lock file names an image that is guaranteed still pullable.
+- **No registry backfill was needed.** A pre-fix manifest is exposed only during the UTC
+  day it was published, since a later day cannot collide on its date tag; all 10 current
+  images were verified to hold a past date tag.
+- Separately established for issue #13: `401 UNAUTHORIZED` is Quay's *repository*-level
+  answer for "not readable by you" (identical for private, unpublished, and nonexistent
+  repos), whereas a collected manifest returns `404`. So the transient 401 reported there
+  cannot have been a missing digest, and nothing in our publish path can cause it —
+  `changevisibility` runs only under an explicit `set_public=true` and only ever sets
+  *public*.
+
 ## 2026-09-05
 
 ### Added — `astro`, the catalog's 11th env and its first astronomy one (issue #11)

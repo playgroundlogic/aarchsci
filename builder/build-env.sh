@@ -60,6 +60,22 @@ if command -v uv >/dev/null 2>&1; then PY=(uv run python); else PY=(python3); fi
 # Date tag is fine to take from the clock in bash (this is not a resumable journal).
 DATE_TAG="${DATE_TAG:-$(date -u +%Y.%m.%d)}"
 
+# BUILD_TAG is the one tag that is unique per build and therefore NEVER moves. It
+# exists to keep every published manifest permanently pullable by digest, and that
+# is a bug fix, not a nicety — see issue #13. All three of our other tags can be
+# taken away from a manifest by a later push: `latest` always moves, and `<date>` +
+# `s<lock-hash>` both collide when the same env is republished on the same UTC day
+# with an unchanged resolved set. When all three move at once the old manifest is
+# left with zero tags, and Quay garbage-collects untagged manifests: four of ours
+# were collected that way on 2026-08-18 (dft, geospatial, pointcloud, comp-chem)
+# and now return 404 MANIFEST_UNKNOWN. Digest pins to them are dead forever.
+# A cosign signature does NOT protect the image — the .sig manifest carries its own
+# tag, so it survives while the image it signs is collected, leaving a dangling
+# signature. All four orphans still have live .sig tags today.
+# Seconds resolution because it only has to be unique per (repo, build), and two
+# builds of one env cannot finish in the same second.
+BUILD_TAG="${BUILD_TAG:-${DATE_TAG}.$(date -u +%H%M%S)}"
+
 # --- 1. Build the arm64 probe image (native, no emulation) -----------------
 # Build to a temp tag and --load so we can (a) read the resolved package set, (b)
 # run the smoke test — all BEFORE deciding how/whether to publish. The build context
@@ -127,7 +143,7 @@ echo "[build] smoke test PASSED — ${ENV_NAME} is verified on ${PLATFORM}."
 # to a build that actually worked.
 {
   echo "# ${ENV_NAME} — resolved conda-forge package set (linux-aarch64)"
-  echo "# Source spec: envs/${ENV_NAME}.yaml   Built: ${DATE_TAG}   Builder: ${GIT_SHA}"
+  echo "# Source spec: envs/${ENV_NAME}.yaml   Built: ${BUILD_TAG}   Builder: ${GIT_SHA}"
   echo "# lock-hash: ${LOCK_HASH}   packages: ${PKG_COUNT}"
   echo "# Regenerate with: ./builder/build-env.sh ${ENV_NAME}"
   printf '%s\n' "$RESOLVED"
@@ -135,14 +151,17 @@ echo "[build] smoke test PASSED — ${ENV_NAME} is verified on ${PLATFORM}."
 echo "[build] wrote lock: ${LOCK_FILE}"
 
 # --- 5. Publish (optional) --------------------------------------------------
-# Tags: <date> (human/reconciler), s<lock-hash> (content-addressed, idempotent),
-# latest (convenience). arm64-only for v1 — the amd64 half already assembles
-# upstream; this fills the arm64 gap. (buildx --load already produced the layers;
-# --push rebuilds from cache and pushes the manifest.)
+# Tags: <date>.<HHMMSS> (immutable — the retention anchor, see BUILD_TAG above),
+# <date> (human/reconciler), s<lock-hash> (content-addressed, idempotent), latest
+# (convenience). Only the first is guaranteed never to move; the other three are
+# conveniences that point at whatever was published most recently.
+# arm64-only for v1 — the amd64 half already assembles upstream; this fills the
+# arm64 gap. (buildx --load already produced the layers; --push rebuilds from cache
+# and pushes the manifest.)
 DIGEST=""
 DATE_IMAGE="${REGISTRY}/${ENV_NAME}:${DATE_TAG}"
 if [ "${PUSH:-0}" = "1" ]; then
-  echo "[build] pushing ${REGISTRY}/${ENV_NAME} tags: ${DATE_TAG}, ${HASH_TAG}, latest (${PLATFORM}) ..."
+  echo "[build] pushing ${REGISTRY}/${ENV_NAME} tags: ${BUILD_TAG}, ${DATE_TAG}, ${HASH_TAG}, latest (${PLATFORM}) ..."
   docker buildx build \
     --platform "$PLATFORM" \
     --build-arg ENV_NAME="$ENV_NAME" \
@@ -151,13 +170,24 @@ if [ "${PUSH:-0}" = "1" ]; then
     --build-arg SMOKE_FILE="$(basename "$SMOKE_FILE")" \
     --build-arg SMOKE_DEST="$SMOKE_DEST" \
     -f "$HERE/Dockerfile" \
+    -t "${REGISTRY}/${ENV_NAME}:${BUILD_TAG}" \
     -t "$DATE_IMAGE" \
     -t "${REGISTRY}/${ENV_NAME}:${HASH_TAG}" \
     -t "${REGISTRY}/${ENV_NAME}:latest" \
     --push \
     "$ENV_DIR"
-  DIGEST="$(docker buildx imagetools inspect "$DATE_IMAGE" --format '{{.Manifest.Digest}}' 2>/dev/null)"
+  # Read the digest through the immutable tag: it is the only one guaranteed to still
+  # name THIS build by the time we look, even if a concurrent publish of the same env
+  # has already moved <date>/s<hash>/latest along.
+  DIGEST="$(docker buildx imagetools inspect "${REGISTRY}/${ENV_NAME}:${BUILD_TAG}" --format '{{.Manifest.Digest}}' 2>/dev/null)"
   echo "[build] pushed. digest=${DIGEST:-unknown}"
+  # Retention guard: the whole point of BUILD_TAG is that this manifest can never be
+  # left untagged. If the immutable tag did not resolve, that promise is unverified.
+  if [ -z "$DIGEST" ]; then
+    echo "[build] ERROR: immutable tag ${BUILD_TAG} did not resolve after push — refusing to" >&2
+    echo "[build]        report success, because digest retention (issue #13) is unproven." >&2
+    exit 3
+  fi
 else
   echo "[build] not pushing (set PUSH=1). Probe image was built + verified locally."
 fi
@@ -169,6 +199,7 @@ PINNED=""
 emit() { echo "$1=$2"; [ -n "${GITHUB_OUTPUT:-}" ] && echo "$1=$2" >> "$GITHUB_OUTPUT"; return 0; }
 echo "[build] outputs:"
 emit env        "$ENV_NAME"
+emit build_tag  "$BUILD_TAG"
 emit date_tag   "$DATE_TAG"
 emit hash_tag   "$HASH_TAG"
 emit lock_hash  "$LOCK_HASH"

@@ -85,8 +85,19 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     NVPL (NVIDIA Performance Libraries, CPU-only Arm math), the only env here where that
     is true. su2 is deliberately excluded: its arm64 builds stop at py311 and would cap
     the whole env's interpreter).
-- Tags: `latest`, a date tag (e.g. `2026.06.25`), and a content-addressed
-  `s<lock-hash>` tag (the hash of the resolved package set).
+- Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
+  (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
+  package set), and `latest`.
+- To pin an image, use `@sha256:` or the `<date>.<HHMMSS>` tag — only those two never
+  move. `latest` moves on every republish; `<date>` and `s<lock-hash>` move if the same
+  env is republished on the same UTC day with an unchanged package set. `s<lock-hash>`
+  names a resolved package SET, not an image: two rebuilds of one set share that tag but
+  are different digests (one such tag has pointed at four). Before the immutable build
+  tag existed, four manifests lost all three of their tags in a single same-day
+  republish and were garbage-collected; they now 404. A cosign signature does not
+  prevent this — the `.sig` manifest has its own tag and survives independently, so
+  those four still have live signature tags pointing at images that are gone. Full
+  retention policy: github.com/playgroundlogic/aarchsci/issues/13
 - Works on Apple Silicon and AWS Graviton (linux/arm64).
 - Each tag is an OCI image index declaring `linux/arm64` explicitly, so `docker pull` on
   x86_64 fails at the registry (`no matching manifest for linux/amd64`) instead of

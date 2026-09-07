@@ -43,8 +43,18 @@ cosign verify quay.io/aarchsci/geospatial:latest \
 ## Available environments
 
 Each is a curated, version-pinned conda-forge env, built native arm64, verified
-(assemble + import + functional smoke test), signed, and public. Tags: `latest`,
-a date (`2026.06.26`), and a content-addressed `s<lock-hash>`.
+(assemble + import + functional smoke test), signed, and public. Tags: an immutable
+`<date>.<HHMMSS>` build tag (`2026.09.07.041233`), a date (`2026.06.26`), a
+content-addressed `s<lock-hash>`, and `latest`.
+
+**If you pin, pin `@sha256:` or the `<date>.<HHMMSS>` tag — those are the only two
+that never move.** `latest` moves every republish; `<date>` and `s<lock-hash>` move
+if the same env is republished on the same UTC day with an unchanged package set.
+`s<lock-hash>` in particular names a resolved package *set*, not an image, so two
+rebuilds of the same set share the tag but are different digests. We learned this the
+expensive way — before the immutable tag existed, four manifests lost all their tags
+that way and were garbage-collected ([issue #13](https://github.com/playgroundlogic/aarchsci/issues/13)
+has the full retention policy and the four dead digests).
 
 | Env | Pkgs | What's in it |
 |-----|-----:|--------------|
