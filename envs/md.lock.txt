@@ -1,6 +1,6 @@
 # md — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/md.yaml   Built: 2026.09.06   Builder: 0508e1f
-# lock-hash: 08b9ac7e166a   packages: 227
+# Source spec: envs/md.yaml   Built: 2026.09.07.133717   Builder: 9a8cd30
+# lock-hash: 5be607b0ef8a   packages: 227
 # Regenerate with: ./builder/build-env.sh md
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -161,7 +161,7 @@ netcdf-fortran 4.6.4
 netcdf4 1.7.4
 networkx 3.6.1
 numexpr 2.14.2
-numpy 2.5.2
+numpy 2.5.3
 ocl-icd 2.3.4
 opencl-headers 2025.06.13
 openjpeg 2.5.4
