@@ -1,10 +1,10 @@
 # dft — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/dft.yaml   Built: 2026.09.07.133718   Builder: 9a8cd30
-# lock-hash: a5da85204457   packages: 237
+# Source spec: envs/dft.yaml   Built: 2026.09.08.121515   Builder: bba5720
+# lock-hash: aab3e1bfeb9a   packages: 237
 # Regenerate with: ./builder/build-env.sh dft
 _openmp_mutex 4.5
 annotated-types 0.8.0
-armadillo 15.4.2
+armadillo 15.6.0
 arpack 3.9.1
 ase 3.29.0
 backports.zstd 1.7.0
@@ -202,7 +202,7 @@ qcelemental 0.51.0
 qcengine 0.51.0
 qcmanybody 0.8.0
 qhull 2020.2
-rdma-core 64.0
+rdma-core 65.0
 readline 8.3
 requests 2.34.2
 ruamel.yaml 0.19.1
