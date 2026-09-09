@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.09.08.121516   Builder: bba5720
-# lock-hash: 1badc3544c1d   packages: 377
+# Source spec: envs/astro.yaml   Built: 2026.09.09.122638   Builder: 5630246
+# lock-hash: c31f1a81f114   packages: 364
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -12,7 +12,6 @@ aiohappyeyeballs 2.7.1
 aiohttp 3.14.3
 aioitertools 0.13.0
 aiosignal 1.4.0
-aom 3.14.1
 asdf 5.4.0
 asdf-astropy 0.11.0
 asdf-coordinates-schemas 0.5.1
@@ -59,10 +58,8 @@ bqscales 0.3.7
 brotli 1.2.0
 brotli-bin 1.2.0
 brotli-python 1.2.0
-brunsli 0.1
 bzip2 1.0.8
 c-ares 1.34.8
-c-blosc2 3.3.3
 ca-certificates 2026.7.22
 cached-property 2.0.1
 cached_property 2.0.1
@@ -71,7 +68,6 @@ cdflib 1.3.12
 certifi 2026.7.22
 cffi 2.1.1
 cfitsio 4.6.4
-charls 2.4.4
 charset-normalizer 3.5.1
 click 8.5.0
 click-plugins 1.1.1.2
@@ -130,7 +126,6 @@ html5lib 1.1
 hyperframe 6.1.0
 icu 78.3
 idna 3.19
-imagecodecs 2026.8.16
 imageio 2.37.4
 importlib-metadata 9.0.1
 importlib_resources 7.1.0
@@ -152,7 +147,6 @@ json-c 0.18
 jupyter_client 8.10.0
 jupyter_core 5.9.1
 jupyterlab_widgets 3.0.17
-jxrlib 1.1
 keyring 25.7.0
 keyutils 1.6.3
 kiwisolver 1.5.1
@@ -169,7 +163,6 @@ libarrow-acero 25.0.0
 libarrow-compute 25.0.0
 libarrow-dataset 25.0.0
 libarrow-substrait 25.0.0
-libavif16 1.4.2
 libblas 3.11.0
 libbrotlicommon 1.2.0
 libbrotlidec 1.2.0
@@ -177,7 +170,6 @@ libbrotlienc 1.2.0
 libcblas 3.11.0
 libcrc32c 1.1.2
 libcurl 8.22.0
-libdav1d7 1.5.4
 libdeflate 1.25
 libedit 3.1.20250104
 libev 4.33
@@ -235,7 +227,6 @@ libxml2-16 2.15.4
 libxml2-devel 2.15.4
 libxslt 1.1.45
 libzlib 1.3.2
-libzopfli 1.0.3
 locket 1.0.0
 lxml 6.1.2
 lz4 4.4.5
@@ -263,7 +254,6 @@ nlohmann_json 3.12.0
 numcodecs 0.16.5
 numpy 2.5.3
 openjpeg 2.5.4
-openjph 0.31.0
 openssl 3.6.4
 orc 2.3.1
 packaging 26.3
@@ -307,7 +297,6 @@ pyyaml 6.0.3
 pyzmq 27.2.0
 qhull 2020.2
 rasterio 1.5.1
-rav1e 0.8.1
 re2 2025.11.05
 readline 8.3
 regions 0.12
@@ -334,10 +323,9 @@ spiceypy 8.2.0
 sqlite 3.53.4
 stack_data 0.6.3
 sunpy 8.0.0
-svt-av1 4.2.0
 sympy 1.14.0
 tblib 3.2.2
-tifffile 2026.8.23
+tifffile 2026.9.9
 tk 8.6.13
 tomli-w 1.2.0
 toolz 1.1.0
@@ -373,7 +361,6 @@ yt 4.4.2
 zarr 3.3.0
 zeep 4.3.3
 zeromq 4.3.5
-zfp 1.0.1
 zict 3.0.0
 zipp 4.1.0
 zlib 1.3.2
