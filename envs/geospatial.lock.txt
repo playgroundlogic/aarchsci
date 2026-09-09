@@ -1,19 +1,15 @@
 # geospatial — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geospatial.yaml   Built: 2026.09.08.121518   Builder: bba5720
-# lock-hash: 47a082cfa3c0   packages: 125
+# Source spec: envs/geospatial.yaml   Built: 2026.09.09.122637   Builder: 5630246
+# lock-hash: a9c9edf8a83e   packages: 111
 # Regenerate with: ./builder/build-env.sh geospatial
 _openmp_mutex 4.5
 affine 3.0.1
-aom 3.14.1
 attrs 26.1.0
 blosc 1.21.6
-brunsli 0.1
 bzip2 1.0.8
 c-ares 1.34.8
-c-blosc2 3.3.3
 ca-certificates 2026.7.22
 certifi 2026.7.22
-charls 2.4.4
 click 8.5.0
 click-plugins 1.1.1.2
 cligj 0.7.2
@@ -23,26 +19,21 @@ gdal 3.13.3
 geos 3.14.1
 giflib 6.1.3
 icu 78.3
-imagecodecs 2026.8.16
 imageio 2.37.4
 json-c 0.18
-jxrlib 1.1
 keyutils 1.6.3
 krb5 1.22.2
 lazy-loader 0.5
 lcms2 2.19.1
 ld_impl_linux-aarch64 2.46.1
 lerc 4.2.0
-libaec 1.1.5
 libarchive 3.8.9
-libavif16 1.4.2
 libblas 3.11.0
 libbrotlicommon 1.2.0
 libbrotlidec 1.2.0
 libbrotlienc 1.2.0
 libcblas 3.11.0
 libcurl 8.22.0
-libdav1d7 1.5.4
 libdeflate 1.25
 libedit 3.1.20250104
 libev 4.33
@@ -84,7 +75,6 @@ libxml2 2.15.4
 libxml2-16 2.15.4
 libxml2-devel 2.15.4
 libzlib 1.3.2
-libzopfli 1.0.3
 lz4-c 1.10.0
 lzo 2.10
 minizip 4.2.2
@@ -93,7 +83,6 @@ ncurses 6.6
 networkx 3.6.1
 numpy 2.5.3
 openjpeg 2.5.4
-openjph 0.31.0
 openssl 3.6.4
 packaging 26.3
 pcre2 10.47
@@ -106,7 +95,6 @@ pyproj 3.8.0
 python 3.14.7
 python_abi 3.14
 rasterio 1.5.1
-rav1e 0.8.1
 readline 8.3
 scikit-image 0.26.0
 scipy 1.18.0
@@ -115,15 +103,13 @@ shapely 2.1.2
 snappy 1.2.2
 snuggs 1.4.7
 sqlite 3.53.4
-svt-av1 4.2.0
-tifffile 2026.8.23
+tifffile 2026.9.9
 tk 8.6.13
 tzdata 2026c
 uriparser 0.9.8
 xerces-c 3.3.0
 xorg-libxau 1.0.12
 xorg-libxdmcp 1.1.5
-zfp 1.0.1
 zlib 1.3.2
 zlib-ng 2.3.3
 zstd 1.5.7
