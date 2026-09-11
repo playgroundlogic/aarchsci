@@ -1,6 +1,6 @@
 # md — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/md.yaml   Built: 2026.09.10.122014   Builder: 8bc4aa4
-# lock-hash: 5723c0540b17   packages: 227
+# Source spec: envs/md.yaml   Built: 2026.09.11.121853   Builder: 3733067
+# lock-hash: 3cfff44c3b52   packages: 227
 # Regenerate with: ./builder/build-env.sh md
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -43,7 +43,7 @@ font-ttf-ubuntu 0.83
 fontconfig 2.18.3
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
-fonttools 4.63.0
+fonttools 4.65.0
 formulaic 1.2.2
 freetype 2.14.3
 fribidi 1.0.16
@@ -195,7 +195,7 @@ rdma-core 65.0
 readline 8.3
 rhash 1.4.6
 s2n 1.7.6
-scikit-learn 1.9.0
+scikit-learn 1.9.1
 scipy 1.18.0
 seaborn 0.13.2
 seaborn-base 0.13.2
