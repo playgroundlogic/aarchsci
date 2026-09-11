@@ -1,6 +1,6 @@
 # viz — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/viz.yaml   Built: 2026.09.09.122640   Builder: 5630246
-# lock-hash: 0395df27e6e0   packages: 245
+# Source spec: envs/viz.yaml   Built: 2026.09.11.121857   Builder: 3733067
+# lock-hash: 6eb2615801d0   packages: 244
 # Regenerate with: ./builder/build-env.sh viz
 _openmp_mutex 4.5
 aiohappyeyeballs 2.7.1
@@ -34,7 +34,7 @@ font-ttf-ubuntu 0.83
 fontconfig 2.18.3
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
-fonttools 4.63.0
+fonttools 4.65.0
 freetype 2.14.3
 fribidi 1.0.16
 frozenlist 1.8.0
@@ -207,7 +207,6 @@ tk 8.6.13
 typing-extensions 4.16.0
 typing_extensions 4.16.0
 tzdata 2026c
-unicodedata2 17.0.1
 utfcpp 4.09
 viskores 1.1.0
 vtk-base 9.6.2
