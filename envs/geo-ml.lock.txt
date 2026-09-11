@@ -1,6 +1,6 @@
 # geo-ml — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geo-ml.yaml   Built: 2026.09.10.122015   Builder: 8bc4aa4
-# lock-hash: 2c590033e5b3   packages: 368
+# Source spec: envs/geo-ml.yaml   Built: 2026.09.11.121855   Builder: 3733067
+# lock-hash: be4f226265d4   packages: 367
 # Regenerate with: ./builder/build-env.sh geo-ml
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -88,7 +88,7 @@ font-ttf-ubuntu 0.83
 fontconfig 2.18.3
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
-fonttools 4.63.0
+fonttools 4.65.0
 formulaic 1.2.2
 freetype 2.14.3
 freexl 2.0.0
@@ -302,7 +302,7 @@ rtree 1.4.1
 s2n 1.7.5
 s3fs 2026.7.0
 scikit-image 0.26.0
-scikit-learn 1.9.0
+scikit-learn 1.9.1
 scipy 1.18.0
 seaborn 0.13.2
 seaborn-base 0.13.2
@@ -342,7 +342,6 @@ traitlets 5.16.1
 typing-extensions 4.16.0
 typing_extensions 4.16.0
 tzdata 2026c
-unicodedata2 17.0.1
 uriparser 0.9.8
 urllib3 2.7.0
 vcs_versioning 2.3.4
