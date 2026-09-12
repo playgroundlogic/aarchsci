@@ -1,6 +1,6 @@
 # earth-observation — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/earth-observation.yaml   Built: 2026.09.10.122016   Builder: 8bc4aa4
-# lock-hash: db36bd371a82   packages: 248
+# Source spec: envs/earth-observation.yaml   Built: 2026.09.12.114243   Builder: 925c93c
+# lock-hash: b58d37bf0400   packages: 248
 # Regenerate with: ./builder/build-env.sh earth-observation
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -218,7 +218,7 @@ requests 2.34.2
 rioxarray 0.23.0
 s2n 1.7.5
 scikit-image 0.26.0
-scipy 1.18.0
+scipy 1.18.1
 setuptools 84.0.0
 shapely 2.1.2
 six 1.17.0
