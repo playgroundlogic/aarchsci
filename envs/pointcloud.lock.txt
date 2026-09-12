@@ -1,6 +1,6 @@
 # pointcloud — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pointcloud.yaml   Built: 2026.09.11.121852   Builder: 3733067
-# lock-hash: fbf962c8b156   packages: 233
+# Source spec: envs/pointcloud.yaml   Built: 2026.09.12.114248   Builder: 925c93c
+# lock-hash: 5408fc9758f7   packages: 233
 # Regenerate with: ./builder/build-env.sh pointcloud
 _openmp_mutex 4.5
 affine 3.0.1
@@ -156,10 +156,10 @@ libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
 libsuitesparseconfig 7.10.1
-libsystemd0 261.2
+libsystemd0 261.3
 libthrift 0.22.0
 libtiff 4.7.2
-libudev1 261.2
+libudev1 261.3
 libumfpack 6.3.5
 liburing 2.14
 libutf8proc 2.11.3
@@ -213,7 +213,7 @@ readline 8.3
 richdem 2.4.3
 s2n 1.7.5
 scikit-image 0.26.0
-scipy 1.18.0
+scipy 1.18.1
 setuptools 84.0.0
 shapely 2.1.2
 snappy 1.2.2
