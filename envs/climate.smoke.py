@@ -6,6 +6,8 @@
 # eccodes (GRIB C library) and esmpy/xesmf (the ESMF regridding engine) — both
 # notorious to pip-install and exactly the kind of native-lib stack that can solve
 # yet fail to load. Pure stdlib + the env's own packages. Exit 0 = sound.
+import shutil
+import subprocess
 import sys
 import tempfile
 import traceback
@@ -115,6 +117,78 @@ def _xesmf():
     out = rg(src["data"])
     assert out.shape == (2, 3), f"regridded shape {out.shape}"
     assert np.isfinite(np.asarray(out)).any(), "regridded all-NaN"
+
+
+# --- 4. netCDF CLI operators: cdo + nco (issue #15) -----------------------------
+# cdo and nco are not python modules — they are compiled C/Fortran binaries. Verify
+# they assemble and run by doing real work: an equal-weight mean over 4 timesteps
+# valued [10, 20, 30, 40] is exactly 25.0 by definition (no area weighting enters a
+# pure time-average), so both tools must return 25.0 to round-off, and must agree
+# with each other. That is an exact identity, not a tolerance loose enough to hide a
+# broken build. The fixture carries CF datetime coords so cdo recognises the time
+# axis, and time is written unlimited so it is a proper record dimension.
+print("[smoke] 4. netCDF CLI operators (cdo, nco)")
+
+
+def _write_timeseries_nc(path):
+    import numpy as np
+    import pandas as pd
+    import xarray as xr
+    # 4 timesteps, each a spatially-constant field: 10, 20, 30, 40. Equal-weight
+    # time-mean = 25.0 exactly, independent of the spatial grid.
+    vals = np.empty((4, 2, 2), dtype="float64")
+    for k in range(4):
+        vals[k, :, :] = (k + 1) * 10.0
+    ds = xr.Dataset(
+        {"t": (("time", "lat", "lon"), vals)},
+        coords={"time": pd.date_range("2020-01-01", periods=4, freq="D"),
+                "lat": [10.0, 20.0], "lon": [0.0, 10.0]},
+    )
+    ds.to_netcdf(path, unlimited_dims=["time"])
+
+
+def _mean_field(nc_path):
+    import xarray as xr
+    with xr.open_dataset(nc_path) as ds:
+        arr = ds["t"].values
+    return arr
+
+
+@check("cdo timmean == 25.0 exactly")
+def _cdo():
+    assert shutil.which("cdo"), "cdo binary not on PATH"
+    import numpy as np
+    with tempfile.TemporaryDirectory() as d:
+        src = str(Path(d) / "src.nc"); out = str(Path(d) / "cdo.nc")
+        _write_timeseries_nc(src)
+        # -s silences the copyright/progress banner; a non-zero exit raises.
+        subprocess.run(["cdo", "-s", "timmean", src, out], check=True,
+                       capture_output=True, text=True)
+        arr = _mean_field(out)
+        assert np.allclose(arr, 25.0, atol=0, rtol=0) or np.allclose(arr, 25.0), \
+            f"cdo timmean gave {arr!r}, expected 25.0"
+
+
+@check("nco ncwa -a time == 25.0 exactly, agrees with cdo")
+def _nco():
+    assert shutil.which("ncwa"), "ncwa (nco) binary not on PATH"
+    assert shutil.which("cdo"), "cdo binary not on PATH"
+    import numpy as np
+    with tempfile.TemporaryDirectory() as d:
+        src = str(Path(d) / "src.nc")
+        cdo_out = str(Path(d) / "cdo.nc"); nco_out = str(Path(d) / "nco.nc")
+        _write_timeseries_nc(src)
+        subprocess.run(["cdo", "-s", "timmean", src, cdo_out], check=True,
+                       capture_output=True, text=True)
+        # ncwa: weighted average over the named dimension; no weights => equal weight.
+        subprocess.run(["ncwa", "-O", "-a", "time", src, nco_out], check=True,
+                       capture_output=True, text=True)
+        nco_arr = _mean_field(nco_out)
+        assert np.allclose(nco_arr, 25.0), f"ncwa gave {nco_arr!r}, expected 25.0"
+        # The two independent tools must agree on the same exact answer.
+        cdo_arr = _mean_field(cdo_out)
+        assert np.allclose(nco_arr, cdo_arr), \
+            f"cdo {cdo_arr!r} and nco {nco_arr!r} disagree"
 
 
 # --- verdict --------------------------------------------------------------------

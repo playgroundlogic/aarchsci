@@ -309,6 +309,18 @@ in an amended form rather than intact:
   `envs/dft.smoke.py` at the point where someone would otherwise "strengthen" the checks
   and be puzzled.
 
+- **`qe` → `dft` (issue #14), and it is siesta's problem with the opposite ending.** QE
+  is plane-wave DFT and needs a pseudopotential per element, and conda-forge's `qe` ships
+  **none** — measured, 0 `*.UPF` in the prefix, exactly siesta's wall. The difference is
+  that the data is available *as its own conda-forge package*: `sssp` (noarch, 62.7 MB,
+  zero-dependency) ships 340 UPF files on disk, so `qe` + `sssp` runs a real SCF with no
+  runtime download. So `qe` gets the **full** treatment siesta cannot: `dft.smoke.py`
+  converges a bulk-Si SCF (−22.83 Ry), asserts the forces vanish by symmetry, and
+  reproduces the energy on 2 ranks. What it does *not* do — deliberately — is compare
+  QE's total energy to gpaw's: different energy references (USPP vs PAW) make that
+  physically meaningless. The lesson is that "engine ships no data" is fatal only when no
+  *separate* blessed data package exists; for pseudopotentials, `sssp` is that package.
+
 `dftbplus` and `elk` remain out on the unchanged v1 grounds.
 
 **Does each engine ship the data its calculations need?** This was first written up as a
@@ -319,6 +331,7 @@ packages and looking (2026-08-18):
 |---|---|---|
 | `nwchem` | **yes** | 606 basis files in `share/nwchem/libraries`, 1339 more in `libraries.bse`, 8 pseudopotentials in `libraryps` |
 | `siesta` | no | 359 files — the binaries, `libpsml` and the `psml2psf` converter. Zero `*.psf`, `*.vps` or `*.psml` data, and **no bundled example inputs either** (issue #1 assumed an example ships; measured, none does). The obvious source, conda-forge `pseudo_dojo`, is 0.2 MB of code with no tables and pins `numpy <1.25` / `pymatgen <=2023.9.10`, so it would wreck the env twice over |
+| `qe` | no, but `sssp` supplies it | `qe` itself ships 0 `*.UPF`. Unlike siesta, the data has its own clean conda-forge package: `sssp` 1.1.2 (noarch, 62.7 MB, zero-dependency) ships 340 UPF files incl. `Si.pbe-n-rrkjus_psl.1.0.0.UPF`, on disk, no runtime download. So `qe` + `sssp` gets a full SCF in D3 where siesta can't — the pseudopotential problem is solved by a package, not conceded |
 | `dftbplus` | no | zero `*.skf` files in the whole prefix; `share/` holds only toolchain/doc dirs plus the bundled `dftd4` and `s-dftd3` dispersion data. Upstream distributes Slater-Koster sets separately from the code |
 | `lammps` | no | 42 files total: `bin/lmp`, `bin/lmp_mpi` and the Python module. No `potentials/` directory, and **no `bench/in.lj`** — issue #3 assumed that input ships with the package; it does not, so `md`'s smoke test writes the melt input itself |
 | `gromacs` | **yes** | the opposite of what was assumed: ships `share/gromacs/top` with the full force-field set (`amber99sb-ildn.ff`, `tip3p.itp`) and reference structures including `spc216.gro`, so `md`'s D3 runs real solvated MD with nothing staged or downloaded |
@@ -389,16 +402,27 @@ Two of these deserve attention:
   absence. The obvious excuse for the highest-value gap is gone, and the real fix may be
   more tractable than assumed.
 
-**A data package that changes a scoping call:** `sssp` — the Standard Solid State
-Pseudopotentials library — is on conda-forge as a **`noarch`, 62.7 MB, zero-dependency**
-package. Size and empty dependency list mean it ships the UPF files rather than fetching
-them at runtime (the `whitebox` failure mode is a few KB of Python shim). `pslibrary` has
-no arm64 build, but `sssp` covers the need without it, and `basis_set_exchange` is
-likewise `noarch`. That means **`qe` + `sssp` looks functionally D3-verifiable on arm64
-with no runtime download** — so the pseudopotential-data objection that kept plane-wave
-QE out of v1 may not survive. The natural v2 is therefore a QE-centered env
-(`qe` + `sssp` + `wannier90` + `yambo`, all OpenMPI on arm64) rather than more packages
-bolted onto `dft`: a second engine with its own data story earns its own image.
+**A data package that changed a scoping call — now acted on (issue #14):** `sssp` — the
+Standard Solid State Pseudopotentials library — is on conda-forge as a **`noarch`,
+62.7 MB, zero-dependency** package. Size and empty dependency list mean it ships the UPF
+files rather than fetching them at runtime (the `whitebox` failure mode is a few KB of
+Python shim). `pslibrary` has no arm64 build, but `sssp` covers the need without it, and
+`basis_set_exchange` is likewise `noarch`. This paragraph originally predicted `qe` +
+`sssp` would be D3-verifiable on arm64 with no runtime download; **that is now measured
+and shipped.** `qe` 7.5 + `sssp` 1.1.2 went into `dft` (not a separate env): the joint
+solve adds only those two packages and moves no existing pin, and `dft.smoke.py` runs a
+real bulk-Si SCF (−22.83 Ry, converged, forces zero by symmetry) and reproduces it on
+2 ranks. So the pseudopotential-data objection that kept plane-wave QE out of v1 did not
+survive — `sssp` ships the data the way `nwchem`'s basis sets and `gpaw`'s PAW setups do.
+
+One honest correction went with it. The obvious framing — "two plane-wave DFT engines,
+so cross-check QE's energy against gpaw's" — is *physically wrong*: QE (ultrasoft
+pseudopotential) and gpaw (PAW) use different absolute energy references, so their total
+energies are not comparable and asserting agreement would be a bogus check. The real
+value is two unrelated plane-wave SCF stacks that each converge and each parallelise
+correctly on arm64; the numeric agreement asserted is within each code (serial vs 2-rank),
+which is the valid comparison. `wannier90`/`yambo` remain a plausible future QE-centered
+env, but the core plane-wave engine now lives in `dft`.
 
 ## When a real gap appears
 

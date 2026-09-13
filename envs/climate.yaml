@@ -30,3 +30,15 @@ dependencies:
   - esmpy
   - cftime
   - pyproj
+  # --- netCDF/GRIB command-line operators (issue #15) ---
+  # cdo and nco are the CLI complement to the xarray/xesmf/metpy stack above: the
+  # same data, a different and heavily-used interface (regrid, arithmetic, subsetting,
+  # record concatenation, metadata surgery). They are compiled C/Fortran binaries,
+  # effectively python-independent, and share climate's existing netcdf4/eccodes/hdf5.
+  # No MPI question, and that is measured, not assumed: every arm64 build of both at
+  # the current version is serial/OpenMP with no mpi dependency (checked all 6 files
+  # of each), so they cannot introduce an MPI flavor into an env that has no MPI lock.
+  # Joint solve confirmed: 249 -> 262 packages, python/xarray unchanged, no mpich or
+  # openmpi pulled in. Verified by cdo.smoke work in climate.smoke.py section 4.
+  - cdo
+  - nco

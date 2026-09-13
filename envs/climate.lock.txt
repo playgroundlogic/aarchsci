@@ -1,6 +1,6 @@
 # climate — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/climate.yaml   Built: 2026.09.12.114245   Builder: 925c93c
-# lock-hash: 9113cb01345a   packages: 248
+# Source spec: envs/climate.yaml   Built: 2026.09.13.022929   Builder: 9a8cd30
+# lock-hash: 8bc38c951a40   packages: 262
 # Regenerate with: ./builder/build-env.sh climate
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -35,6 +35,7 @@ c-ares 1.34.8
 ca-certificates 2026.7.22
 cairo 1.18.4
 cartopy 0.25.0
+cdo 2.6.1
 certifi 2026.7.22
 cf-xarray 0.11.3
 cf_xarray 0.11.3
@@ -56,6 +57,8 @@ donfig 0.8.1.post1
 eccodes 2.48.0
 esmf 8.9.1
 esmpy 8.9.1
+expat 2.8.1
+fftw 3.3.11
 findlibs 0.1.3
 flexcache 0.3
 flexparser 0.4
@@ -76,6 +79,7 @@ gflags 2.3.1
 glog 0.7.1
 google-crc32c 1.8.0
 graphite2 1.3.15
+gsl 2.8
 h2 4.4.1
 hdf4 4.2.15
 hdf5 2.1.0
@@ -152,24 +156,29 @@ libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
 libthrift 0.22.0
 libtiff 4.7.2
+libudunits2 2.2.28
 libutf8proc 2.11.3
 libuuid 2.42.3
 libwebp-base 1.6.0
 libxcb 1.17.0
 libxml2 2.15.4
 libxml2-16 2.15.4
+libxml2-devel 2.15.4
 libzip 1.11.2
 libzlib 1.3.2
 llvmlite 0.49.0
 locket 1.0.0
 lz4 4.4.5
 lz4-c 1.10.0
+magics 4.16.0
+magics-python 1.5.8
 markupsafe 3.0.3
 matplotlib-base 3.11.1
 metpy 1.7.1
 msgpack-python 1.2.2
 munkres 1.1.4
 narwhals 2.26.0
+nco 5.3.9
 ncurses 6.6
 netcdf-fortran 4.6.3
 netcdf4 1.7.4
@@ -182,6 +191,7 @@ openssl 3.6.4
 orc 2.3.1
 packaging 26.3
 pandas 3.0.5
+pango 1.58.2
 partd 1.4.2
 pcre2 10.47
 pillow 12.3.0
@@ -215,12 +225,14 @@ s2n 1.7.5
 scipy 1.18.1
 setuptools 84.0.0
 shapely 2.1.2
+simplejson 4.1.2
 six 1.17.0
 snappy 1.2.2
 sortedcontainers 2.4.0
 sparse 0.19.2
 sqlite 3.53.4
 tblib 3.2.2
+tempest-remap 2.2.0
 tk 8.6.13
 toolz 1.1.0
 tornado 6.5.8
@@ -228,6 +240,7 @@ traitlets 5.16.1
 typing-extensions 4.16.0
 typing_extensions 4.16.0
 tzdata 2026c
+udunits2 2.2.28
 urllib3 2.7.0
 wrapt 2.4.0
 xarray 2026.7.0
@@ -242,6 +255,7 @@ xorg-libxfixes 6.0.2
 xorg-libxi 1.8.3
 xorg-libxrender 0.9.12
 xorg-libxxf86vm 1.1.7
+xorg-xorgproto 2025.1
 xyzservices 2026.9.1
 yaml 0.2.5
 zarr 3.3.0

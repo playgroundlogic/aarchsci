@@ -558,6 +558,153 @@ def _parallel():
           f"delta {delta:.2e} eV)")
 
 
+# --- 8. quantum espresso (real SCF, serial + 2-rank) -------------------------------
+# QE gets the FULL treatment — a real converged plane-wave SCF — because unlike siesta
+# it has its data: the `sssp` package ships pseudopotentials on disk (340 *.UPF files,
+# no runtime download), so pw.x can actually compute. This is a second, independent
+# plane-wave DFT engine alongside gpaw, which is why issue #14 wanted it here.
+#
+# What is deliberately NOT asserted: numerical agreement of the QE and gpaw TOTAL
+# energies. QE (ultrasoft pseudopotential) and gpaw (PAW) use different absolute energy
+# references, so their totals are not comparable — an "energies agree" assertion would
+# be physically wrong, not rigorous. The valid numeric comparison is within each code,
+# serial vs 2-rank, which is exactly the env's parallel contract and is what runs below.
+# The real cross-code value is two unrelated plane-wave SCF stacks that each converge
+# and each parallelise correctly on arm64.
+print("[smoke] 8. quantum espresso (real SCF, serial + 2-rank)")
+
+# Bulk Si in the diamond structure, 2 atoms, at the ideal symmetric geometry — so the
+# forces are zero by symmetry and that is a real physical correctness check, not a
+# tolerance. celldm(1) is the lattice parameter in bohr (5.43 Ang = 10.26 bohr). The
+# {pseudo_dir}/{pseudo} are filled from sssp on disk at run time.
+QE_SCF_INPUT = """&control
+    calculation = 'scf'
+    pseudo_dir = '{pseudo_dir}'
+    outdir = './out'
+    prefix = 'si'
+    tprnfor = .true.
+/
+&system
+    ibrav = 2
+    celldm(1) = 10.26
+    nat = 2
+    ntyp = 1
+    ecutwfc = 25.0
+    ecutrho = 200.0
+/
+&electrons
+    conv_thr = 1.0d-8
+/
+ATOMIC_SPECIES
+ Si 28.086 {pseudo}
+ATOMIC_POSITIONS alat
+ Si 0.00 0.00 0.00
+ Si 0.25 0.25 0.25
+K_POINTS automatic
+ 4 4 4 0 0 0
+"""
+
+QE_SI = {}  # serial total energy, for the 2-rank comparison
+
+
+def _elf_machine(path):
+    """e_machine from an ELF header, or None if the file is not an ELF. 183 == EM_AARCH64."""
+    import struct
+    with open(path, "rb") as fh:
+        head = fh.read(20)
+    if head[:4] != b"\x7fELF":
+        return None
+    little = head[5] == 1
+    return struct.unpack("<H" if little else ">H", head[18:20])[0]
+
+
+def _sssp_si_pseudo():
+    """Locate an Si pseudopotential shipped by sssp, on disk. Returns (dir, filename).
+
+    Globbed rather than hardcoded so an sssp version bump that renames the UPF does not
+    silently break the test. The presence of this file on disk IS the no-runtime-download
+    check — the same principle as gpaw's setup_paths and nwchem's basis library.
+    """
+    base = Path(sys.prefix) / "share" / "sssp" / "efficiency"
+    assert base.is_dir(), f"sssp pseudopotential dir missing: {base} (is sssp installed?)"
+    cands = sorted(base.glob("Si*.UPF")) + sorted(base.glob("Si*.upf"))
+    assert cands, f"no Si pseudopotential in {base} — sssp shipped no usable UPF"
+    return str(base), cands[0].name
+
+
+def _run_qe_scf(argv, cwd):
+    pdir, pseudo = _sssp_si_pseudo()
+    (Path(cwd) / "si.in").write_text(QE_SCF_INPUT.format(pseudo_dir=pdir, pseudo=pseudo))
+    proc = subprocess.run(argv + ["-in", "si.in"], cwd=str(cwd), capture_output=True,
+                          text=True, env=_mpi_env(), timeout=900)
+    return proc.returncode, proc.stdout + proc.stderr
+
+
+def _qe_energy(out):
+    m = re.search(r"!\s*total energy\s*=\s*(-?\d+\.\d+)\s*Ry", out)
+    assert m, f"no converged '! total energy' line in pw.x output:\n{out[-1500:]}"
+    return float(m.group(1))
+
+
+@check("sssp Si pseudopotential is on disk (no runtime download)")
+def _qe_pseudo():
+    pdir, pseudo = _sssp_si_pseudo()
+    print(f"       ({pseudo} in {pdir})")
+
+
+@check("qe pw.x is aarch64+MPI and converges a real Si SCF with zero force by symmetry")
+def _qe_serial():
+    pw = shutil.which("pw.x")
+    assert pw, "pw.x not on PATH"
+    # The binary's own ELF header is a stronger arm64 statement than any subdir label.
+    mach = _elf_machine(os.path.realpath(pw))
+    assert mach == 183, f"pw.x ELF e_machine is {mach}, expected 183 (AArch64)"
+    rc, out = _run_qe_scf([pw], cwd=tempfile.mkdtemp())
+    ver = re.search(r"Program PWSCF v\.(\S+)", out)
+    assert ver, f"could not parse PWSCF version from:\n{out[:400]}"
+    # A serial QE build prints "Serial version"; only the MPI build prints this.
+    assert "Parallel version (MPI" in out, f"pw.x is not an MPI build:\n{out[:600]}"
+    assert rc == 0, f"pw.x exited {rc}:\n{out[-1500:]}"
+    assert "convergence has been achieved" in out, \
+        f"Si SCF did not converge:\n{out[-1500:]}"
+    e = _qe_energy(out)
+    # Range, not an exact value: the pseudopotential/cutoffs are the channel's, and we do
+    # not want a false failure from a 4th-decimal change. ~-22.83 Ry at these settings.
+    assert -30.0 < e < -15.0, f"Si SCF total energy unphysical: {e} Ry"
+    # Forces on both atoms are zero by the diamond symmetry — a genuine physical
+    # assertion, not a loose tolerance. Anything nonzero means the force code is wrong.
+    fvals = re.findall(r"atom\s+\d+\s+type\s+\d+\s+force =\s*(-?\d+\.\d+)\s+(-?\d+\.\d+)\s+(-?\d+\.\d+)", out)
+    assert fvals, f"pw.x printed no per-atom forces:\n{out[-1500:]}"
+    maxf = max(abs(float(c)) for row in fvals for c in row)
+    assert maxf < 1e-4, f"forces not zero by symmetry: max|f| = {maxf} Ry/bohr"
+    QE_SI["energy"] = e
+    print(f"       (PWSCF {ver.group(1)}, aarch64 MPI, Si SCF = {e:.6f} Ry, max|force| = {maxf:.1e})")
+
+
+@check("qe on 2 MPI ranks reproduces the serial Si SCF energy")
+def _qe_parallel():
+    mpiexec = shutil.which("mpiexec")
+    assert mpiexec, "mpiexec not on PATH"
+    serial = QE_SI.get("energy")
+    assert serial is not None, "serial QE check did not run; nothing to compare"
+    rc, out = _run_qe_scf([mpiexec, "-n", "2", "--oversubscribe", shutil.which("pw.x")],
+                          cwd=tempfile.mkdtemp())
+    assert rc == 0, f"mpiexec -n 2 pw.x exited {rc}:\n{out[-1500:]}"
+    # pw.x announces its own MPI process count — QE's view of the communicator, not our
+    # assumption about mpiexec.
+    m = re.search(r"Number of MPI processes:\s*(\d+)", out)
+    assert m and int(m.group(1)) == 2, \
+        f"pw.x saw {m and m.group(1)} MPI processes under -n 2, expected 2"
+    par = _qe_energy(out)
+    delta = abs(par - serial)
+    # Same code, same everything but rank count: the domain decomposition must not change
+    # the energy beyond summation-order noise.
+    assert delta < 1e-6, (
+        f"2-rank energy {par:.8f} Ry disagrees with serial {serial:.8f} Ry "
+        f"(delta {delta:.2e})")
+    print(f"       (nproc=2, serial {serial:.8f} vs 2-rank {par:.8f} Ry, delta {delta:.1e})")
+
+
 # --- verdict ----------------------------------------------------------------------
 print("[smoke] " + ("-" * 50))
 if FAILURES:

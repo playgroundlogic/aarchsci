@@ -110,6 +110,39 @@ dependencies:
   # else. This is a transitive dependency we did not ask for, which is precisely why it
   # needs the explicit pin — nothing else in this spec constrains it.
   - plumed=*=mpi_openmpi*
+  # --- fifth ab-initio engine: Quantum ESPRESSO + its pseudopotentials (issue #14) ---
+  # qe is THE plane-wave DFT engine, and it lands in dft rather than a new env for the
+  # nwchem reason: every one of its arm64 builds is OpenMPI-flavored and its whole
+  # parallel stack (openmpi >=5.0.8, elpa/hdf5 mpi_openmpi_*, scalapack, fftw) is
+  # already what this env resolves. Joint solve confirmed: 237 -> 239 packages (qe + sssp)
+  # and not one existing pin moves. qe carries no `py` in its build string (compiled
+  # Fortran, pw.x et al.), so unlike psi4 there is no python-ABI question.
+  #
+  # No version/flavor pin is needed and that is deliberate: qe 7.5 has two arm64 builds,
+  # `_1` (openmpi >=5.0.8) and `_0` (openmpi >=4.1.6,<5.0a0). This env already forces
+  # openmpi 5.x via nwchem, so `_0` is not merely a worse tiebreak — it is graph-
+  # excluded (it would require downgrading openmpi, which nwchem forbids). The solver is
+  # compelled to `_1`; dft.smoke.py also verifies pw.x is the MPI build at run time,
+  # which is stronger than a build-string grep for a package whose flavor lives in its
+  # dependencies rather than its build string.
+  #
+  # sssp — the Standard Solid State Pseudopotentials — is what lets qe do REAL work here,
+  # and it is the whole reason qe is not stuck at siesta's SCF-less verification level.
+  # It is a noarch, ~62.7 MB, zero-dependency package that ships the UPF files ON DISK
+  # (340 of them), so pw.x runs a converged SCF with no runtime download — the same
+  # principle gpaw's PAW setups and nwchem's basis sets satisfy, and the opposite of the
+  # `whitebox` runtime-fetch wontfix. This closes the pseudopotential-data gap that
+  # GAPS.md flagged as the thing keeping plane-wave QE out. dft.smoke.py runs a real Si
+  # SCF (−22.83 Ry, forces zero by symmetry) and reproduces it on 2 ranks.
+  #
+  # Deliberately NOT done: a numerical QE-vs-gpaw total-energy cross-check. QE (ultrasoft
+  # pseudopotential) and gpaw (PAW) use different absolute energy references, so their
+  # total energies are not comparable — asserting they agree would be physically wrong.
+  # The real cross-code value is having two independent plane-wave SCF engines that each
+  # converge and each parallelise correctly; the numeric agreement asserted is within
+  # each code (serial vs 2-rank), which is the valid comparison.
+  - qe
+  - sssp
   # --- structure / symmetry / phonons ---
   - spglib
   - phonopy

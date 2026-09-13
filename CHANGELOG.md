@@ -3,6 +3,40 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-09-13
+
+### Added — `cdo` + `nco` to `climate` (issue #15)
+- **climate 249 → 262 packages, lock-hash `s8bc38c951a40`.** cdo 2.6.1 and nco 5.3.9,
+  the standard netCDF/GRIB command-line operators — the CLI complement to the env's
+  xarray/xesmf/metpy Python stack.
+- **No MPI question, measured not assumed.** Every arm64 build of both at the current
+  version is serial/OpenMP with no mpi dependency, so they cannot introduce an MPI
+  flavor into an env with no MPI lock; the joint solve pulled in neither mpich nor
+  openmpi, and python/xarray did not move.
+- **D3 does real work with an exact answer.** An equal-weight mean over 4 timesteps
+  valued [10,20,30,40] is exactly 25.0 by definition; `cdo timmean` and nco `ncwa -a
+  time` must each return 25.0 and agree with each other. Both pass inside the built image.
+
+### Added — Quantum ESPRESSO + pseudopotentials to `dft` (issue #14)
+- **`qe` 7.5 + `sssp` 1.1.2 added to `dft`.** qe is the flagship plane-wave DFT engine;
+  the joint solve adds only those two packages and moves no existing pin (the nwchem
+  pattern). qe carries no `py` in its build string, so no python-ABI question, and its
+  OpenMPI-5 build (`_1`) is compelled by the graph — `_0` needs openmpi <5, which nwchem
+  forbids — so no flavor pin is needed.
+- **A real SCF, because sssp ships the data.** conda-forge's `qe` ships zero
+  pseudopotentials, the same wall `siesta` hit — but `sssp` (noarch, 62.7 MB,
+  zero-dependency) ships 340 UPF files on disk, no runtime download. So unlike siesta,
+  qe gets full verification: `dft.smoke.py` converges a bulk-Si SCF (−22.83 Ry), asserts
+  the forces vanish by symmetry (exactly 0), and reproduces the energy on 2 ranks to 1e-8
+  Ry.
+- **One self-correction, stated plainly.** The tempting "two plane-wave engines, so
+  cross-check QE's energy against gpaw's" is physically wrong — QE (ultrasoft
+  pseudopotential) and gpaw (PAW) use different absolute energy references, so their total
+  energies are not comparable. The valid numeric comparison is within each code (serial
+  vs 2-rank); the cross-code value is two independent SCF stacks that each converge and
+  parallelise correctly on arm64. This also realizes the `qe + sssp` path GAPS.md had
+  flagged as merely plausible.
+
 ## 2026-09-07
 
 ### Fixed — published images could be garbage-collected; four already were (issue #13)

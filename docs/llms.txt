@@ -38,17 +38,25 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
   - `geo-ml` (381 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (249 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
-    esmpy, netcdf4, zarr; atmospheric/climate analysis with GRIB + regridding).
+  - `climate` (262 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+    esmpy, netcdf4, zarr, cdo, nco; atmospheric/climate analysis with GRIB + regridding.
+    cdo and nco are the netCDF/GRIB command-line operators — the CLI complement to the
+    Python stack; both are serial/OpenMP with no MPI, so they add no flavor to the env).
   - `pointcloud` (245 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
   - `comp-chem` (210 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, xtb-python, vina; cheminformatics + MD + quantum chemistry
     + docking).
-  - `dft` (237 pkgs — gpaw, siesta, psi4, nwchem, ase, libxc, libvdwxc, elpa, scalapack,
-    fftw, openmpi, mpi4py, spglib, phonopy, pymatgen; plane-wave/LCAO density-functional
-    theory plus Gaussian-basis quantum chemistry, MPI-parallel. Run in parallel with
+  - `dft` (239 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
+    libvdwxc, elpa, scalapack, fftw, openmpi, mpi4py, spglib, phonopy, pymatgen; plane-wave/
+    LCAO density-functional theory plus Gaussian-basis quantum chemistry, MPI-parallel. Run
+    in parallel with
     `docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python script.py`.
+    qe is a second plane-wave DFT engine alongside gpaw; sssp ships its pseudopotentials on
+    disk so qe runs a real Si SCF (verified serial + 2-rank), but note qe and gpaw total
+    energies are NOT comparable (ultrasoft-pseudopotential vs PAW energy references), so
+    there is no cross-code energy assertion — the verified numeric agreement is within each
+    code.
     nwchem is pinned to the `mpi_ts` (two-sided) ARMCI network, which works on 1, 2 and 4
     ranks with a container's default 64 MB `/dev/shm`; the `mpi_pr` progress-ranks variant
     aborts on 1 rank and exhausts `/dev/shm` on 3).
