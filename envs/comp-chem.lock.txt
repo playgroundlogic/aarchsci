@@ -1,6 +1,6 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.09.12.114244   Builder: 925c93c
-# lock-hash: ee35ceb81dc7   packages: 210
+# Source spec: envs/comp-chem.yaml   Built: 2026.09.14.141823   Builder: 44de4d1
+# lock-hash: aa4c57f9e41f   packages: 210
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -29,7 +29,7 @@ cffi 2.1.1
 cftime 1.6.5
 charset-normalizer 3.5.1
 cloudpickle 3.1.2
-contourpy 1.3.3
+contourpy 1.4.0
 cpcm-x 1.1.0
 cpython 3.13.15
 cuda-version 11.8
