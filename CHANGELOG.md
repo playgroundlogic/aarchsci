@@ -3,6 +3,28 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-09-14
+
+### Added — `cfd-fv`, the catalog's 13th env: SU2 finite-volume CFD (issue #16)
+- **New env `cfd-fv` — 57 packages, lock-hash `s4ac4ff422132`.** SU2 8.5.0 (SU2_CFD et
+  al.), OpenMPI, mpi4py, on python 3.11. A second CFD culture alongside `fem-cfd`'s
+  finite-element PDE solving — SU2 is compressible/aerodynamic finite-volume.
+- **Its own env, not an addition to `fem-cfd`, and #12 already measured why:** SU2's
+  arm64 builds cap Python at 3.11, so folding it into `fem-cfd` (py3.14) would drag that
+  whole env — python, numpy, scipy — backwards. SU2 gets py3.11 to itself. Standalone
+  solve confirmed: su2 8.5.0 `py311h46f73c0_0` (OpenMPI build), openmpi 5.0.10, no mpich.
+- **D3 does real CFD, with a self-generated mesh and an exact-ish physics check.**
+  conda-forge's su2 ships no meshes and no runnable tutorial cases (0 `*.su2`; the
+  reference cases live in SU2's separate repo), and no `pysu2` binding — so the issue's
+  "reproduce a published tutorial number" isn't available out of the box. But a CFD mesh
+  is geometry the test can legitimately generate (unlike a pseudopotential), so the smoke
+  test writes a distorted (non-orthogonal) quad mesh and runs a real Euler solve. The
+  check is **free-stream preservation**: uniform flow is the exact solution, and a
+  correct finite-volume scheme holds it to machine zero even on skewed cells — measured
+  `rms[Rho]` = −14.46 (serial) and −14.43 (2-rank), both converged, with the 2-rank run
+  doing genuine ParMETIS domain decomposition. A scheme with wrong metric terms fails
+  this.
+
 ## 2026-09-13
 
 ### Added — `cdo` + `nco` to `climate` (issue #15)

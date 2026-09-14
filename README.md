@@ -7,7 +7,7 @@ Sister project to [aarchbio](https://github.com/playgroundlogic/aarchbio) (which
 does this for bioinformatics / BioContainers). aarch.science covers the layer
 aarchbio scopes out: the **conda-forge** scientific stack.
 
-> **Status:** live. **12 verified, signed, public env images** on
+> **Status:** live. **13 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -70,13 +70,15 @@ has the full retention policy and the four dead digests).
 | [`r`](envs/r.yaml) | 328 | R 4.5 + tidyverse, data.table, arrow, sf, terra, glmnet, randomForest, caret, knitr/rmarkdown + pandoc, Rcpp |
 | [`astro`](envs/astro.yaml) | 377 | astropy, photutils, sunpy, healpy, yt, regions, reproject, specutils, astroquery |
 | [`fem-cfd`](envs/fem-cfd.yaml) | 130 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), OpenMPI, mpi4py, HDF5/ADIOS2 |
+| [`cfd-fv`](envs/cfd-fv.yaml) | 57 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
 
-`dft`, `md` and `fem-cfd` are the MPI-parallel envs, so their verification goes further
-than the others': the smoke tests run the same calculation serially and again under
+`dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes
+further than the others': the smoke tests run the same calculation serially and again under
 `mpiexec -n 2` and fail unless the answers agree (`dft` on bulk-silicon DFT *and* on an
 NWChem H2O SCF, `md` on a LAMMPS Lennard-Jones melt, `fem-cfd` on a Poisson solve whose
-L2 error must match to 1e-10 across the domain decomposition). Run them in parallel the
-same way:
+L2 error must match to 1e-10 across the domain decomposition, `cfd-fv` on an SU2 Euler
+solve that must preserve free-stream to ~1e-14 on a distorted mesh under both). Run them
+in parallel the same way:
 
 ```bash
 docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python your_script.py
@@ -137,7 +139,7 @@ that difference cost seven variables — `CONDA_PREFIX`, `CONDA_DEFAULT_ENV`, `C
 plus one `PATH` entry (`/opt/conda/condabin`), and none of it mattered: `geospatial`, `dft`
 and `md` all passed under `exec`, `run` **and** `run --cleanenv`, including `dft`/`md`'s
 2-rank MPI legs (`dft` reproduced its serial bulk-Si energy to 6e-08 eV under Apptainer).
-The other eight are untested under Apptainer.
+The other ten are untested under Apptainer.
 
 **That "none of it mattered" no longer holds for `dft`, and the reason is worth stating
 plainly:** adding `nwchem` made `run` load-bearing rather than merely advisable.

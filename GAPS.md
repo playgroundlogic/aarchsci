@@ -87,9 +87,9 @@ family as noarch-vs-subdir: a name that looks like a platform claim and isn't.
 **The curated science head is near-complete on arm64.** This is still the real
 finding, and it's the inverse of the pip experience: the exact stack that fails
 `No matching distribution found for rasterio` on PyPI solves *and* assembles cleanly
-on conda-forge. Twelve envs ship verified (geospatial, earth-observation, geo-ml,
-climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd), and every headline
-package in all twelve assembles and does real work natively.
+on conda-forge. Thirteen envs ship verified (geospatial, earth-observation, geo-ml,
+climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv), and every
+headline package in all thirteen assembles and does real work natively.
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
 changed: every solve-gap listed above is a **candidate we probed and declined**, not a

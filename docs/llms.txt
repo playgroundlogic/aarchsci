@@ -91,8 +91,16 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     JIT-compiles C at runtime — FFCx builds a C extension per variational form, which is
     why `gcc` is a *runtime* dependency, so don't strip the toolchain — and its BLAS is
     NVPL (NVIDIA Performance Libraries, CPU-only Arm math), the only env here where that
-    is true. su2 is deliberately excluded: its arm64 builds stop at py311 and would cap
-    the whole env's interpreter).
+    is true. su2 is deliberately excluded from THIS env — its arm64 builds stop at py311
+    and would cap the whole env's interpreter — and lives in its own `cfd-fv` env instead).
+  - `cfd-fv` (57 pkgs — su2 (SU2_CFD, finite-volume CFD), openmpi, mpi4py, on python 3.11;
+    compressible/aerodynamic CFD, MPI-parallel. A second CFD culture alongside fem-cfd's
+    finite-element solving. Its own env because su2's arm64 builds cap python at 3.11.
+    Verified by a real Euler solve on a self-generated DISTORTED mesh: free-stream must be
+    preserved to ~1e-14 (rms density residual), serially and on 2 ranks — a correct
+    finite-volume scheme holds uniform flow to machine zero even on skewed cells; a broken
+    one does not. Note: conda-forge's su2 ships no meshes/tutorial cases and no pysu2
+    binding, so the smoke test generates its own mesh and drives SU2_CFD as a binary).
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
@@ -164,13 +172,14 @@ packaging one), bioinformatics (that's aarch.bio), and compiling from source
 
 ## Facts
 
-- 12 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
-  comp-chem, dft, md, viz, r, astro, fem-cfd) — native arm64, verified
+- 13 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+  comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv) — native arm64, verified
   (assemble+import+functional) + signed + public.
-- `dft` (gpaw, siesta, psi4, ase, libxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy,
-  pymatgen), `md` (gromacs, lammps, ambertools) and `fem-cfd` (fenics-dolfinx, PETSc,
-  SLEPc) are MPI-parallel; their verification also runs the calculation under
-  `mpiexec -n 2` and requires the parallel and serial answers to agree.
+- `dft` (gpaw, siesta, psi4, nwchem, quantum-espresso, ase, libxc, ELPA, ScaLAPACK,
+  OpenMPI, spglib, phonopy, pymatgen), `md` (gromacs, lammps, ambertools), `fem-cfd`
+  (fenics-dolfinx, PETSc, SLEPc) and `cfd-fv` (SU2) are MPI-parallel; their verification
+  also runs the calculation under `mpiexec -n 2` and requires the parallel and serial
+  answers to agree.
 - Verification means real work, not imports: `md` conserves energy to 0.0109 kcal/mol
   over an in-vacuo NVE run, `viz` renders a PNG with no GPU and then reads it back
   with pillow to prove the frame contains geometry rather than being blank, and

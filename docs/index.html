@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">12</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd</div>
+                    <div class="stat-num green">13</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -476,6 +476,28 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   <strong>compiles C at runtime</strong> &mdash; FFCx builds a C extension per
                   variational form, which is why <code>gcc</code> is a runtime dependency, not a
                   build-time one.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">cfd-fv</span><br>
+                  <strong>57 packages</strong> &mdash; SU2: finite-volume CFD (compressible / aerodynamic), MPI-parallel
+                </p>
+                <div class="catalog">
+                    <span class="chip">SU2</span>
+                    <span class="chip">SU2_CFD</span>
+                    <span class="chip">OpenMPI</span>
+                    <span class="chip">mpi4py</span>
+                    <span class="chip">numpy / scipy</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  A second CFD culture next to <code>fem-cfd</code> &mdash; finite <em>volume</em>,
+                  not finite element. SU2 ships no meshes, so the smoke test builds its own: a
+                  deliberately <strong>distorted</strong> quad mesh, then a real Euler solve on it.
+                  The check is free-stream preservation &mdash; uniform flow is the exact solution,
+                  and a correct finite-volume scheme holds it to machine zero <em>even on skewed
+                  cells</em>, so the density residual must fall to ~10<sup>&minus;14</sup>. A scheme
+                  with wrong metric terms fails that. Runs serially and again on 2 ranks (real
+                  ParMETIS domain decomposition), and the two must agree. Its own env because SU2's
+                  arm64 builds cap Python at 3.11.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

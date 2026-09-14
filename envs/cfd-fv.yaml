@@ -1,0 +1,43 @@
+# aarch.science — cfd-fv environment
+# Finite-volume computational fluid dynamics, built on SU2 (DESIGN D2). SU2 is a
+# compressible/aerodynamic finite-volume solver (SU2_CFD et al.), methodologically
+# distinct from the finite-element PDE solving in `fem-cfd` (fenics-dolfinx) — hence a
+# separate env, and a second CFD culture in the catalog rather than a single case.
+#
+# WHY ITS OWN ENV, not an addition to fem-cfd (issue #16, and issue #12 measured it):
+# SU2's arm64 builds cap Python at 3.11 (py310 + py311 only, no py312+). fem-cfd runs
+# py3.14; adding su2 there would drag the whole env — python, numpy, scipy — back to
+# 3.11. So su2 gets py3.11 to itself here. `fem-cfd.yaml`'s "NOT included: su2" note is
+# the other end of this decision.
+#
+# MPI: every arm64 su2 build is OpenMPI-flavored (no mpich, no nompi), so the usual
+# `mpi=*=openmpi` env-wide lock applies, consistent with dft/md/fem-cfd. Verified to
+# solve AND assemble native arm64, including a real 2-rank CFD solve (see
+# cfd-fv.smoke.py). Versions left to the channel's current; the reconciler pins the
+# resolved set and rebuilds on change.
+name: cfd-fv
+channels:
+  - conda-forge
+dependencies:
+  # python is left as >=3.11, but su2 caps it: its newest arm64 builds are py311/py310
+  # only, so the solve lands on 3.11 (measured: python 3.11.16). Not hard-pinned, so a
+  # future su2 py312 build would let the env move up on its own.
+  - python >=3.11
+  - numpy
+  - scipy
+  # --- MPI flavor lock (the dft/md/fem-cfd precedent) ---
+  # conda-forge permits one MPI implementation per env. su2's arm64 builds are all
+  # OpenMPI (openmpi >=5.0.10); this lock keeps the flavor explicit and stops a drift to
+  # an mpich-flavored mpi4py/openmpi that would not match su2.
+  - mpi=*=openmpi
+  - openmpi
+  - mpi4py
+  # --- the CFD solver ---
+  # su2 provides the SU2_CFD / SU2_DEF / SU2_SOL binaries. Note what it does NOT ship:
+  # no meshes and no runnable tutorial cases (0 *.su2 in the package — the tutorial
+  # cases with reference values live in SU2's separate GitHub repo, not conda-forge),
+  # and the compiled `pysu2` python binding is absent (only the SU2 helper package and
+  # the CLI). So cfd-fv.smoke.py generates its own mesh fixture and drives SU2_CFD as a
+  # binary — see that file. A runtime download of the tutorial suite is off the table
+  # (the whitebox wontfix precedent).
+  - su2
