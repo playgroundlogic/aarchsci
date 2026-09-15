@@ -1,6 +1,6 @@
 # geo-ml — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geo-ml.yaml   Built: 2026.09.14.141823   Builder: 44de4d1
-# lock-hash: 1150409d483d   packages: 367
+# Source spec: envs/geo-ml.yaml   Built: 2026.09.15.124818   Builder: 82b7235
+# lock-hash: 1b3765970bb4   packages: 367
 # Regenerate with: ./builder/build-env.sh geo-ml
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -306,7 +306,7 @@ scikit-learn 1.9.1
 scipy 1.18.1
 seaborn 0.13.2
 seaborn-base 0.13.2
-segregation 2.5.5
+segregation 2.6.0
 setuptools 84.0.0
 setuptools-scm 10.2.3
 setuptools_scm 10.2.3
