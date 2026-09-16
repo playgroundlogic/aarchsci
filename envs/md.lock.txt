@@ -1,6 +1,6 @@
 # md — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/md.yaml   Built: 2026.09.14.141826   Builder: 44de4d1
-# lock-hash: 4ba2bf3beb6e   packages: 227
+# Source spec: envs/md.yaml   Built: 2026.09.16.124342   Builder: de12238
+# lock-hash: c6bfbfbf8462   packages: 227
 # Regenerate with: ./builder/build-env.sh md
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -101,7 +101,7 @@ libgcc-ng 16.2.0
 libgettextpo 0.25.1
 libgfortran 16.2.0
 libgfortran5 16.2.0
-libglib 2.88.3
+libglib 2.90.0
 libgomp 16.2.0
 libharfbuzz 14.4.0
 libhwloc 2.13.0
@@ -204,7 +204,7 @@ six 1.17.0
 snappy 1.2.2
 statsmodels 0.15.0
 sysroot_linux-aarch64 2.34
-threadpoolctl 3.6.0
+threadpoolctl 3.7.0
 tidynamics 1.1.2
 tk 8.6.13
 tqdm 4.70.1
