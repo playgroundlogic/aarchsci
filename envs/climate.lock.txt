@@ -1,6 +1,6 @@
 # climate — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/climate.yaml   Built: 2026.09.14.141823   Builder: 44de4d1
-# lock-hash: 554acc45dfb3   packages: 262
+# Source spec: envs/climate.yaml   Built: 2026.09.16.124340   Builder: de12238
+# lock-hash: 4606f8d42b4b   packages: 262
 # Regenerate with: ./builder/build-env.sh climate
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -123,7 +123,7 @@ libgcc-ng 16.2.0
 libgfortran 16.2.0
 libgfortran5 16.2.0
 libgl 1.7.0
-libglib 2.88.3
+libglib 2.90.0
 libglu 9.0.3
 libglvnd 1.7.0
 libglx 1.7.0
