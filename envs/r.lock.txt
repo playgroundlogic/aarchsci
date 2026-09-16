@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.09.15.124817   Builder: 82b7235
-# lock-hash: a57bc512c345   packages: 328
+# Source spec: envs/r.yaml   Built: 2026.09.16.124339   Builder: de12238
+# lock-hash: b4d08d866498   packages: 328
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -88,7 +88,7 @@ libgcc-ng 16.2.0
 libgdal-core 3.13.3
 libgfortran 16.2.0
 libgfortran5 16.2.0
-libglib 2.88.3
+libglib 2.90.0
 libgomp 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
@@ -164,7 +164,7 @@ r-cachem 1.1.0
 r-callr 3.7.6
 r-caret 7.0_1
 r-cellranger 1.1.0
-r-class 7.3_23
+r-class 7.3_24
 r-classint 0.4_11
 r-cli 3.6.6
 r-clipr 0.8.1
@@ -277,10 +277,10 @@ r-s7 0.2.2
 r-sass 0.4.10
 r-scales 1.4.0
 r-selectr 0.6_0
-r-sf 1.1_2
+r-sf 1.1_3
 r-shape 1.4.6.1
 r-sparsevctrs 0.3.6
-r-spatial 7.3_18
+r-spatial 7.3_19
 r-squarem 2026.1
 r-stringi 1.8.9
 r-stringr 1.6.0
