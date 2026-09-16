@@ -1,6 +1,6 @@
 # geo-ml — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geo-ml.yaml   Built: 2026.09.15.124818   Builder: 82b7235
-# lock-hash: 1b3765970bb4   packages: 367
+# Source spec: envs/geo-ml.yaml   Built: 2026.09.16.124339   Builder: de12238
+# lock-hash: 195db4ba476a   packages: 367
 # Regenerate with: ./builder/build-env.sh geo-ml
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -166,7 +166,7 @@ libgcc-ng 16.2.0
 libgdal-core 3.13.3
 libgfortran 16.2.0
 libgfortran5 16.2.0
-libglib 2.88.3
+libglib 2.90.0
 libgomp 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
@@ -209,7 +209,7 @@ libutf8proc 2.11.3
 libuuid 2.42.3
 libwebp-base 1.6.0
 libxcb 1.17.0
-libxgboost 3.4.1
+libxgboost 3.4.2
 libxml2 2.15.4
 libxml2-16 2.15.4
 libxml2-devel 2.15.4
@@ -274,7 +274,7 @@ pthread-stubs 0.4
 ptyprocess 0.7.0
 pulp 2.8.0
 pure_eval 0.2.4
-py-xgboost 3.4.1
+py-xgboost 3.4.2
 pyarrow 25.0.0
 pyarrow-core 25.0.0
 pyct 0.6.0
@@ -330,7 +330,7 @@ stack_data 0.6.3
 statsmodels 0.15.0
 sympy 1.14.0
 tblib 3.2.2
-threadpoolctl 3.6.0
+threadpoolctl 3.7.0
 tifffile 2026.9.9
 tk 8.6.13
 tobler 0.14.0
@@ -351,7 +351,7 @@ widgetsnbextension 4.0.16
 wrapt 2.4.0
 xarray 2026.7.0
 xerces-c 3.3.0
-xgboost 3.4.1
+xgboost 3.4.2
 xmltodict 1.0.4
 xorg-libice 1.1.2
 xorg-libsm 1.2.6
