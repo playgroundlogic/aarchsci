@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.09.15.124819   Builder: 82b7235
-# lock-hash: 02b372c8a475   packages: 363
+# Source spec: envs/astro.yaml   Built: 2026.09.17.124216   Builder: 91635b8
+# lock-hash: 0dc99154dcae   packages: 363
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -183,7 +183,7 @@ libgcc-ng 16.2.0
 libgdal-core 3.13.3
 libgfortran 16.2.0
 libgfortran5 16.2.0
-libglib 2.88.3
+libglib 2.90.0
 libgomp 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
@@ -233,7 +233,7 @@ lz4 4.4.5
 lz4-c 1.10.0
 lzo 2.10
 markupsafe 3.0.3
-matplotlib-base 3.11.1
+matplotlib-base 3.11.2
 matplotlib-inline 0.2.2
 minizip 4.2.2
 more-itertools 11.1.0
@@ -339,7 +339,7 @@ tzdata 2026c
 uncompresspy 0.4.1
 unyt 3.1.0
 uriparser 0.9.8
-urllib3 2.7.0
+urllib3 2.8.0
 wcwidth 0.8.3
 webencodings 0.5.1
 widgetsnbextension 4.0.16
