@@ -1,6 +1,6 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.09.17.124217   Builder: 91635b8
-# lock-hash: e38ba9bd5001   packages: 210
+# Source spec: envs/comp-chem.yaml   Built: 2026.09.19.120205   Builder: ed21867
+# lock-hash: 7bd00fafdbc5   packages: 210
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -51,7 +51,7 @@ freetype 2.14.3
 freetype-py 2.3.0
 fribidi 1.0.16
 graphite2 1.3.15
-greenlet 3.5.5
+greenlet 3.5.6
 griddataformats 1.2.0
 gsd 5.0.1
 h5py 3.16.0
