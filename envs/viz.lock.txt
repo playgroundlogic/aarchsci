@@ -1,6 +1,6 @@
 # viz — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/viz.yaml   Built: 2026.09.20.123319   Builder: c71ebb3
-# lock-hash: afe2a6feae3d   packages: 246
+# Source spec: envs/viz.yaml   Built: 2026.09.21.142405   Builder: 9cc8a2c
+# lock-hash: e5120a844dfa   packages: 246
 # Regenerate with: ./builder/build-env.sh viz
 _openmp_mutex 4.5
 aiohappyeyeballs 2.7.1
@@ -158,7 +158,7 @@ libxkbcommon 1.13.2
 libxkbfile 1.2.0
 libxml2 2.15.4
 libxml2-16 2.15.4
-libzip 1.11.2
+libzip 1.11.4
 libzlib 1.3.2
 lz4-c 1.10.0
 matplotlib-base 3.11.2
