@@ -1,6 +1,6 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.09.20.123318   Builder: c71ebb3
-# lock-hash: f95619cbe30e   packages: 210
+# Source spec: envs/comp-chem.yaml   Built: 2026.09.21.142407   Builder: 9cc8a2c
+# lock-hash: eff6342d9af3   packages: 210
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -119,7 +119,7 @@ libxcb 1.17.0
 libxcrypt 4.4.38
 libxml2 2.15.4
 libxml2-16 2.15.4
-libzip 1.11.2
+libzip 1.11.4
 libzlib 1.3.2
 lz4-c 1.10.0
 matplotlib-base 3.11.2
@@ -198,7 +198,7 @@ typing-extensions 4.16.0
 typing_extensions 4.16.0
 tzdata 2026c
 vina 1.2.7
-wrapt 2.4.0
+wrapt 2.4.1
 xcfun 2.1.1
 xorg-libice 1.1.2
 xorg-libsm 1.2.6
