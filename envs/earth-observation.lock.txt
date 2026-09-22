@@ -1,6 +1,6 @@
 # earth-observation — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/earth-observation.yaml   Built: 2026.09.21.142404   Builder: 9cc8a2c
-# lock-hash: fb06680c6c40   packages: 249
+# Source spec: envs/earth-observation.yaml   Built: 2026.09.22.124505   Builder: 8b01607
+# lock-hash: afba4fcf713d   packages: 249
 # Regenerate with: ./builder/build-env.sh earth-observation
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -63,7 +63,7 @@ hdf5 1.14.6
 hpack 4.2.0
 hyperframe 6.1.0
 icu 78.3
-idna 3.19
+idna 3.20
 imageio 2.37.4
 importlib-metadata 9.0.1
 jinja2 3.1.6
@@ -93,7 +93,7 @@ libdeflate 1.25
 libedit 3.1.20250104
 libev 4.33
 libevent 2.1.12
-libexpat 2.8.1
+libexpat 2.8.4
 libffi 3.7.0
 libfreetype 2.14.3
 libfreetype6 2.14.3
@@ -155,7 +155,7 @@ muparser 2.3.5
 narwhals 2.26.0
 ncurses 6.6
 netcdf4 1.7.4
-networkx 3.6.1
+networkx 3.7
 nlohmann_json 3.12.0
 numcodecs 0.16.5
 numpy 2.5.3
@@ -177,7 +177,7 @@ psutil 7.2.2
 pthread-stubs 0.4
 pyarrow 25.0.0
 pyarrow-core 25.0.0
-pyparsing 3.3.2
+pyparsing 3.3.3
 pyproj 3.8.0
 pysocks 1.7.1
 pystac 1.15.2
