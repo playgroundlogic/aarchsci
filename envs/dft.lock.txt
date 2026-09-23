@@ -1,6 +1,6 @@
 # dft — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/dft.yaml   Built: 2026.09.22.124507   Builder: 8b01607
-# lock-hash: ee6bc5c629d5   packages: 239
+# Source spec: envs/dft.yaml   Built: 2026.09.23.125221   Builder: d223cd6
+# lock-hash: c72f24e39a5c   packages: 239
 # Regenerate with: ./builder/build-env.sh dft
 _openmp_mutex 4.5
 annotated-types 0.8.0
@@ -127,7 +127,7 @@ libstdcxx-ng 16.2.0
 libsystemd0 261.3
 libtiff 4.7.2
 libudev1 261.3
-libuuid 2.42.3
+libuuid 2.42.4
 libvdwxc 0.5.0
 libwebp-base 1.6.0
 libxc 7.1.2
@@ -178,7 +178,7 @@ pint 0.26.1
 pip 26.2.1
 pixman 0.46.4
 platformdirs 4.11.11
-plotly 7.0.0
+plotly 7.1.0
 plumed 2.10.1
 psi4 1.11
 psutil 7.2.2
