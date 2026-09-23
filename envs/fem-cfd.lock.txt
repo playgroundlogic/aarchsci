@@ -1,6 +1,6 @@
 # fem-cfd — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/fem-cfd.yaml   Built: 2026.09.22.124505   Builder: 8b01607
-# lock-hash: 396f3a8c7b5c   packages: 129
+# Source spec: envs/fem-cfd.yaml   Built: 2026.09.23.125227   Builder: d223cd6
+# lock-hash: 7e08f310319a   packages: 129
 # Regenerate with: ./builder/build-env.sh fem-cfd
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -86,7 +86,7 @@ libsuitesparseconfig 7.10.1
 libsystemd0 261.3
 libudev1 261.3
 libumfpack 6.3.5
-libuuid 2.42.3
+libuuid 2.42.4
 libxml2 2.15.4
 libxml2-16 2.15.4
 libzlib 1.3.2
