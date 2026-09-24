@@ -1,6 +1,6 @@
 # dft — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/dft.yaml   Built: 2026.09.23.125221   Builder: d223cd6
-# lock-hash: c72f24e39a5c   packages: 239
+# Source spec: envs/dft.yaml   Built: 2026.09.24.125035   Builder: c05ebde
+# lock-hash: 135ab32c12e2   packages: 236
 # Regenerate with: ./builder/build-env.sh dft
 _openmp_mutex 4.5
 annotated-types 0.8.0
@@ -38,7 +38,7 @@ font-ttf-ubuntu 0.83
 fontconfig 2.18.3
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
-fonttools 4.65.0
+fonttools 4.66.0
 freetype 2.14.3
 fribidi 1.0.17
 future 1.0.0
@@ -59,7 +59,6 @@ hpack 4.2.0
 hyperframe 6.1.0
 icu 78.3
 idna 3.20
-importlib-metadata 9.0.1
 importlib-resources 7.1.0
 importlib_resources 7.1.0
 integratorxx 1.0.0
@@ -67,7 +66,6 @@ joblib 1.6.0
 keyutils 1.6.3
 kiwisolver 1.5.1
 krb5 1.22.2
-latexcodec 2.0.1
 lcms2 2.19.1
 ld_impl_linux-aarch64 2.46.1
 lerc 4.2.0
@@ -124,9 +122,9 @@ libsqlite 3.53.4
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
-libsystemd0 261.3
+libsystemd0 262
 libtiff 4.7.2
-libudev1 261.3
+libudev1 262
 libuuid 2.42.4
 libvdwxc 0.5.0
 libwebp-base 1.6.0
@@ -139,7 +137,7 @@ libxml2-16 2.15.4
 libxslt 1.1.45
 libzip 1.11.4
 libzlib 1.3.2
-llvm-openmp 23.1.1
+llvm-openmp 23.1.2
 lua 5.4.8
 lxml 6.1.3
 lz4-c 1.10.0
@@ -177,7 +175,7 @@ pillow 12.3.0
 pint 0.26.1
 pip 26.2.1
 pixman 0.46.4
-platformdirs 4.11.11
+platformdirs 4.11.12
 plotly 7.1.0
 plumed 2.10.1
 psi4 1.11
@@ -186,12 +184,11 @@ pthread-stubs 0.4
 pugixml 1.15
 py-cpuinfo 9.0.0
 pybind11-abi 11
-pybtex 0.26.1
 pydantic 2.13.5
 pydantic-core 2.46.5
 pydantic-settings 2.15.0
-pymatgen 2026.5.4
-pymatgen-core 2026.8.30
+pymatgen 2026.9.24
+pymatgen-core 2026.9.23
 pyparsing 3.3.3
 pysocks 1.7.1
 python 3.14.7
