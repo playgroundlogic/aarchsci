@@ -1,6 +1,6 @@
 # dft — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/dft.yaml   Built: 2026.09.24.125035   Builder: c05ebde
-# lock-hash: 135ab32c12e2   packages: 236
+# Source spec: envs/dft.yaml   Built: 2026.09.25.125416   Builder: 23ba4eb
+# lock-hash: 1c9446b74f4a   packages: 236
 # Regenerate with: ./builder/build-env.sh dft
 _openmp_mutex 4.5
 annotated-types 0.8.0
@@ -169,8 +169,8 @@ palettable 3.3.3
 pandas 3.0.6
 pcmsolver 1.2.3
 pcre2 10.47
-phonopy 4.5.0
-phonors 0.3.0
+phonopy 4.6.0
+phonors 0.4.0
 pillow 12.3.0
 pint 0.26.1
 pip 26.2.1
