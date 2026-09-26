@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.09.25.125413   Builder: 23ba4eb
-# lock-hash: 7e7a77d2fc6d   packages: 328
+# Source spec: envs/r.yaml   Built: 2026.09.26.122137   Builder: 836bb2c
+# lock-hash: 6fb1525a53b6   packages: 328
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -78,7 +78,7 @@ libdeflate 1.25
 libedit 3.1.20250104
 libev 4.33
 libevent 2.1.12
-libexpat 2.8.4
+libexpat 2.8.5
 libffi 3.7.0
 libfreetype 2.14.3
 libfreetype6 2.14.3
