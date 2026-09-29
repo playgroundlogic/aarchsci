@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.09.28.154201   Builder: 982c4a6
-# lock-hash: 291fca1e4243   packages: 364
+# Source spec: envs/astro.yaml   Built: 2026.09.29.141304   Builder: f61e0cb
+# lock-hash: 41d51415ddb4   packages: 363
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -86,7 +86,6 @@ dask-core 2026.8.0
 dask-image 2026.5.0
 dbus 1.16.2
 debugpy 1.8.22
-deprecated 3.0.0
 distributed 2026.8.0
 donfig 0.8.1.post1
 drms 0.9.1
@@ -241,7 +240,7 @@ mpc 1.4.0
 mpfr 4.2.2
 mpl_animators 1.2.4
 mpmath 1.4.1
-msgpack-python 1.2.2
+msgpack-python 1.2.3
 msgspec 0.21.1
 multidict 6.7.1
 munkres 1.1.4
@@ -252,7 +251,7 @@ ndcube 2.4.2
 nest-asyncio2 1.7.3
 networkx 3.7
 nlohmann_json 3.12.0
-numcodecs 0.16.5
+numcodecs 0.17.0
 numpy 2.5.3
 openjpeg 2.5.4
 openssl 3.6.4
