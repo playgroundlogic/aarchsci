@@ -1,6 +1,6 @@
 # viz — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/viz.yaml   Built: 2026.09.28.154203   Builder: 982c4a6
-# lock-hash: 394b6c736f1d   packages: 246
+# Source spec: envs/viz.yaml   Built: 2026.09.29.141304   Builder: f61e0cb
+# lock-hash: cee23a305718   packages: 246
 # Regenerate with: ./builder/build-env.sh viz
 _openmp_mutex 4.5
 aiohappyeyeballs 2.7.1
@@ -167,7 +167,7 @@ mesa-libgallium 26.2.3
 mesa-llvmpipe 26.2.3
 mesalib 26.2.3
 mpg123 1.33.7
-msgpack-python 1.2.2
+msgpack-python 1.2.3
 multidict 6.7.1
 munkres 1.1.4
 ncurses 6.6
