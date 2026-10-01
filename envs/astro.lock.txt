@@ -1,11 +1,11 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.09.30.135820   Builder: 5033f53
-# lock-hash: 1bad593f317c   packages: 363
+# Source spec: envs/astro.yaml   Built: 2026.10.01.143920   Builder: f8c4a71
+# lock-hash: 874cfda71a1b   packages: 363
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
 affine 3.0.1
-aiobotocore 3.9.1
+aiobotocore 3.9.2
 aiofiles 25.1.0
 aioftp 0.28.0
 aiohappyeyeballs 2.7.1
@@ -51,7 +51,7 @@ beautifulsoup4 4.15.0
 bleach 6.4.0
 blosc 1.21.6
 bokeh 3.10.0
-botocore 1.43.75
+botocore 1.43.102
 bottleneck 1.6.0
 bqplot 0.13.1
 bqscales 0.3.7
@@ -77,7 +77,7 @@ cmyt 2.0.2
 comm 0.2.3
 contourpy 1.4.0
 cpython 3.14.7
-cryptography 50.0.1
+cryptography 50.0.2
 cspice 67
 cycler 0.12.1
 cytoolz 1.1.0
@@ -202,7 +202,7 @@ libopenblas 0.3.34
 libopentelemetry-cpp 1.27.0
 libopentelemetry-cpp-headers 1.27.0
 libparquet 25.0.0
-libpng 1.6.58
+libpng 1.6.59
 libprotobuf 7.35.1
 libpsl 0.23.1
 libpython 3.14.7
