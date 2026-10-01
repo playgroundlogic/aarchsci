@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.09.30.135822   Builder: 5033f53
-# lock-hash: d114e90d2505   packages: 328
+# Source spec: envs/r.yaml   Built: 2026.10.01.143918   Builder: f8c4a71
+# lock-hash: 26033ca840d7   packages: 328
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -108,7 +108,7 @@ libopenblas 0.3.34
 libopentelemetry-cpp 1.27.0
 libopentelemetry-cpp-headers 1.27.0
 libparquet 25.0.0
-libpng 1.6.58
+libpng 1.6.59
 libprotobuf 7.35.1
 libpsl 0.23.1
 libre2-11 2025.11.05
@@ -305,7 +305,7 @@ r-viridislite 0.4.3
 r-vroom 1.7.1
 r-withr 3.0.3
 r-wk 0.9.5
-r-xfun 0.60
+r-xfun 0.61
 r-xml2 1.6.0
 r-yaml 2.3.12
 re2 2025.11.05
