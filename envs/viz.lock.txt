@@ -1,6 +1,6 @@
 # viz — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/viz.yaml   Built: 2026.09.29.141304   Builder: f61e0cb
-# lock-hash: cee23a305718   packages: 246
+# Source spec: envs/viz.yaml   Built: 2026.10.01.143921   Builder: f8c4a71
+# lock-hash: b9e21fac0c20   packages: 246
 # Regenerate with: ./builder/build-env.sh viz
 _openmp_mutex 4.5
 aiohappyeyeballs 2.7.1
@@ -34,7 +34,7 @@ font-ttf-ubuntu 0.83
 fontconfig 2.18.3
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
-fonttools 4.66.0
+fonttools 4.66.1
 freetype 2.14.3
 fribidi 1.0.17
 frozenlist 1.8.0
@@ -127,7 +127,7 @@ libopenvino-tensorflow-lite-frontend 2026.4.0
 libopus 1.6.1
 libpciaccess 0.19
 libplacebo 7.360.1
-libpng 1.6.58
+libpng 1.6.59
 libpq 18.6
 libprotobuf 7.35.1
 libpsl 0.23.1
@@ -145,7 +145,7 @@ libtiff 4.7.2
 libudev1 262
 libunwind 1.8.3
 liburing 2.14
-libusb 1.0.29
+libusb 1.0.30
 libuuid 2.42.4
 libvorbis 1.3.7
 libvpx 1.17.0
@@ -179,12 +179,12 @@ openldap 2.6.13
 openssl 3.6.4
 packaging 26.3
 pango 1.58.2
-paraview 6.1.1
+paraview 6.2.0
 pcre2 10.47
 pillow 12.3.0
 pip 26.2.1
 pixman 0.46.4
-proj 9.8.1
+proj 9.9.0
 propcache 0.5.2
 pthread-stubs 0.4
 pugixml 1.15
@@ -194,7 +194,7 @@ python 3.14.7
 python-dateutil 2.9.0.post0
 python_abi 3.14
 qhull 2020.2
-qt6-main 6.11.2
+qt6-main 6.12.0
 readline 8.3
 sdl2 2.32.56
 sdl3 3.4.16
@@ -211,8 +211,8 @@ typing_extensions 4.16.0
 tzdata 2026c
 utfcpp 4.09
 viskores 1.1.0
-vtk-base 9.6.2
-vtk-io-ffmpeg 9.6.2
+vtk-base 9.7.0
+vtk-io-ffmpeg 9.7.0
 wayland 1.26.0
 wslink 2.5.7
 x264 1!164.3095
