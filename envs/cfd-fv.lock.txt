@@ -1,6 +1,6 @@
 # cfd-fv — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/cfd-fv.yaml   Built: 2026.09.26.122135   Builder: 836bb2c
-# lock-hash: 354a9d351924   packages: 57
+# Source spec: envs/cfd-fv.yaml   Built: 2026.10.04.132222   Builder: f9d87e6
+# lock-hash: cf5fe4a85c7a   packages: 57
 # Regenerate with: ./builder/build-env.sh cfd-fv
 _openmp_mutex 4.5
 bzip2 1.0.8
@@ -43,7 +43,7 @@ mpi4py 4.1.2
 ncurses 6.6
 numpy 2.4.6
 openmpi 5.0.11
-openssl 3.6.4
+openssl 3.6.5
 packaging 26.3
 pip 26.2.1
 python 3.11.16
