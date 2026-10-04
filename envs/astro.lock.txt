@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.10.03.124149   Builder: 4e3c61b
-# lock-hash: 784b895d1892   packages: 364
+# Source spec: envs/astro.yaml   Built: 2026.10.04.132225   Builder: f9d87e6
+# lock-hash: d846ca900a84   packages: 364
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -254,7 +254,7 @@ nlohmann_json 3.12.0
 numcodecs 0.17.0
 numpy 2.5.3
 openjpeg 2.5.4
-openssl 3.6.4
+openssl 3.6.5
 orc 2.3.1
 packaging 26.3
 pandas 3.0.6
@@ -292,7 +292,7 @@ python-abi3 3.14
 python-dateutil 2.9.0.post0
 python-gil 3.14.7
 python_abi 3.14
-pytz 2026.4
+pytz 2026.5
 pyvo 1.9.1
 pyyaml 6.0.3
 pyzmq 27.2.0
@@ -362,7 +362,7 @@ zarr 3.4.0
 zeep 4.3.3
 zeromq 4.3.5
 zict 3.0.0
-zipp 4.1.0
+zipp 4.1.1
 zlib 1.3.2
 zlib-ng 2.3.3
 zstd 1.5.7
