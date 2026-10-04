@@ -1,6 +1,6 @@
 # fem-cfd — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/fem-cfd.yaml   Built: 2026.10.01.143920   Builder: f8c4a71
-# lock-hash: f073ca6ce336   packages: 129
+# Source spec: envs/fem-cfd.yaml   Built: 2026.10.04.132224   Builder: f9d87e6
+# lock-hash: be7bafe20039   packages: 129
 # Regenerate with: ./builder/build-env.sh fem-cfd
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -100,7 +100,7 @@ nanobind-abi 19
 ncurses 6.6
 numpy 2.5.3
 openmpi 5.0.10
-openssl 3.6.4
+openssl 3.6.5
 parmetis 4.0.3
 petsc 3.25.5
 petsc4py 3.25.5
