@@ -1,6 +1,6 @@
 # earth-observation — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/earth-observation.yaml   Built: 2026.10.06.142115   Builder: 28bd598
-# lock-hash: c815ad3d8c5f   packages: 246
+# Source spec: envs/earth-observation.yaml   Built: 2026.10.07.143954   Builder: 0dbc90e
+# lock-hash: bcdaec631d8b   packages: 246
 # Regenerate with: ./builder/build-env.sh earth-observation
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -41,7 +41,7 @@ click-plugins 1.1.1.2
 cligj 0.7.2
 cloudpickle 3.1.2
 contourpy 1.4.0
-cpython 3.14.7
+cpython 3.14.8
 cytoolz 1.1.0
 dask 2026.8.0
 dask-core 2026.8.0
@@ -89,7 +89,7 @@ libcblas 3.11.0
 libcrc32c 1.1.2
 libcurl 8.22.0
 libdeflate 1.25
-libedit 3.1.20250104
+libedit 3.1.20260512
 libev 4.33
 libevent 2.1.12
 libexpat 2.8.5
@@ -123,7 +123,7 @@ libparquet 25.0.0
 libpng 1.6.59
 libprotobuf 7.35.1
 libpsl 0.23.1
-libpython 3.14.7
+libpython 3.14.8
 libre2-11 2025.11.05
 librttopo 1.1.0
 libspatialite 5.1.0
@@ -204,9 +204,9 @@ pystac-ext-timestamps 1.1.1
 pystac-ext-version 1.2.1
 pystac-ext-view 1.0.1
 pystac-ext-xarray-assets 1.0.1
-python 3.14.7
+python 3.14.8
 python-dateutil 2.9.0.post0
-python-gil 3.14.7
+python-gil 3.14.8
 python-tzdata 2026.5
 python_abi 3.14
 pytz 2026.5
@@ -229,7 +229,7 @@ stackstac 0.5.1
 tblib 3.2.2
 tifffile 2026.9.20
 tk 8.6.13
-toolz 1.1.0
+toolz 1.2.0
 tornado 6.5.10
 typing-extensions 4.16.0
 typing_extensions 4.16.0
