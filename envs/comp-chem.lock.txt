@@ -1,6 +1,6 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.10.06.142113   Builder: 28bd598
-# lock-hash: a7fa26e803ca   packages: 207
+# Source spec: envs/comp-chem.yaml   Built: 2026.10.07.143952   Builder: 0dbc90e
+# lock-hash: 9c63ea9ff97d   packages: 207
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -31,7 +31,7 @@ charset-normalizer 3.5.1
 cloudpickle 3.1.2
 contourpy 1.4.0
 cpcm-x 1.1.0
-cpython 3.13.15
+cpython 3.13.16
 cuda-version 11.8
 cycler 0.12.1
 cyrus-sasl 2.1.28
@@ -78,7 +78,7 @@ libcblas 3.11.0
 libcint 6.1.3
 libcurl 8.22.0
 libdeflate 1.25
-libedit 3.1.20250104
+libedit 3.1.20260512
 libev 4.33
 libexpat 2.8.5
 libffi 3.7.0
@@ -90,7 +90,7 @@ libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.0
 libgomp 16.2.0
-libharfbuzz 14.5.1
+libharfbuzz 14.6.0
 libiconv 1.18
 libjpeg-turbo 3.2.0
 liblapack 3.11.0
@@ -103,7 +103,7 @@ libopenblas 0.3.34
 libpng 1.6.59
 libpq 18.6
 libpsl 0.23.1
-libpython 3.13.15
+libpython 3.13.16
 libraqm 0.11.0
 librdkit 2026.03.1
 libsqlite 3.53.4
@@ -158,15 +158,15 @@ pixman 0.46.4
 pthread-stubs 0.4
 py-cpuinfo 9.0.0
 pybind11-abi 4
-pycairo 1.29.1
+pycairo 1.29.2
 pycparser 3.0
 pyedr 0.8.0
 pyparsing 3.3.2
 pyscf 2.14.0
 pytables 3.11.1
-python 3.13.15
+python 3.13.16
 python-dateutil 2.9.0.post0
-python-gil 3.13.15
+python-gil 3.13.16
 python_abi 3.13
 pytng 0.3.4
 qhull 2020.2
