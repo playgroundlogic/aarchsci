@@ -1,14 +1,13 @@
 # viz — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/viz.yaml   Built: 2026.10.06.142114   Builder: 28bd598
-# lock-hash: 6d5265afeaec   packages: 245
+# Source spec: envs/viz.yaml   Built: 2026.10.07.143955   Builder: 0dbc90e
+# lock-hash: c4b9426e84d1   packages: 244
 # Regenerate with: ./builder/build-env.sh viz
 _openmp_mutex 4.5
 aiohappyeyeballs 2.7.1
-aiohttp 3.14.3
+aiohttp 3.14.4
 aiosignal 1.4.0
 alsa-lib 1.2.16.1
 aom 3.14.1
-async-timeout 5.0.1
 attrs 26.1.0
 blosc 1.21.6
 brotli 1.2.0
@@ -71,7 +70,7 @@ libdav1d7 1.5.4
 libdeflate 1.25
 libdovi 3.4.0
 libdrm 2.4.129
-libedit 3.1.20250104
+libedit 3.1.20260512
 libegl 1.7.0
 libegl-devel 1.7.0
 libev 4.33
@@ -93,7 +92,7 @@ libglvnd 1.7.0
 libglx 1.7.0
 libglx-devel 1.7.0
 libgomp 16.2.0
-libharfbuzz 14.5.1
+libharfbuzz 14.6.0
 libharu 2.4.6
 libhwloc 2.15.0
 libhwy 1.4.0
@@ -101,8 +100,8 @@ libiconv 1.18
 libjpeg-turbo 3.2.0
 libjxl 0.12.0
 liblapack 3.11.0
-libllvm23 23.1.2
-libllvmspirv23 23.1.1
+libllvm23 23.1.3
+libllvmspirv23 23.1.2
 liblzma 5.8.3
 libmpdec 4.0.0
 libnetcdf 4.10.1
@@ -130,7 +129,7 @@ libpng 1.6.59
 libpq 18.6
 libprotobuf 7.35.1
 libpsl 0.23.1
-libpython 3.14.7
+libpython 3.14.8
 libraqm 0.11.0
 librsvg 2.62.4
 libsndfile 1.2.2
@@ -189,7 +188,7 @@ pthread-stubs 0.4
 pugixml 1.15
 pulseaudio-client 17.0
 pyparsing 3.3.3
-python 3.14.7
+python 3.14.8
 python-dateutil 2.9.0.post0
 python_abi 3.14
 qhull 2020.2
@@ -200,7 +199,7 @@ sdl3 3.4.18
 shaderc 2026.3
 six 1.17.0
 snappy 1.2.2
-spirv-tools 2026.3
+spirv-tools 2026.4
 sqlite 3.53.4
 svt-av1 4.2.0
 tbb 2023.1.0
@@ -242,7 +241,7 @@ xorg-libxshmfence 1.3.3
 xorg-libxtst 1.2.5
 xorg-libxxf86vm 1.1.7
 xorg-xorgproto 2025.1
-xorg-xvfb-server 21.1.24
+xorg-xvfb-server 21.1.25
 yarl 1.25.1
 zfp 1.0.1
 zlib-ng 2.3.3
