@@ -6,10 +6,11 @@ stack** — geospatial / earth-observation first. Sister project to
 packages** (BioContainers) one per image. aarch.science covers the other layer: curated
 **conda-forge** stacks.
 
-The split is by **layer and current home, not by subject** — see **D5**. A tool whose
-development has migrated off bioconda to conda-forge belongs here even if it is
-biological, which is why `single-cell` (scanpy, Seurat) and `neuroimaging` (AFNI, DIPY)
-ship from this project. Everything bioconda actively carries stays with aarchbio.
+The split is by **artifact shape, not subject and not channel** — see **D5**. aarchbio
+ships one tool per image as a drop-in for a BioContainers reference; aarchsci ships domain
+environments. The same software can be in both, which is why `single-cell` (scanpy,
+Seurat) and `neuroimaging` (AFNI, DIPY) ship from here *and* aarchbio ships a single-tool
+`scanpy`. Neither project is "the bioinformatics one".
 
 > This document is the authoritative design. It is written before the builder so
 > the architecture — especially where it *diverges* from aarchbio — is deliberate.
@@ -237,58 +238,71 @@ wins on price/perf. (The pip-arm64-wheel gap is a CPU-stack problem anyway.)
   packages; gaps go upstream).
 - ~~Bioinformatics (that's aarchbio).~~ **Amended 2026-10-08 — see D5 below.**
 
-## D5 — bioinformatics: the boundary is bioconda, not the subject matter
+## D5 — the boundary between the two projects is ARTIFACT SHAPE
 
-**Settled 2026-10-08.** The original non-goal read "Bioinformatics (that's aarchbio)",
-which drew the line by *domain*. That turned out to leave a real gap, found by three
-requests in one week (#17 scanpy, #20 r-seurat, #26 neuroimaging).
+**Settled 2026-10-08, after two wrong drafts. The drafts are kept because the way each
+failed is the useful part.**
 
-The two projects divide by **layer**, not by subject. aarchbio's own README is explicit:
-it "operates at exactly one layer: it rebuilds **bioconda tool packages** into native
-arm64 containers," and lists conda-forge packages as out of scope. So a domain-shaped
-exclusion here does not meet a layer-shaped inclusion there — and anything that is
-biological *and* conda-forge-only falls between the two, belonging to neither.
+The original non-goal read "Bioinformatics (that's aarchbio)", drawing the line by
+**domain**. Three requests in one week walked into the gap that left (#17 scanpy,
+#20 r-seurat, #26 neuroimaging).
 
-**The rule: each project tracks the software's CURRENT HOME.**
+**The rule:**
 
-> If a tool's live development publishes to **bioconda**, it is aarchbio's.
-> If its development has moved to **conda-forge**, it is aarchsci's — whatever its
-> subject matter. A stale copy left behind on the other channel confers no claim.
+> **aarchbio** publishes **one tool per image**, tagged `<version>--<build>` to mirror a
+> BioContainers reference, so it can be a drop-in for `quay.io/biocontainers/<tool>`.
+> **aarchsci** publishes **domain environments**: many packages solved together, run it
+> and start working.
+>
+> Not domain. Not channel. The same software can legitimately appear in both, in
+> different shapes.
 
-An earlier draft of this section phrased the test as "is bioconda a *viable source*?",
-which was worse in a way worth recording: it made the boundary about *our* ability to ship
-rather than about where the software actually lives. "Current home" is the better
-principle. It is a fact about upstream, not about us; it reads the same from either
-project; and it handles migration in **either** direction, including a future tool that
-moves the other way.
+`scanpy` is the worked example: it is a single-tool image in aarchbio — sourced from
+conda-forge, because bioconda's 1.7.2 cannot import — **and** a component of aarchsci's
+`single-cell` environment. Different artifacts, different needs, both should exist.
+Nothing has to be handed over.
 
-Applying it, with the evidence:
+| you want | shape | project |
+|---|---|---|
+| a drop-in for `quay.io/biocontainers/scanpy:…` | one tool | **aarchbio** |
+| a stack where scanpy, Seurat, leidenalg and anndata already work together | environment | **aarchsci** (`single-cell`) |
+| `samtools` for one pipeline step | one tool | **aarchbio** |
+| a verified geospatial / DFT / MD / astronomy stack | environment | **aarchsci** |
 
-| tool | bioconda | conda-forge | current home |
-|---|---|---|---|
-| `afni`, `dipy`, `nibabel`, `nilearn`, `nipype` | **absent** | current | conda-forge → **aarchsci** (`neuroimaging`) |
-| `scanpy` | 1.7.2 (2021), and that copy *fails to import* against a current anndata (aarchbio#63) | 1.12.4 | conda-forge → **aarchsci** |
-| `r-seurat` | 3.0.2 (2019), zero `linux-aarch64` files | 5.5.1 | conda-forge → **aarchsci** |
-| the other ~503 bioconda tools | current | (deps only) | bioconda → **aarchbio** |
+### Draft 1, rejected: "is bioconda a *viable source*?"
 
-The last row is the important one: this amendment moves a handful of migrated packages,
-not a domain. Everything bioconda actively carries stays where it is.
+Made the boundary about **our ability to ship** rather than about the software, so it
+would have read differently from each project's side.
 
-**What the sister project does about a migrated tool is its own call, and either answer is
-coherent:** keep serving its historical bioconda version (a faithful rebuild of what
-bioconda actually has — which is what aarchbio is *for*), or point at aarchsci. What would
-*not* be coherent is expecting aarchbio to curate conda-forge packages, since that is
-explicitly not its layer.
+### Draft 2, rejected: "each project tracks the software's CURRENT HOME"
 
-Why not decide this by domain, as the original non-goal did: "is it bioinformatics?"
-invites taxonomy arguments with no resolution — is neuroimaging bioinformatics? is
-cheminformatics? `comp-chem` has shipped since v1 without anyone asking. "Where does the
-software live now?" has an answer you can look up.
+Channel-based — development on bioconda → aarchbio, moved to conda-forge → aarchsci. It
+was wrong, and aarchbio#75 is where it got corrected. Two reasons:
 
-**What this does NOT change:** the channel is still conda-forge (D2). aarchsci does not
-rebuild BioContainers, mirror bioconda, or compile from source. It curates conda-forge
-envs — and now does so without a carve-out for which science the packages happen to serve.
+1. **It was false about the sister project.** aarchbio already publishes single-tool
+   images sourced from conda-forge whenever bioconda has no recipe or a broken one:
+   `scanpy:1.12.4--pyhd8ed1ab_1`, `anndata:0.13.4--pyhd8ed1ab_0`,
+   `decoupler-py:2.1.6--pyhd8ed1ab_0`, each labelled
+   `io.aarchbio.source-channel=conda-forge`. Channel was never its boundary.
+2. **It would have recreated the gap it was meant to close.** Under it `scanpy` became
+   aarchsci's — but aarchsci publishes only environments, so no single-tool `scanpy` image
+   would exist here, and the drop-in replacement for `quay.io/biocontainers/scanpy` would
+   have belonged to neither project.
 
-**Mirror statement owed upstream:** aarchbio's scope table should name the same boundary
-from its side, so the two documents agree rather than merely not conflicting. That is a
-change in the sister repo and is not made here.
+**The process error behind draft 2 is the part worth not repeating.** The evidence was
+already in hand: `conda-meta` inside aarchbio's scanpy image reported
+`channel=conda-forge`, and that was cited correctly when #17 was first closed. It was then
+*withdrawn* on the strength of aarchbio's README, which listed conda-forge as out of scope
+— a statement that project's own practice had already outgrown. A measured property of a
+built artifact was discarded in favour of a prose claim in a document.
+
+That is exactly backwards, and it is the same inversion D3 exists to prevent: **prefer
+what the artifact does to what a label says about it.** Including when the label is a
+sister project's README. Including when the artifact evidence happens to support one's own
+earlier position, which is the case where it is easiest to talk yourself out of it.
+
+**What this does not change:** the channel here is still conda-forge (D2) and the unit here
+is still a curated environment. aarchsci does not publish single-tool images, mirror
+BioContainers, or compile from source. `single-cell` and `neuroimaging` stay in scope —
+they are environments, which is what this project builds, and that was never the part in
+dispute.

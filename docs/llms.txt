@@ -28,26 +28,22 @@ Two questions, and the first usually settles it.
      geospatial, dft, astro, single-cell. Right answer when someone needs a *working
      stack* to import against.
 
-2. WHERE DOES THE TOOL LIVE NOW? Each project tracks the software's CURRENT HOME. Live
-   development publishing to bioconda -> aarch.bio. Development that has MOVED to
-   conda-forge -> aarch.science, whatever the subject matter. A stale copy left behind on
-   the other channel confers no claim.
+2. THE SAME SOFTWARE CAN BE IN BOTH, IN DIFFERENT SHAPES. The split is by artifact, not
+   by subject and not by channel. `scanpy` is a single-tool image in aarch.bio (sourced
+   from conda-forge, because bioconda's 1.7.2 cannot import) AND a component of
+   aarch.science's `single-cell` environment. Both are correct; neither is a mistake.
 
-   The practical test, which catches every confusing case: COMPARE THE VERSIONS. If
-   bioconda's copy is years behind conda-forge's, the answer is aarch.science. Worked
-   examples — all of these are in aarch.science despite being biology:
+     want a drop-in for quay.io/biocontainers/scanpy:...   -> aarch.bio
+     want scanpy+Seurat+leidenalg+anndata working together -> aarch.science single-cell
+     want samtools for one pipeline step                   -> aarch.bio
+     want a verified geospatial/DFT/astronomy stack        -> aarch.science
 
-     scanpy    bioconda 1.7.2 (2021, and that copy raises ImportError against a current
-               anndata)  vs conda-forge 1.12.4   -> aarch.science `single-cell`
-     r-seurat  bioconda 3.0.2 (2019, zero linux-aarch64 builds)
-               vs conda-forge 5.5.1              -> aarch.science `single-cell`
-     afni, dipy, nibabel, nilearn, nipype
-               not on bioconda at all            -> aarch.science `neuroimaging`
-
-   Everything bioconda actively carries stays with aarch.bio — that is the large majority
-   of bioinformatics. Do NOT tell someone a bioinformatics tool is unavailable on arm64
-   without checking both projects and both channels; "it's biology, so it's aarch.bio"
-   has been wrong since 2026-10-08 (DESIGN D5).
+   NEITHER project is "the bioinformatics one". aarch.bio ships biology and general tools
+   as single images, from whichever channel actually provides a working package.
+   aarch.science ships biology and everything else as environments (`single-cell`,
+   `neuroimaging`). So do NOT answer "is X available on arm64?" from the subject matter or
+   the channel — check both catalogs. Two framings that are BOTH wrong: "it's biology, so
+   it's aarch.bio" and "it's on conda-forge, so it's aarch.science" (DESIGN D5).
 
 ## The crucial difference from a solve: verified to RUN
 
@@ -174,11 +170,12 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     `templateflow` is excluded because it downloads atlases at runtime.)
   - `single-cell` (345 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
     python 3.14, AND r-seurat 5.5 on R 4.5, in one image; single-cell transcriptomics in
-    both ecosystems. Here rather than in the bioinformatics sister project under DESIGN D5:
-    each project tracks the software's CURRENT HOME, and both frameworks have migrated —
-    bioconda's scanpy is 1.7.2 from 2021 and raises ImportError against a current anndata,
-    its r-seurat is 3.0.2 from 2019 with no linux-aarch64 build, while conda-forge carries
-    1.12.4 and 5.5.1. BOTH halves are in ONE env on purpose: the point is clustering
+    both ecosystems. Here because it is an ENVIRONMENT (DESIGN D5: the split with the
+    sister project is artifact shape, not subject) — aarch.bio also ships a single-tool
+    scanpy image, and both are correct. The versions matter either way: bioconda's scanpy
+    is 1.7.2 from 2021 and raises ImportError against a current anndata, its r-seurat is
+    3.0.2 from 2019 with no linux-aarch64 build, while conda-forge carries 1.12.4 and
+    5.5.1 — which is why both halves here come from conda-forge. BOTH halves are in ONE env on purpose: the point is clustering
     identical bytes with two unrelated codebases and comparing partitions by adjusted Rand
     index, which separate images could never verify. Measured: scanpy ARI 1.0000 vs a
     planted truth, Seurat ARI 1.0000, and 1.0000 between the two. Scored against the
@@ -246,13 +243,14 @@ first; geo-ml, climate later). Curated environment images, not a registry mirror
 Out of scope: GPU/CUDA (Graviton has no NVIDIA GPU — a hardware reality, not a
 packaging one), rebuilding BioContainers or mirroring bioconda (that's aarch.bio), and
 compiling from source (gaps go upstream to conda-forge).
-Bioinformatics is NOT out of scope by subject (amended 2026-10-08). Each project tracks
-the software's CURRENT HOME: if a tool's live development publishes to bioconda it belongs
-to aarch.bio; if development has moved to conda-forge it belongs here, whatever its
-subject. A stale copy left behind on the other channel confers no claim. This moves a
-handful of migrated packages rather than a domain — the ~503 tools bioconda actively
-carries stay with aarch.bio. Qualifying so far: afni, dipy, nibabel, nilearn and nipype
-(absent from bioconda entirely, hence the `neuroimaging` env), plus scanpy (bioconda 1.7.2
+Bioinformatics is NOT out of scope by subject (amended 2026-10-08, DESIGN D5). The split
+with the sister project is ARTIFACT SHAPE: aarch.bio publishes one tool per image as a
+drop-in for quay.io/biocontainers/<tool>, from whichever channel provides a working
+package; aarch.science publishes domain environments. The same software can be in both —
+scanpy is a single-tool image at aarch.bio AND a component of `single-cell` here. So
+biology lands here when someone wants an ENVIRONMENT: `single-cell` and `neuroimaging`.
+For reference, the version situation that makes conda-forge the source for those: scanpy
+(bioconda 1.7.2
 from 2021, which raises ImportError against a current anndata, vs conda-forge 1.12.4) and
 r-seurat (bioconda 3.0.2 from 2019 with zero linux-aarch64 builds, vs conda-forge 5.5.1) —
 hence the `single-cell` env.

@@ -173,39 +173,33 @@
                 </table>
                 </div>
 
-                <p class="footer-note" style="margin-top:1.75rem;"><strong>2. Where does the tool actually live now?</strong> Each project tracks the software's <strong>current home</strong>. Live development on bioconda &rarr; aarch.bio. Development that has <strong>moved to conda-forge</strong> &rarr; aarch.science, whatever the subject. A stale copy left behind on the other channel doesn't count.</p>
-
-                <p class="footer-note" style="margin-top:0.75rem;">The practical test, which catches the confusing cases: <strong>compare the versions.</strong> If bioconda's copy is years behind conda-forge's, you want aarch.science. These all live <em>here</em>, despite being biology:</p>
+                <p class="footer-note" style="margin-top:1.75rem;"><strong>2. The same software can be in both &mdash; in different shapes.</strong> The split is by artifact, not by subject and not by channel. So <em>"it's biology, go to aarch.bio"</em> and <em>"it's on conda-forge, come here"</em> are <strong>both wrong</strong>. <code>scanpy</code> is a single-tool image in aarch.bio (sourced from conda-forge, because bioconda's 1.7.2 cannot import) <strong>and</strong> a component of <code>single-cell</code> here. Both are correct.</p>
                 <div style="overflow-x:auto;">
                 <table style="width:100%;border-collapse:collapse;font-size:0.95rem;margin-top:0.75rem;">
                   <tr style="border-bottom:1px solid var(--border);">
-                    <th style="text-align:left;padding:0.5rem 0.75rem;">tool</th>
-                    <th style="text-align:left;padding:0.5rem 0.75rem;">bioconda</th>
-                    <th style="text-align:left;padding:0.5rem 0.75rem;">conda-forge</th>
-                    <th style="text-align:left;padding:0.5rem 0.75rem;">here, in</th>
+                    <th style="text-align:left;padding:0.5rem 0.75rem;">you want</th>
+                    <th style="text-align:left;padding:0.5rem 0.75rem;">go to</th>
                   </tr>
                   <tr style="border-bottom:1px solid var(--border);">
-                    <td style="padding:0.5rem 0.75rem;"><code>scanpy</code></td>
-                    <td style="padding:0.5rem 0.75rem;">1.7.2 (2021, won't import)</td>
-                    <td style="padding:0.5rem 0.75rem;"><strong>1.12.4</strong></td>
-                    <td style="padding:0.5rem 0.75rem;"><code>single-cell</code></td>
+                    <td style="padding:0.5rem 0.75rem;">a drop-in for <code>quay.io/biocontainers/scanpy:&hellip;</code></td>
+                    <td style="padding:0.5rem 0.75rem;"><a href="https://aarch.bio/" style="color:var(--accent-teal)">aarch.bio</a></td>
                   </tr>
                   <tr style="border-bottom:1px solid var(--border);">
-                    <td style="padding:0.5rem 0.75rem;"><code>r-seurat</code></td>
-                    <td style="padding:0.5rem 0.75rem;">3.0.2 (2019, no arm64)</td>
-                    <td style="padding:0.5rem 0.75rem;"><strong>5.5.1</strong></td>
-                    <td style="padding:0.5rem 0.75rem;"><code>single-cell</code></td>
+                    <td style="padding:0.5rem 0.75rem;">a stack where scanpy, Seurat, leidenalg and anndata already work together</td>
+                    <td style="padding:0.5rem 0.75rem;">aarch.science <code>single-cell</code></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:0.5rem 0.75rem;"><code>samtools</code> for one pipeline step</td>
+                    <td style="padding:0.5rem 0.75rem;"><a href="https://aarch.bio/" style="color:var(--accent-teal)">aarch.bio</a></td>
                   </tr>
                   <tr>
-                    <td style="padding:0.5rem 0.75rem;"><code>afni</code>, <code>dipy</code>, <code>nibabel</code>, <code>nilearn</code></td>
-                    <td style="padding:0.5rem 0.75rem;"><em>not on bioconda</em></td>
-                    <td style="padding:0.5rem 0.75rem;">current</td>
-                    <td style="padding:0.5rem 0.75rem;"><code>neuroimaging</code></td>
+                    <td style="padding:0.5rem 0.75rem;">a verified geospatial / DFT / astronomy stack</td>
+                    <td style="padding:0.5rem 0.75rem;">aarch.science</td>
                   </tr>
                 </table>
                 </div>
 
-                <p class="footer-note" style="margin-top:1.25rem;">Everything bioconda actively carries stays with <a href="https://aarch.bio/" style="color:var(--accent-teal)">aarch.bio</a> &mdash; that's the large majority of bioinformatics. Still unsure? <a href="https://github.com/playgroundlogic/aarchsci/issues/new" style="color:var(--accent-teal)">Open an issue</a> and we'll point you at the right project, or build it if neither does.</p>
+                <p class="footer-note" style="margin-top:1.25rem;"><strong>Neither project is "the bioinformatics one."</strong> <a href="https://aarch.bio/" style="color:var(--accent-teal)">aarch.bio</a> ships biology <em>and</em> general tools as single images, from whichever channel actually provides a working package; aarch.science ships biology <em>and</em> everything else as environments. Still unsure? <a href="https://github.com/playgroundlogic/aarchsci/issues/new" style="color:var(--accent-teal)">Open an issue</a> and we'll point you at the right project, or build it if neither does.</p>
             </div>
         </section>
 

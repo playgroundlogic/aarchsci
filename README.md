@@ -23,23 +23,22 @@ Two questions decide it, and the first one usually settles it:
 | **source** | bioconda / BioContainers | conda-forge |
 | **you want it when** | "I need *this tool* in a pipeline step" | "I need a *working stack* I can import against" |
 
-**2. Where does the tool actually live now?** Each project tracks the software's
-**current home**. If its live development publishes to bioconda → aarch.bio. If
-development has **moved to conda-forge** → aarch.science, whatever the subject. A stale
-copy left behind on the other channel doesn't count.
+**2. The same software can be in both — in different shapes.** The split is by artifact,
+not by subject or channel, so "it's biology, go to aarch.bio" and "it's conda-forge, come
+here" are *both* wrong. `scanpy` is a single-tool image in aarch.bio **and** a component
+of `single-cell` here, and both are correct:
 
-The practical test, which catches the confusing cases: **compare the versions.** If
-bioconda's copy is years behind conda-forge's, you want aarch.science. Worked examples —
-all of these live *here*, not in the sister project, despite being biology:
+| you want | go to |
+|---|---|
+| a drop-in for `quay.io/biocontainers/scanpy:…` | **aarch.bio** |
+| a stack where scanpy, Seurat, leidenalg and anndata already work together | **aarch.science** ([`single-cell`](envs/single-cell.yaml)) |
+| `samtools` for one pipeline step | **aarch.bio** |
+| a verified geospatial / DFT / astronomy stack | **aarch.science** |
 
-| tool | bioconda | conda-forge | here, in |
-|---|---|---|---|
-| `scanpy` | 1.7.2 (2021, won't import) | **1.12.4** | [`single-cell`](envs/single-cell.yaml) |
-| `r-seurat` | 3.0.2 (2019, no arm64) | **5.5.1** | [`single-cell`](envs/single-cell.yaml) |
-| `afni`, `dipy`, `nibabel`, `nilearn` | *not on bioconda* | current | [`neuroimaging`](envs/neuroimaging.yaml) |
-
-Everything bioconda actively carries stays with aarch.bio — that's the large majority of
-bioinformatics. Full reasoning in [DESIGN.md](DESIGN.md) under **D5**.
+Neither project is the "bioinformatics one". aarch.bio ships biology *and* general tools
+as single images; aarch.science ships biology *and* everything else as environments
+([`single-cell`](envs/single-cell.yaml), [`neuroimaging`](envs/neuroimaging.yaml)). Full
+reasoning in [DESIGN.md](DESIGN.md) under **D5**.
 
 Still unsure? [Open an issue](https://github.com/playgroundlogic/aarchsci/issues/new) and
 we'll tell you which project to use, or build it if neither does.

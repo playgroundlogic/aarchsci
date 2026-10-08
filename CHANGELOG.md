@@ -3,6 +3,50 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-08 (D5 corrected: the boundary is artifact shape)
+
+### Changed — D5 rewritten after aarchbio#75 showed the channel rule was wrong
+The sister project rejected the proposed boundary and was right to. D5 now reads: **the
+split is ARTIFACT SHAPE.** aarchbio publishes one tool per image, tagged
+`<version>--<build>` as a drop-in for `quay.io/biocontainers/<tool>`, from whichever
+channel provides a working package. aarchsci publishes domain environments. Not domain,
+not channel — and **the same software can legitimately be in both**: `scanpy` is a
+single-tool image there *and* a component of `single-cell` here.
+
+Two reasons the channel rule ("each project tracks the software's current home") failed,
+both verified rather than conceded:
+
+1. **It was false about the sister project.** aarchbio already publishes single-tool images
+   sourced from conda-forge — `scanpy:1.12.4--pyhd8ed1ab_1`,
+   `anndata:0.13.4--pyhd8ed1ab_0`, `decoupler-py:2.1.6--pyhd8ed1ab_0`, each carrying
+   `io.aarchbio.source-channel=conda-forge` and an
+   `org.opencontainers.image.source` pointing at a conda-forge feedstock. Confirmed by
+   inspecting the published images.
+2. **It would have recreated the gap it was meant to close.** Under it `scanpy` became
+   aarchsci's — but aarchsci publishes only environments, so no single-tool `scanpy` would
+   exist here and the drop-in for `quay.io/biocontainers/scanpy` would belong to neither
+   project.
+
+**The process error is recorded in D5 because it is the reusable part.** The evidence was
+already in hand — `conda-meta` in aarchbio's scanpy image said `channel=conda-forge`, and
+that was cited correctly when #17 first closed. It was then *withdrawn* because aarchbio's
+README listed conda-forge as out of scope: a measured property of a built artifact
+discarded in favour of a prose claim in a document whose own practice had outgrown it.
+That is the inversion D3 exists to prevent — **prefer what the artifact does to what a
+label says about it** — and it is hardest to notice when the artifact evidence supports
+one's own earlier position.
+
+Also declined the sister project's offer to hand over `scanpy`/`anndata`/`decoupler-py`:
+under artifact shape they are correctly theirs, and accepting would have orphaned three
+working single-tool images to satisfy a rule that was itself the mistake.
+
+Docs corrected to match: the router's second question in README, `docs/index.html` and
+`docs/llms.txt` no longer says "compare the versions / where does it live" — it now says
+the same software can be in both in different shapes, with the artifact-shape table. Both
+misleading framings are called out explicitly: *"it's biology, so it's aarch.bio"* and
+*"it's on conda-forge, so it's aarch.science."* `single-cell` and `neuroimaging` stay in
+scope unchanged — they are environments, which was never the part in dispute.
+
 ## 2026-10-08 (docs: make the aarch.bio / aarch.science split findable)
 
 ### Changed — a "which project has this tool" router on all three doc surfaces
