@@ -121,6 +121,24 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     finite-volume scheme holds uniform flow to machine zero even on skewed cells; a broken
     one does not. Note: conda-forge's su2 ships no meshes/tutorial cases and no pysu2
     binding, so the smoke test generates its own mesh and drives SU2_CFD as a binary).
+  - `optimization` (61 pkgs — HiGHS + highspy, SCIP + PySCIPOpt, CBC, scipy; linear and
+    mixed-integer programming. Its own env rather than part of geo-ml because optimization
+    is a cross-cutting METHOD, not a domain. Verification uses exact identities rather than
+    tolerances: the LP optimum is a textbook value (36 exactly), the primal-dual gap must be
+    0 by strong duality, and HiGHS and SCIP — unrelated codebases — must agree to 0 on the
+    same problem. Note `scip` is pinned <10.1: pyscipopt 6.2.1 links libscip.so.10.0 while
+    declaring `scip >=10.0.0,<11.0a0`, so an unpinned solve installs scip 10.1.0 and
+    `import pyscipopt` then fails — an upstream soname/metadata bug, caught by D3.)
+  - `neuroimaging` (229 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
+    volume-based fMRI, diffusion MRI and structural MRI. In scope for this project rather
+    than the bioinformatics sister project because none of these packages are on bioconda at
+    all — they are conda-forge only. Verified with no staged or downloaded data: a NIfTI
+    affine must round-trip BIT-exactly, a DIPY tensor fit on a planted eigensystem must match
+    the closed-form FA (measured 5.6e-16), and AFNI's `3dinfo` — an independent C codebase —
+    must agree with nibabel on the same file's dimensions and voxel sizes. Honest limits:
+    `ants` has no linux-aarch64 build at all and FSL/FreeSurfer/MRtrix3 are not on
+    conda-forge, so registration-heavy and surface-based pipelines are out of reach;
+    `templateflow` is excluded because it downloads atlases at runtime.)
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
@@ -192,8 +210,9 @@ packaging one), bioinformatics (that's aarch.bio), and compiling from source
 
 ## Facts
 
-- 13 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
-  comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv) — native arm64, verified
+- 15 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+  comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging) —
+  native arm64, verified
   (assemble+import+functional) + signed + public.
 - `dft` (gpaw, siesta, psi4, nwchem, quantum-espresso, ase, libxc, ELPA, ScaLAPACK,
   OpenMPI, spglib, phonopy, pymatgen), `md` (gromacs, lammps, ambertools), `fem-cfd`

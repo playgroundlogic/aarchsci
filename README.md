@@ -7,7 +7,7 @@ Sister project to [aarchbio](https://github.com/playgroundlogic/aarchbio) (which
 does this for bioinformatics / BioContainers). aarch.science covers the layer
 aarchbio scopes out: the **conda-forge** scientific stack.
 
-> **Status:** live. **13 verified, signed, public env images** on
+> **Status:** live. **15 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -71,6 +71,8 @@ has the full retention policy and the four dead digests).
 | [`astro`](envs/astro.yaml) | 364 | astropy, photutils, sunpy, healpy, yt, regions, reproject, specutils, astroquery, rebound |
 | [`fem-cfd`](envs/fem-cfd.yaml) | 130 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), CalculiX, OpenMPI, mpi4py, HDF5/ADIOS2 |
 | [`cfd-fv`](envs/cfd-fv.yaml) | 56 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
+| [`optimization`](envs/optimization.yaml) | 61 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
+| [`neuroimaging`](envs/neuroimaging.yaml) | 229 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
 
 `dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes
 further than the others': the smoke tests run the same calculation serially and again under
@@ -139,7 +141,7 @@ that difference cost seven variables — `CONDA_PREFIX`, `CONDA_DEFAULT_ENV`, `C
 plus one `PATH` entry (`/opt/conda/condabin`), and none of it mattered: `geospatial`, `dft`
 and `md` all passed under `exec`, `run` **and** `run --cleanenv`, including `dft`/`md`'s
 2-rank MPI legs (`dft` reproduced its serial bulk-Si energy to 6e-08 eV under Apptainer).
-The other ten are untested under Apptainer.
+The other twelve are untested under Apptainer.
 
 **That "none of it mattered" no longer holds for `dft`, and the reason is worth stating
 plainly:** adding `nwchem` made `run` load-bearing rather than merely advisable.

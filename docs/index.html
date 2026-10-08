@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">13</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv</div>
+                    <div class="stat-num green">15</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -501,6 +501,51 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   with wrong metric terms fails that. Runs serially and again on 2 ranks (real
                   ParMETIS domain decomposition), and the two must agree. Its own env because SU2's
                   arm64 builds cap Python at 3.11.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">optimization</span><br>
+                  <strong>61 packages</strong> &mdash; LP &amp; mixed-integer programming (operations research)
+                </p>
+                <div class="catalog">
+                    <span class="chip">HiGHS + highspy</span>
+                    <span class="chip">SCIP + PySCIPOpt</span>
+                    <span class="chip">CBC</span>
+                    <span class="chip">scipy.optimize</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  Optimization is a <em>method</em>, not a domain, so it gets its own small image
+                  rather than lodging inside a domain env. It also has exact identities available,
+                  so none of its verification is a tolerance: the test LP's optimum is a derivable
+                  36, the primal&ndash;dual gap must be <strong>0 by strong duality</strong> &mdash;
+                  a theorem, not a measurement &mdash; and HiGHS and SCIP, unrelated codebases, must
+                  agree to 0 on identical input. An LP optimum is unique in value even when the
+                  vertex is not, which is what makes that cross-check meaningful.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">neuroimaging</span><br>
+                  <strong>229 packages</strong> &mdash; volume-based fMRI, diffusion &amp; structural MRI
+                </p>
+                <div class="catalog">
+                    <span class="chip">AFNI</span>
+                    <span class="chip">DIPY</span>
+                    <span class="chip">nibabel</span>
+                    <span class="chip">nilearn</span>
+                    <span class="chip">nipype</span>
+                    <span class="chip">scikit-learn</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  Verified with nothing staged and nothing downloaded. A NIfTI affine is the
+                  image's spatial contract, so it must survive a write/read <strong>bit-exactly</strong>
+                  &mdash; asserted with exact equality, because a transform that is "nearly" right is
+                  the classic silent data-loss bug. Then DIPY fits a diffusion tensor to a
+                  <em>planted</em> eigensystem, where fractional anisotropy has a closed form:
+                  measured agreement 5.6&times;10<sup>&minus;16</sup>, machine precision against
+                  analysis rather than against a number someone once recorded. Finally AFNI's
+                  <code>3dinfo</code> &mdash; an unrelated C codebase &mdash; reads the file nibabel
+                  wrote and must report the same dimensions and voxel sizes; neither library can fake
+                  the other's agreement. Honest limits: <code>ants</code> has no arm64 build at all and
+                  FSL/FreeSurfer/MRtrix3 are not on conda-forge, so registration-heavy and
+                  surface-based pipelines are out of reach.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

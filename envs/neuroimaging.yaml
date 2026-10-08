@@ -1,0 +1,56 @@
+# aarch.science — neuroimaging environment
+# Volume-based fMRI, diffusion MRI and structural MRI analysis (DESIGN D2): AFNI as the
+# C/C++ processing suite, DIPY for diffusion modelling, nibabel for NIfTI/BIDS I/O,
+# nilearn for the statistical/ML layer, nipype for workflow assembly.
+#
+# SCOPE, because this is the first env in a life-sciences-adjacent domain and DESIGN's
+# non-goals exclude "bioinformatics (that's aarch.bio)". Neuroimaging is not
+# bioinformatics in the sequence/omics sense, and the decisive evidence is where the
+# packages live: afni, dipy, nibabel, nilearn and nipype are ALL absent from bioconda and
+# present only on conda-forge (checked 2026-10-08). So the sister project — a bioconda
+# per-tool mirror — structurally cannot serve them, while they are exactly what this
+# project's charter describes: the CPU scientific stack on conda-forge. That is also what
+# distinguishes this from issues #17 (scanpy) and #20 (r-seurat), both declined here:
+# those ARE bioinformatics, and aarchbio demonstrably can ship them (it already serves a
+# conda-forge-sourced scanpy 1.12.4).
+#
+# WHAT THIS ENV CANNOT DO, stated up front rather than discovered by a user:
+#   - `ants` has NO linux-aarch64 build at all (linux-64/osx-64/osx-arm64 only), so
+#     ANTs-based registration is unavailable.
+#   - FSL, FreeSurfer and MRtrix3 are not on conda-forge at all; they ship through their
+#     own distribution channels.
+# So registration-heavy and surface-based pipelines are out of reach. Volume-based fMRI
+# and diffusion analysis is a large and honest subset, and is what this env claims.
+#
+# NOT INCLUDED, deliberately: `templateflow`. It is a CLIENT that downloads template and
+# atlas data on first use, which is the runtime-fetch pattern that made `whitebox` a
+# wontfix (GAPS.md). An env whose verification depends on a network call is not verified.
+# Anyone needing standard-space templates can add it and accept the download.
+#
+# Verified to solve AND assemble native arm64, including a closed-form diffusion check
+# (see neuroimaging.smoke.py). No MPI: this is throughput work over independent subjects,
+# which is the shape that suits many cheap cores rather than tight coupling.
+name: neuroimaging
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  - pandas
+  - scikit-learn
+  - h5py
+  - matplotlib-base
+  # --- the neuroimaging stack ---
+  # The python-ABI question was checked, not assumed. The request quoted
+  # `afni 25.0.00 np2py311...` and `nibabel 5.1.0 py312...`, either of which would have
+  # capped this env below python 3.14 — the trap that `su2` set for `fem-cfd` (py311) and
+  # `louvain` for a single-cell env (py312). Measured: afni and dipy both have py314
+  # aarch64 builds, and nibabel became NOARCH at 5.2.0, so its "newest aarch64 build is
+  # 2023" appearance is an artifact of reading only arch-specific files — 5.4.2 installs
+  # everywhere. Nothing here caps the interpreter; the solve lands on python 3.14.
+  - afni
+  - dipy
+  - nibabel
+  - nilearn
+  - nipype

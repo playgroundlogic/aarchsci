@@ -1,0 +1,68 @@
+# aarch.science — optimization environment
+# Mathematical optimization / operations research: linear and mixed-integer programming
+# (DESIGN D2). Three independent solvers plus their Python bindings.
+#
+# WHY ITS OWN ENV rather than an addition to `geo-ml`, which is where issue #23 proposed
+# it: optimization is a cross-cutting METHOD, not a domain. LP/MIP underpins scheduling,
+# resource allocation, network flow, districting, unit commitment and routing across
+# fields that have nothing else in common. `geo-ml` is domain-curated (geospatial machine
+# learning), and lodging a general solver stack inside it would have made the env's name
+# a lie and buried the capability from everyone not doing geospatial work. The issue
+# itself described optimization as "an entirely absent domain," which is the argument for
+# its own image rather than for a lodger.
+#
+# Small by design (61 packages) — this is a solver stack, not an analysis platform.
+#
+# Verified to solve AND assemble native arm64 (see optimization.smoke.py). No MPI: all
+# three solvers are shared-memory/threaded here, so there is no flavour lock to hold.
+name: optimization
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  - pandas
+  # --- the solvers, and their bindings ---
+  # The C/C++ libraries carry no `py` in their build strings, so they are transparent to
+  # the interpreter. The BINDINGS are the part that matters for an ABI question, and both
+  # reach py314, so this env is not capped: highspy and pyscipopt have aarch64 builds for
+  # py310 through py314 (checked, because this is where `su2` capped `fem-cfd` at py311
+  # and where `louvain` would have capped a single-cell env at py312).
+  #
+  # Issue #23 requested only `highs` and `scip`. Both were added WITH their bindings
+  # deliberately: the bare libraries give you a CLI and a C++ API, and a recipe driven
+  # from Python needs `highspy` / `pyscipopt` to exist. Requesting the solver without the
+  # binding would have shipped something that technically contains HiGHS and cannot call
+  # it from the language the rest of the catalog uses.
+  - highs
+  - highspy
+  # --- scip: the <10.1 bound is LOAD-BEARING, do not relax it ---
+  # This is an upstream soname/metadata bug, caught by D3 on the first build of this env
+  # and worth stating in full because the symptom names neither cause nor fix:
+  #
+  #   ImportError: libscip.so.10.0: cannot open shared object file
+  #
+  # pyscipopt 6.2.1 is LINKED against `libscip.so.10.0`, but its run constraint is
+  # `scip >=10.0.0,<11.0a0` — one minor version too loose. Measured on linux-aarch64:
+  #   scip 10.0.3 provides libscip.so / .so.10.0 / .so.10.0.3
+  #   scip 10.1.0 provides libscip.so / .so.10.1 / .so.10.1.0
+  # So an unpinned solve takes scip 10.1.0 (newest, and permitted by the constraint), the
+  # env SOLVES cleanly, and then `import pyscipopt` fails. Textbook solves-but-does-not-
+  # assemble — exactly the D3 failure mode this project exists to catch, and the gate held.
+  #
+  # Note the trap for anyone re-testing this by hand: installing `pyscipopt` ALONE appears
+  # to work, because with no explicit `scip` request the solver happens to land on a
+  # 10.0.x that matches. The breakage only appears once scip is also named, which is why
+  # the first prototype of this env passed and the real build failed.
+  #
+  # The fix belongs upstream at conda-forge/pyscipopt-feedstock (tighten the run export,
+  # or rebuild against 10.1). Until then this bound is what keeps the binding importable.
+  # Revisit when pyscipopt publishes a build depending on scip >=10.1.
+  - scip >=10.0,<10.1
+  - pyscipopt
+  # Third solver, for cross-validation rather than coverage. An LP optimum is unique in
+  # VALUE even when the optimal vertex is not, so independent implementations agreeing on
+  # the objective is a real check — and the issue correctly noted `coin-or-cbc` was absent
+  # from `geo-ml` despite an earlier survey claiming otherwise.
+  - coin-or-cbc

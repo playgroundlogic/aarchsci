@@ -87,9 +87,10 @@ family as noarch-vs-subdir: a name that looks like a platform claim and isn't.
 **The curated science head is near-complete on arm64.** This is still the real
 finding, and it's the inverse of the pip experience: the exact stack that fails
 `No matching distribution found for rasterio` on PyPI solves *and* assembles cleanly
-on conda-forge. Thirteen envs ship verified (geospatial, earth-observation, geo-ml,
-climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv), and every
-headline package in all thirteen assembles and does real work natively.
+on conda-forge. Fifteen envs ship verified (geospatial, earth-observation, geo-ml,
+climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization,
+neuroimaging), and every headline package in all fifteen assembles and does real work
+natively.
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
 changed: every solve-gap listed above is a **candidate we probed and declined**, not a
@@ -158,6 +159,36 @@ exists for — both would have shipped broken under a solve-only check:
   ESMF 8.4 module rename (`ESMF` → `esmpy`). Fixed by pinning `xesmf >=0.8.4` in
   the spec so the post-rename line is chosen. Not a gap — a version floor.
 - **`whitebox` (pointcloud)** — see Active gaps below.
+
+### A fourth instance, 2026-10-08, adding `optimization`: `pyscipopt`'s soname constraint
+
+The cleanest solves-but-does-not-assemble case the project has recorded, because the
+cause is a single too-loose version bound and the symptom names neither the cause nor the
+fix.
+
+`pyscipopt` 6.2.1 is **linked against `libscip.so.10.0`** but declares its runtime
+requirement as `scip >=10.0.0,<11.0a0`. Measured on `linux-aarch64`:
+
+| scip | sonames provided |
+|---|---|
+| 10.0.3 | `libscip.so`, `libscip.so.10.0`, `libscip.so.10.0.3` |
+| 10.1.0 | `libscip.so`, `libscip.so.10.1`, `libscip.so.10.1.0` |
+
+scip 10.1.0 satisfies the declared constraint and is newer, so an unpinned solve takes
+it. The env then resolves perfectly and `import pyscipopt` dies with
+`ImportError: libscip.so.10.0: cannot open shared object file`. D3 caught it on the first
+build of the env and refused to tag.
+
+**The trap worth recording for anyone re-testing by hand:** installing `pyscipopt` *alone*
+appears to work, because with no explicit `scip` in the request the solver happens to land
+on a 10.0.x that matches. The breakage only appears once `scip` is also named — which is
+exactly why the prototype of this env passed and the real build failed. A reproduction
+that installs fewer packages than the env does is not a reproduction.
+
+Mitigated in `envs/optimization.yaml` with `scip >=10.0,<10.1`. The fix belongs upstream
+at [`conda-forge/pyscipopt-feedstock`](https://github.com/conda-forge/pyscipopt-feedstock)
+— tighten the run export to the soname it actually links, or rebuild against 10.1. Not an
+arm64 gap: it reproduces identically on `linux-64`.
 
 ### Bugs D3 caught that are *not* arm64 gaps (2026-09, adding `md` and `viz`)
 
@@ -439,6 +470,33 @@ env, but the core plane-wave engine now lives in `dft`.
    (`github.com/conda-forge/<pkg>-feedstock`).
 
 ## Active gaps
+
+### `dftbplus` — stuck (data gap, revisit every 180 days)
+
+**Env affected:** `dft` (excluded; `qe`, `gpaw` and `siesta` cover plane-wave and LCAO
+DFT, and `comp-chem`'s `xtb` covers semiempirical — the tight-binding rung between them
+stays empty).
+
+Requested as issue #25, declined on measured grounds. `dftbplus` 25.1 has a perfectly good
+`linux-aarch64` `mpi_openmpi_h934af07_0` build; `dftb+` installs and runs. The problem is
+data: it ships **0 `*.skf` Slater-Koster files**, and unlike the pseudopotential case there
+is no parameter package to pair it with — `dftbplus-data`, `slako`, `dftb-sk`, `3ob` and
+`mio` are all absent from conda-forge, and `skprogs`/`sktools` exist but have **0**
+aarch64/noarch files and are SK *generators* rather than parameter sets.
+
+Two consequences, and the second is what decided it:
+
+1. D3 could only reach **siesta level** — binary, MPI, input parse, no SCC.
+2. **Users could not run it either.** `siesta` already occupies the one documented
+   no-SCF compromise in `dft`; a second binary that cannot compute without the user
+   separately fetching licence-gated data is advertising a capability rather than
+   shipping one. SK sets are distributed through dftb.org under click-through terms, so
+   they cannot be bundled the way `sssp` let `qe` escape this exact wall.
+
+**What would change it:** an openly-licensed SK set packaged for conda-forge — the `sssp`
+story repeated. `qe` went from excluded-for-want-of-pseudopotentials to a full SCF with
+forces zero by symmetry purely because `sssp` existed. Recorded as `stuck`, not `wontfix`,
+because that upstream fix is plausible.
 
 ### `abinit` — stuck (MPI-flavor conflict, revisit quarterly)
 

@@ -3,6 +3,81 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-08 (envs 14 and 15)
+
+### Added — `optimization` (issue #23) and `neuroimaging` (issue #26)
+
+- **`optimization` — 61 packages, lock `s05f6d9c11f8d`.** HiGHS + highspy, SCIP +
+  PySCIPOpt, CBC. **Its own env, not an addition to `geo-ml` as requested**: optimization
+  is a cross-cutting *method*, not a domain — LP/MIP underpins scheduling, network flow,
+  districting and unit commitment across fields with nothing else in common, so lodging it
+  in a geospatial-ML image would have made that env's name a lie and hidden the capability
+  from everyone else. The issue itself called optimization "an entirely absent domain,"
+  which argues for an image rather than a lodger. Also added the two Python *bindings* the
+  request omitted: bare `highs`/`scip` give a CLI and a C++ API, so a recipe driven from
+  Python needs `highspy`/`pyscipopt` to exist at all.
+- **Its verification is all exact identities, no tolerances.** The test LP's optimum is
+  derivable (36 exactly, x=2 y=6); the primal–dual gap must be **0 by strong duality**,
+  which tests the solver against a theorem rather than a recorded number (measured 0.0);
+  and HiGHS vs SCIP must agree to **0.0** on identical input, which is meaningful because
+  an LP optimum is unique in *value* even when the vertex is not. Plus a 0/1 knapsack
+  checked against brute-force enumeration, and `scipy.optimize.linprog` as a fourth
+  opinion through a different binding to the same solver. The issue's Netlib `afiro`
+  fixture was deliberately **not** used — fetching it at runtime is the `whitebox`
+  wontfix pattern, and a constructed LP is equally exact with zero staged bytes.
+- **`neuroimaging` — 229 packages, lock `sec8bd2598bdb`.** AFNI, DIPY, nibabel, nilearn,
+  nipype. **Scope decided on evidence, not taxonomy:** DESIGN excludes "bioinformatics
+  (that's aarch.bio)", and the decisive fact is that *none* of these packages exist on
+  bioconda — all are conda-forge only. So the sister project (a bioconda per-tool mirror)
+  structurally cannot serve them, while they are precisely this project's charter. That is
+  also what separates this from #17 (scanpy) and #20 (r-seurat), both declined here: those
+  are bioinformatics and aarchbio demonstrably *can* ship them.
+- **Verified with nothing staged and nothing downloaded**, which matters in a field whose
+  test data normally lives in remote archives. A NIfTI affine round-trips **bit-exactly**
+  (asserted with exact equality — a spatial transform that is "nearly" right is the classic
+  silent data-loss bug); DIPY's tensor fit on a *planted* eigensystem matches the
+  closed-form FA to **5.6e-16**, machine precision against analysis rather than against a
+  remembered value; and AFNI's `3dinfo`, an unrelated C codebase, independently confirms
+  nibabel's dimensions and voxel sizes (`2.0 2.0 2.5`) — cross-toolkit agreement neither
+  library can fake. `templateflow` excluded: it downloads atlases at runtime.
+- **Honest limits recorded in the spec:** `ants` has **no** linux-aarch64 build at all, and
+  FSL/FreeSurfer/MRtrix3 are not on conda-forge, so registration-heavy and surface-based
+  pipelines are out of reach. Volume-based fMRI and diffusion is the subset this env claims.
+
+### Fixed — a real assemble-gap found building `optimization`: `pyscipopt`'s soname bound
+- The first build **failed D3** with `ImportError: libscip.so.10.0: cannot open shared
+  object file`. `pyscipopt` 6.2.1 links `libscip.so.10.0` but declares `scip
+  >=10.0.0,<11.0a0` — one minor version too loose. Measured: scip 10.0.3 provides
+  `libscip.so.10.0`, scip 10.1.0 provides `libscip.so.10.1`. So an unpinned solve takes
+  10.1.0, the env resolves perfectly, and the import dies. Textbook
+  solves-but-does-not-assemble; the gate held and refused to tag.
+- Mitigated with `scip >=10.0,<10.1` in the spec (load-bearing, documented in place). The
+  fix belongs upstream at `conda-forge/pyscipopt-feedstock`.
+- **Worth recording: my own prototype passed and the real build failed.** Installing
+  `pyscipopt` alone lands on a compatible 10.0.x; the breakage only appears once `scip` is
+  also named explicitly. A reproduction that installs fewer packages than the env does is
+  not a reproduction.
+
+### Declined, with measurements — #20, #24 (gmsh half), #25
+- **`r-seurat` → `r` (#20)** — declined here for consistency with #17 (same single-cell
+  domain), but the deciding evidence was cost: the joint solve puts `r` at **400 packages,
+  up from 328** (+72, 615 MB), i.e. the entire single-cell R tree, not one package.
+  Redirected to aarchbio with a concrete route — it already ships conda-forge-sourced
+  packages (its scanpy 1.12.4 reports `channel=conda-forge`) — and an explicit standing
+  offer to take it here if aarchbio declines, since a capability with no arm64 home in
+  either project would mean the boundary is serving us rather than users.
+- **`gmsh` → `fem-cfd` (#24)** — declined; no headless aarch64 build exists (all 13 build
+  strings at 4.15.2 checked), so it pulls qt6-main/vtk-base/occt/fltk/xorg and takes the
+  env from 130 to **329** packages for a mesher D3 does not need. Also declined to create
+  a meshing env: nobody requested meshing as a capability, and an env built to justify a
+  dependency rather than serve a use case is the wrong shape.
+- **`dftbplus` → `dft` (#25)** — declined and recorded as `stuck` (not `wontfix`) in
+  GAPS.md and `farm/skip-list.tsv`. Measured: `dftb+` runs but ships **0 `*.skf`** files,
+  and no Slater-Koster package exists on conda-forge (`skprogs`/`sktools` have 0 aarch64
+  files and are generators). The decider was not our verification but that **users could
+  not run it either** — SK sets are licence-gated via dftb.org, so they cannot be bundled
+  the way `sssp` rescued `qe`.
+
 ## 2026-10-08 (later)
 
 ### Changed — base image bumped to Debian 13 / glibc 2.41, unblocking `md` (#18)
