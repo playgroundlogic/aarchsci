@@ -230,4 +230,60 @@ wins on price/perf. (The pip-arm64-wheel gap is a CPU-stack problem anyway.)
 - Mirroring all of conda-forge (D2 — curated heads only).
 - Compiling packages from source (same as aarchbio: build from blessed conda-forge
   packages; gaps go upstream).
-- Bioinformatics (that's aarchbio).
+- ~~Bioinformatics (that's aarchbio).~~ **Amended 2026-10-08 — see D5 below.**
+
+## D5 — bioinformatics: the boundary is bioconda, not the subject matter
+
+**Settled 2026-10-08.** The original non-goal read "Bioinformatics (that's aarchbio)",
+which drew the line by *domain*. That turned out to leave a real gap, found by three
+requests in one week (#17 scanpy, #20 r-seurat, #26 neuroimaging).
+
+The two projects divide by **layer**, not by subject. aarchbio's own README is explicit:
+it "operates at exactly one layer: it rebuilds **bioconda tool packages** into native
+arm64 containers," and lists conda-forge packages as out of scope. So a domain-shaped
+exclusion here does not meet a layer-shaped inclusion there — and anything that is
+biological *and* conda-forge-only falls between the two, belonging to neither.
+
+**The rule: each project tracks the software's CURRENT HOME.**
+
+> If a tool's live development publishes to **bioconda**, it is aarchbio's.
+> If its development has moved to **conda-forge**, it is aarchsci's — whatever its
+> subject matter. A stale copy left behind on the other channel confers no claim.
+
+An earlier draft of this section phrased the test as "is bioconda a *viable source*?",
+which was worse in a way worth recording: it made the boundary about *our* ability to ship
+rather than about where the software actually lives. "Current home" is the better
+principle. It is a fact about upstream, not about us; it reads the same from either
+project; and it handles migration in **either** direction, including a future tool that
+moves the other way.
+
+Applying it, with the evidence:
+
+| tool | bioconda | conda-forge | current home |
+|---|---|---|---|
+| `afni`, `dipy`, `nibabel`, `nilearn`, `nipype` | **absent** | current | conda-forge → **aarchsci** (`neuroimaging`) |
+| `scanpy` | 1.7.2 (2021), and that copy *fails to import* against a current anndata (aarchbio#63) | 1.12.4 | conda-forge → **aarchsci** |
+| `r-seurat` | 3.0.2 (2019), zero `linux-aarch64` files | 5.5.1 | conda-forge → **aarchsci** |
+| the other ~503 bioconda tools | current | (deps only) | bioconda → **aarchbio** |
+
+The last row is the important one: this amendment moves a handful of migrated packages,
+not a domain. Everything bioconda actively carries stays where it is.
+
+**What the sister project does about a migrated tool is its own call, and either answer is
+coherent:** keep serving its historical bioconda version (a faithful rebuild of what
+bioconda actually has — which is what aarchbio is *for*), or point at aarchsci. What would
+*not* be coherent is expecting aarchbio to curate conda-forge packages, since that is
+explicitly not its layer.
+
+Why not decide this by domain, as the original non-goal did: "is it bioinformatics?"
+invites taxonomy arguments with no resolution — is neuroimaging bioinformatics? is
+cheminformatics? `comp-chem` has shipped since v1 without anyone asking. "Where does the
+software live now?" has an answer you can look up.
+
+**What this does NOT change:** the channel is still conda-forge (D2). aarchsci does not
+rebuild BioContainers, mirror bioconda, or compile from source. It curates conda-forge
+envs — and now does so without a carve-out for which science the packages happen to serve.
+
+**Mirror statement owed upstream:** aarchbio's scope table should name the same boundary
+from its side, so the two documents agree rather than merely not conflicting. That is a
+change in the sister repo and is not made here.

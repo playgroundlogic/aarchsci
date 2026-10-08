@@ -19,8 +19,16 @@ Build verified, signed arm64 containers from conda-forge so the work runs native
   paying the Intel c7i tax because c7g failed (`No matching distribution found for
   rasterio`).
 
-## What aarch.science is NOT (scope, from DESIGN D1–D4)
+## What aarch.science is NOT (scope, from DESIGN D1–D5)
 - Not bioconda (that's aarchbio). Channel = conda-forge.
+- **Bioinformatics is NOT excluded by subject (amended 2026-10-08, DESIGN D5).** Each
+  project tracks the software's CURRENT HOME: live development on bioconda -> aarchbio;
+  moved to conda-forge -> aarchsci, whatever the subject. A stale copy left behind
+  confers no claim. Moves a handful of migrated packages, not a domain — the ~503 tools
+  bioconda actively carries stay with aarchbio. Qualifying so far: afni/dipy/nibabel/
+  nilearn/nipype (absent from bioconda -> `neuroimaging`), scanpy (bioconda 1.7.2 fails
+  to import vs conda-forge 1.12.4) and r-seurat (3.0.2 vs 5.5.1, no aarch64) -> the
+  `single-cell` env. Check the channels before asserting a home.
 - Not a registry mirror — curate our own domain env images (`envs/*.yaml`).
 - Not GPU/CUDA — Graviton has no NVIDIA GPU (hardware, not packaging).
 - Not from-source — build from blessed conda-forge packages; gaps go upstream.

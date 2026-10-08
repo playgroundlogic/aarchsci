@@ -3,6 +3,55 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-08 (DESIGN D5 — the bioinformatics boundary, and env 16)
+
+### Changed — DESIGN D5: each project tracks the software's *current home*
+The original non-goal read "Bioinformatics (that's aarchbio)", drawing the line by
+**domain**. The sister project draws its line by **layer** — its README says it "operates
+at exactly one layer: it rebuilds *bioconda tool packages*," with conda-forge explicitly
+out of scope. A domain-shaped exclusion here never met a layer-shaped inclusion there, so
+anything biological that had migrated to conda-forge belonged to neither project. Three
+requests in one week walked into that gap (#17 scanpy, #20 r-seurat, #26 neuroimaging).
+
+**The rule now:** if a tool's live development publishes to bioconda it is aarchbio's; if
+development has moved to conda-forge it is aarchsci's, whatever its subject. A stale copy
+left behind on the other channel confers no claim.
+
+An earlier draft of D5 phrased this as "is bioconda a *viable source*?" — recorded as
+worse, because it made the boundary about *our* ability to ship rather than about where
+the software lives. "Current home" is a fact about upstream, reads identically from either
+project, and handles migration in **either** direction.
+
+Scope of the change, stated so it cannot be read as a land grab: `afni`/`dipy`/`nibabel`/
+`nilearn`/`nipype` (absent from bioconda), `scanpy` (bioconda 1.7.2 from 2021, which
+raises `ImportError` against a current anndata, vs conda-forge 1.12.4) and `r-seurat`
+(bioconda 3.0.2 from 2019 with zero aarch64 files, vs 5.5.1). **The ~503 tools bioconda
+actively carries are unaffected.** What the sister project does about a migrated tool is
+its own call and either answer is coherent — keep serving its historical bioconda version,
+or redirect here; a mirror statement in its scope table is owed but is not made from here.
+
+### Added — `single-cell`, env 16: Scanpy and Seurat in one image (#17, #20)
+- **345 packages, lock `sdd975a7ffb44`.** scanpy 1.12.4 + anndata 0.13.4 + leidenalg +
+  python-igraph + umap-learn on python 3.14.8, **and** Seurat 5.5.1 on R 4.5.3, coexisting.
+- **Both halves in one env deliberately.** #17 and #20 asked for the same thing from
+  opposite sides: Scanpy and Seurat clustering *identical bytes*, compared by adjusted Rand
+  index. Two separate images can never verify that — a smoke test cannot reach across
+  containers. Holding both frameworks together is the whole point.
+- **Measured inside the built image:** on a generated matrix with three planted groups,
+  scanpy's leiden recovers them at **ARI 1.0000**, Seurat at **ARI 1.0000**, and the two
+  partitions agree at **ARI 1.0000**. Both are scored against the *planted truth* as well
+  as against each other — deliberately, since two codebases agreeing on a wrong answer
+  would pass a cross-check alone. ARI rather than label equality because cluster names are
+  arbitrary; only the partition is comparable (issue #20 made this point and it was right).
+- **Not** `r-seurat` into the `r` env, which was #20's literal request: measured, that
+  takes `r` from 328 to 400 packages (+72, 615 MB) and gives a general-purpose R image a
+  specialist centre of gravity. Here the weight is the point.
+- **`louvain` excluded**, measured: its newest aarch64 builds stop at py312, so it would
+  cap this env two interpreter versions back — the `su2`/`fem-cfd` trap — in exchange for a
+  function scanpy deprecates in favour of leiden.
+- First real exercise of the new doc-count sync: adding this env bumped 15 → 16 across
+  README, `docs/llms.txt` and `docs/index.html` with no hand-editing.
+
 ## 2026-10-08 (doc-count rot, fixed permanently)
 
 ### Fixed — the docs' package counts now derive from the locks instead of being retyped

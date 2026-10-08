@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">15</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging</div>
+                    <div class="stat-num green">16</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -546,6 +546,31 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   the other's agreement. Honest limits: <code>ants</code> has no arm64 build at all and
                   FSL/FreeSurfer/MRtrix3 are not on conda-forge, so registration-heavy and
                   surface-based pipelines are out of reach.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">single-cell</span><br>
+                  <strong>345 packages</strong> &mdash; single-cell transcriptomics, both ecosystems in one image
+                </p>
+                <div class="catalog">
+                    <span class="chip">Scanpy</span>
+                    <span class="chip">Seurat 5</span>
+                    <span class="chip">anndata</span>
+                    <span class="chip">leidenalg / igraph</span>
+                    <span class="chip">umap-learn</span>
+                    <span class="chip">python 3.14 + R 4.5</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  Scanpy and Seurat are shipped <em>together</em> for one reason: the strongest
+                  check available here is two unrelated codebases, in two different languages,
+                  clustering <strong>identical bytes</strong> &mdash; and separate images could
+                  never verify that, because a smoke test cannot reach across containers. On a
+                  synthetic matrix with three planted groups, Scanpy recovers them at adjusted
+                  Rand index <strong>1.0000</strong>, Seurat at <strong>1.0000</strong>, and the
+                  two partitions agree at <strong>1.0000</strong>. Both are scored against the
+                  planted truth as well as against each other, since two codebases agreeing on a
+                  wrong answer would sail through a cross-check alone. ARI rather than label
+                  equality, because cluster <em>names</em> are arbitrary &mdash; only the
+                  partition means anything.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

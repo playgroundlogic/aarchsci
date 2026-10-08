@@ -139,6 +139,20 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     `ants` has no linux-aarch64 build at all and FSL/FreeSurfer/MRtrix3 are not on
     conda-forge, so registration-heavy and surface-based pipelines are out of reach;
     `templateflow` is excluded because it downloads atlases at runtime.)
+  - `single-cell` (345 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
+    python 3.14, AND r-seurat 5.5 on R 4.5, in one image; single-cell transcriptomics in
+    both ecosystems. Here rather than in the bioinformatics sister project under DESIGN D5:
+    each project tracks the software's CURRENT HOME, and both frameworks have migrated —
+    bioconda's scanpy is 1.7.2 from 2021 and raises ImportError against a current anndata,
+    its r-seurat is 3.0.2 from 2019 with no linux-aarch64 build, while conda-forge carries
+    1.12.4 and 5.5.1. BOTH halves are in ONE env on purpose: the point is clustering
+    identical bytes with two unrelated codebases and comparing partitions by adjusted Rand
+    index, which separate images could never verify. Measured: scanpy ARI 1.0000 vs a
+    planted truth, Seurat ARI 1.0000, and 1.0000 between the two. Scored against the
+    planted truth as well as each other, because two codebases agreeing on a wrong answer
+    would pass a cross-check alone; ARI rather than label equality because cluster names
+    are arbitrary. `louvain` is excluded — its aarch64 builds stop at py312 and scanpy
+    deprecates it in favour of leiden.)
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
@@ -197,8 +211,18 @@ cosign verify quay.io/aarchsci/geospatial:latest \
 In scope: the CPU scientific stack on conda-forge (geospatial / earth-observation
 first; geo-ml, climate later). Curated environment images, not a registry mirror.
 Out of scope: GPU/CUDA (Graviton has no NVIDIA GPU — a hardware reality, not a
-packaging one), bioinformatics (that's aarch.bio), and compiling from source
-(gaps go upstream to conda-forge).
+packaging one), rebuilding BioContainers or mirroring bioconda (that's aarch.bio), and
+compiling from source (gaps go upstream to conda-forge).
+Bioinformatics is NOT out of scope by subject (amended 2026-10-08). Each project tracks
+the software's CURRENT HOME: if a tool's live development publishes to bioconda it belongs
+to aarch.bio; if development has moved to conda-forge it belongs here, whatever its
+subject. A stale copy left behind on the other channel confers no claim. This moves a
+handful of migrated packages rather than a domain — the ~503 tools bioconda actively
+carries stay with aarch.bio. Qualifying so far: afni, dipy, nibabel, nilearn and nipype
+(absent from bioconda entirely, hence the `neuroimaging` env), plus scanpy (bioconda 1.7.2
+from 2021, which raises ImportError against a current anndata, vs conda-forge 1.12.4) and
+r-seurat (bioconda 3.0.2 from 2019 with zero linux-aarch64 builds, vs conda-forge 5.5.1) —
+hence the `single-cell` env.
 
 ## Key links
 
@@ -210,8 +234,8 @@ packaging one), bioinformatics (that's aarch.bio), and compiling from source
 
 ## Facts
 
-- 15 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
-  comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging) —
+- 16 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+  comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell) —
   native arm64, verified
   (assemble+import+functional) + signed + public.
 - `dft` (gpaw, siesta, psi4, nwchem, quantum-espresso, ase, libxc, ELPA, ScaLAPACK,

@@ -1,0 +1,63 @@
+# aarch.science — single-cell environment
+# Single-cell transcriptomics, BOTH ecosystems in one image: Scanpy (Python/AnnData) and
+# Seurat (R). Clustering, dimensionality reduction, and the graph-community tooling both
+# frameworks need.
+#
+# WHY THIS IS HERE AT ALL — DESIGN D5, amended 2026-10-08. aarchsci used to exclude
+# bioinformatics by subject ("that's aarchbio"). That drew the line by domain while the
+# sister project draws its by LAYER — it rebuilds *bioconda tool packages* — so anything
+# biological that had migrated to conda-forge belonged to neither. D5 replaces the domain
+# rule with: each project tracks the software's CURRENT HOME. Both packages here qualify
+# on that test, and the evidence is specific rather than a judgement call:
+#
+#   scanpy    bioconda 1.7.2 (2021)  vs conda-forge 1.12.4. The bioconda copy does not
+#             merely lag — against a current anndata it raises
+#             `ImportError: cannot import name 'read' from 'anndata'` (aarchbio#63).
+#   r-seurat  bioconda 3.0.2 (2019)  vs conda-forge 5.5.1, with ZERO linux-aarch64 files.
+#
+# So neither has a live bioconda home, and both are current on conda-forge. The ~503 tools
+# bioconda actively carries are unaffected and stay with aarchbio.
+#
+# WHY ONE ENV AND NOT TWO: issues #17 (scanpy) and #20 (r-seurat) asked for the same
+# thing from opposite sides — Scanpy and Seurat clustering *identical bytes* so their
+# partitions can be compared by adjusted Rand index. Two separate images cannot do that;
+# a smoke test cannot reach across containers. Holding both frameworks here is what makes
+# the catalog's strongest verification shape available: two unrelated codebases, in two
+# different languages, on one input. See single-cell.smoke.py.
+#
+# This is also why `r-seurat` is NOT added to the `r` env, which was the literal request
+# in #20: measured, that takes `r` from 328 to 400 packages (+72, 615 MB) and gives a
+# general-purpose R image a specialist centre of gravity. Here the weight is the point.
+#
+# Verified to solve AND assemble native arm64 — python 3.14 and R 4.5 coexisting, with
+# the cross-framework agreement actually measured (ARI 1.0000 both against the planted
+# truth and against each other).
+name: single-cell
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  - pandas
+  - scikit-learn        # PCA/neighbors, and adjusted_rand_score for the cross-check
+  - h5py                # .h5ad
+  - matplotlib-base
+  # --- the Python half ---
+  # anndata must be solved WITH scanpy, not against it: the aarchbio#63 breakage was
+  # exactly a 2021 scanpy paired with a 2026 anndata.
+  - scanpy >=1.12
+  - anndata
+  # leidenalg + python-igraph are NOT pulled in by a bare scanpy solve, and an env
+  # without them loads data fine and then fails at `sc.tl.leiden` — after the user has
+  # already done the expensive part. Both named explicitly for that reason.
+  - leidenalg
+  - python-igraph
+  - umap-learn
+  # Deliberately NOT included: `louvain`. Its newest aarch64 builds stop at py312
+  # (py39/310/311/312 only), so it would cap this env two interpreter versions back —
+  # the su2/fem-cfd trap. scanpy deprecates `sc.tl.louvain` in favour of `sc.tl.leiden`
+  # anyway, so the cost buys a superseded function. Measured, see aarchbio#63 discussion.
+  # --- the R half ---
+  - r-base
+  - r-seurat >=5
