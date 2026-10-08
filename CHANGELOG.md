@@ -3,6 +3,40 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-08 (docs: make the aarch.bio / aarch.science split findable)
+
+### Changed — a "which project has this tool" router on all three doc surfaces
+D5 changed the boundary; the docs still described the old one, which is worse than saying
+nothing because it sent readers confidently to the wrong project. Every surface said some
+version of "aarchbio does bioinformatics" — true for ~503 tools and wrong for the ones
+people were actually asking about.
+
+- **README** — new "Looking for a specific tool? Which project has it" section near the
+  top, before the catalog.
+- **docs/index.html** — new `#which` section after the hero, linked from the hero note, so
+  it is seen before the env cards rather than after them.
+- **docs/llms.txt** — router placed at the TOP rather than in Scope at the bottom, with an
+  explicit instruction, because the failure mode for an LLM consumer is answering "is X
+  available on arm64?" from the stale framing: *"Do NOT tell someone a bioinformatics tool
+  is unavailable on arm64 without checking both projects and both channels."*
+- **DESIGN.md** intro also corrected — it still described aarchbio as covering
+  bioinformatics generally, contradicting D5 twelve lines above it.
+
+The router is two questions rather than a scope statement, because that is what a reader
+actually needs:
+
+1. **One tool, or a stack?** aarch.bio ships one tool per image (~503, bioconda);
+   aarch.science ships curated multi-package envs (16, conda-forge). "I need *this tool*
+   for a pipeline step" versus "I need a *working stack* to import against."
+2. **Where does the tool live now?** With the practical test spelled out — **compare the
+   versions**; if bioconda's copy is years behind conda-forge's, it is here — and the three
+   worked examples (`scanpy` 1.7.2 vs 1.12.4, `r-seurat` 3.0.2 vs 5.5.1, the neuroimaging
+   stack absent from bioconda entirely).
+
+Every version of it states plainly that **everything bioconda actively carries stays with
+aarch.bio**, so the split reads as a division of labour rather than a claim. Mirror
+statement requested upstream at aarchbio#75.
+
 ## 2026-10-08 (DESIGN D5 — the bioinformatics boundary, and env 16)
 
 ### Changed — DESIGN D5: each project tracks the software's *current home*

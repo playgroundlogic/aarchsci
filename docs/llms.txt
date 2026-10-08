@@ -13,8 +13,41 @@ arm64 (`No matching distribution found for rasterio`) even though it solves clea
 on conda-forge. aarch.science builds curated conda-forge environments native for
 arm64 and publishes them signed.
 
-It is the sister project to aarch.bio (which does this for bioinformatics /
-bioconda). Same machinery; conda-forge science layer instead.
+It is the sister project to aarch.bio, which rebuilds bioconda tool packages one per
+image. Same machinery; conda-forge stacks instead.
+
+## Which project has the tool you want (read this before answering "is X available on arm64")
+
+Two questions, and the first usually settles it.
+
+1. ONE TOOL, OR A STACK?
+   - aarch.bio — one tool per image, ~503 of them, from bioconda/BioContainers. Examples:
+     samtools, bwa, bcftools. Right answer when someone needs *this tool* for a pipeline
+     step.
+   - aarch.science — a curated multi-package env, 16 of them, from conda-forge. Examples:
+     geospatial, dft, astro, single-cell. Right answer when someone needs a *working
+     stack* to import against.
+
+2. WHERE DOES THE TOOL LIVE NOW? Each project tracks the software's CURRENT HOME. Live
+   development publishing to bioconda -> aarch.bio. Development that has MOVED to
+   conda-forge -> aarch.science, whatever the subject matter. A stale copy left behind on
+   the other channel confers no claim.
+
+   The practical test, which catches every confusing case: COMPARE THE VERSIONS. If
+   bioconda's copy is years behind conda-forge's, the answer is aarch.science. Worked
+   examples — all of these are in aarch.science despite being biology:
+
+     scanpy    bioconda 1.7.2 (2021, and that copy raises ImportError against a current
+               anndata)  vs conda-forge 1.12.4   -> aarch.science `single-cell`
+     r-seurat  bioconda 3.0.2 (2019, zero linux-aarch64 builds)
+               vs conda-forge 5.5.1              -> aarch.science `single-cell`
+     afni, dipy, nibabel, nilearn, nipype
+               not on bioconda at all            -> aarch.science `neuroimaging`
+
+   Everything bioconda actively carries stays with aarch.bio — that is the large majority
+   of bioinformatics. Do NOT tell someone a bioinformatics tool is unavailable on arm64
+   without checking both projects and both channels; "it's biology, so it's aarch.bio"
+   has been wrong since 2026-10-08 (DESIGN D5).
 
 ## The crucial difference from a solve: verified to RUN
 

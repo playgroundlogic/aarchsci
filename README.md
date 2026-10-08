@@ -3,13 +3,46 @@
 **Verified, signed, native arm64 (aarch64) containers for the scientific-computing
 stack** — geospatial / earth-observation first. For Apple Silicon and AWS Graviton.
 
-Sister project to [aarchbio](https://github.com/playgroundlogic/aarchbio) (which
-does this for bioinformatics / BioContainers). aarch.science covers the layer
-aarchbio scopes out: the **conda-forge** scientific stack.
+Sister project to [aarch.bio](https://aarch.bio/), which rebuilds **bioconda tool
+packages**. aarch.science covers the **conda-forge** scientific stack.
 
 > **Status:** live. **16 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
+
+## Looking for a specific tool? Which project has it
+
+Two questions decide it, and the first one usually settles it:
+
+**1. Do you want one tool, or a working stack?**
+
+| | aarch.bio | aarch.science |
+|---|---|---|
+| **unit** | one tool per image (~503) | a curated multi-package env (16) |
+| **example** | `samtools`, `bwa`, `bcftools` | `geospatial`, `dft`, `astro`, `single-cell` |
+| **source** | bioconda / BioContainers | conda-forge |
+| **you want it when** | "I need *this tool* in a pipeline step" | "I need a *working stack* I can import against" |
+
+**2. Where does the tool actually live now?** Each project tracks the software's
+**current home**. If its live development publishes to bioconda → aarch.bio. If
+development has **moved to conda-forge** → aarch.science, whatever the subject. A stale
+copy left behind on the other channel doesn't count.
+
+The practical test, which catches the confusing cases: **compare the versions.** If
+bioconda's copy is years behind conda-forge's, you want aarch.science. Worked examples —
+all of these live *here*, not in the sister project, despite being biology:
+
+| tool | bioconda | conda-forge | here, in |
+|---|---|---|---|
+| `scanpy` | 1.7.2 (2021, won't import) | **1.12.4** | [`single-cell`](envs/single-cell.yaml) |
+| `r-seurat` | 3.0.2 (2019, no arm64) | **5.5.1** | [`single-cell`](envs/single-cell.yaml) |
+| `afni`, `dipy`, `nibabel`, `nilearn` | *not on bioconda* | current | [`neuroimaging`](envs/neuroimaging.yaml) |
+
+Everything bioconda actively carries stays with aarch.bio — that's the large majority of
+bioinformatics. Full reasoning in [DESIGN.md](DESIGN.md) under **D5**.
+
+Still unsure? [Open an issue](https://github.com/playgroundlogic/aarchsci/issues/new) and
+we'll tell you which project to use, or build it if neither does.
 
 ## Why
 
@@ -20,7 +53,7 @@ for rasterio` — PyPI's arm64 wheel coverage for native-lib science is fragile)
 
 The packages *do* exist on **conda-forge** for arm64 — the same stack solves
 cleanly there (123 packages, verified). The gap is the same one
-[aarchbio](https://github.com/playgroundlogic/aarchbio) fills for bioinformatics:
+[aarch.bio](https://aarch.bio/) fills for bioconda tools:
 **the capability is present, the delivery is broken.** aarch.science builds a
 verified, signed arm64 container from the conda-forge packages so the work can run
 native on Graviton.

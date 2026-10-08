@@ -2,9 +2,14 @@
 
 Verified, signed, native **arm64 (aarch64)** containers for the **scientific-computing
 stack** — geospatial / earth-observation first. Sister project to
-[aarchbio](https://github.com/playgroundlogic/aarchbio), which does the same for
-bioinformatics (BioContainers/bioconda). aarch.science covers the layer aarchbio
-deliberately excluded: the **conda-forge** scientific stack.
+[aarchbio](https://github.com/playgroundlogic/aarchbio), which rebuilds **bioconda tool
+packages** (BioContainers) one per image. aarch.science covers the other layer: curated
+**conda-forge** stacks.
+
+The split is by **layer and current home, not by subject** — see **D5**. A tool whose
+development has migrated off bioconda to conda-forge belongs here even if it is
+biological, which is why `single-cell` (scanpy, Seurat) and `neuroimaging` (AFNI, DIPY)
+ship from this project. Everything bioconda actively carries stays with aarchbio.
 
 > This document is the authoritative design. It is written before the builder so
 > the architecture — especially where it *diverges* from aarchbio — is deliberate.

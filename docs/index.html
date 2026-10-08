@@ -131,8 +131,83 @@
               (177,643 features). Not just cheaper: the same answer, faster.
               <a href="https://github.com/playgroundlogic/aarchsci/tree/main/benchmark" style="color:var(--accent-teal)">See the benchmark →</a>
             </p>
-            <p class="footer-note">The sister project to <a href="https://aarch.bio/" style="color:var(--accent-teal)">aarch.bio</a> — same machinery, the conda-forge science layer instead of bioconda.</p>
+            <p class="footer-note">The sister project to <a href="https://aarch.bio/" style="color:var(--accent-teal)">aarch.bio</a>, which rebuilds <strong>bioconda tool packages</strong> one per image. aarch.science curates <strong>conda-forge</strong> stacks. <a href="#which" style="color:var(--accent-teal)">Which one has the tool I want? →</a></p>
         </div>
+
+        <!-- Which project -->
+        <section id="which" style="border-top:1px solid var(--border);">
+            <div class="container">
+                <p class="section-header" style="margin-bottom:0.5rem;">
+                  <span style="font-size:2rem;font-weight:800;letter-spacing:-0.03em;">Looking for a specific tool?</span><br>
+                  <span class="footer-note">Two questions decide which project has it — the first usually settles it.</span>
+                </p>
+
+                <p class="footer-note" style="margin-top:1.5rem;"><strong>1. Do you want one tool, or a working stack?</strong></p>
+                <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.95rem;margin-top:0.5rem;">
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <th style="text-align:left;padding:0.5rem 0.75rem;"></th>
+                    <th style="text-align:left;padding:0.5rem 0.75rem;"><a href="https://aarch.bio/" style="color:var(--accent-teal)">aarch.bio</a></th>
+                    <th style="text-align:left;padding:0.5rem 0.75rem;">aarch.science</th>
+                  </tr>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:0.5rem 0.75rem;"><strong>unit</strong></td>
+                    <td style="padding:0.5rem 0.75rem;">one tool per image (~503)</td>
+                    <td style="padding:0.5rem 0.75rem;">a curated multi-package env (16)</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:0.5rem 0.75rem;"><strong>example</strong></td>
+                    <td style="padding:0.5rem 0.75rem;"><code>samtools</code>, <code>bwa</code>, <code>bcftools</code></td>
+                    <td style="padding:0.5rem 0.75rem;"><code>geospatial</code>, <code>dft</code>, <code>astro</code>, <code>single-cell</code></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:0.5rem 0.75rem;"><strong>source</strong></td>
+                    <td style="padding:0.5rem 0.75rem;">bioconda / BioContainers</td>
+                    <td style="padding:0.5rem 0.75rem;">conda-forge</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0.5rem 0.75rem;"><strong>you want it when</strong></td>
+                    <td style="padding:0.5rem 0.75rem;">"I need <em>this tool</em> for a pipeline step"</td>
+                    <td style="padding:0.5rem 0.75rem;">"I need a <em>working stack</em> to import against"</td>
+                  </tr>
+                </table>
+                </div>
+
+                <p class="footer-note" style="margin-top:1.75rem;"><strong>2. Where does the tool actually live now?</strong> Each project tracks the software's <strong>current home</strong>. Live development on bioconda &rarr; aarch.bio. Development that has <strong>moved to conda-forge</strong> &rarr; aarch.science, whatever the subject. A stale copy left behind on the other channel doesn't count.</p>
+
+                <p class="footer-note" style="margin-top:0.75rem;">The practical test, which catches the confusing cases: <strong>compare the versions.</strong> If bioconda's copy is years behind conda-forge's, you want aarch.science. These all live <em>here</em>, despite being biology:</p>
+                <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;font-size:0.95rem;margin-top:0.75rem;">
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <th style="text-align:left;padding:0.5rem 0.75rem;">tool</th>
+                    <th style="text-align:left;padding:0.5rem 0.75rem;">bioconda</th>
+                    <th style="text-align:left;padding:0.5rem 0.75rem;">conda-forge</th>
+                    <th style="text-align:left;padding:0.5rem 0.75rem;">here, in</th>
+                  </tr>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:0.5rem 0.75rem;"><code>scanpy</code></td>
+                    <td style="padding:0.5rem 0.75rem;">1.7.2 (2021, won't import)</td>
+                    <td style="padding:0.5rem 0.75rem;"><strong>1.12.4</strong></td>
+                    <td style="padding:0.5rem 0.75rem;"><code>single-cell</code></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:0.5rem 0.75rem;"><code>r-seurat</code></td>
+                    <td style="padding:0.5rem 0.75rem;">3.0.2 (2019, no arm64)</td>
+                    <td style="padding:0.5rem 0.75rem;"><strong>5.5.1</strong></td>
+                    <td style="padding:0.5rem 0.75rem;"><code>single-cell</code></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:0.5rem 0.75rem;"><code>afni</code>, <code>dipy</code>, <code>nibabel</code>, <code>nilearn</code></td>
+                    <td style="padding:0.5rem 0.75rem;"><em>not on bioconda</em></td>
+                    <td style="padding:0.5rem 0.75rem;">current</td>
+                    <td style="padding:0.5rem 0.75rem;"><code>neuroimaging</code></td>
+                  </tr>
+                </table>
+                </div>
+
+                <p class="footer-note" style="margin-top:1.25rem;">Everything bioconda actively carries stays with <a href="https://aarch.bio/" style="color:var(--accent-teal)">aarch.bio</a> &mdash; that's the large majority of bioinformatics. Still unsure? <a href="https://github.com/playgroundlogic/aarchsci/issues/new" style="color:var(--accent-teal)">Open an issue</a> and we'll point you at the right project, or build it if neither does.</p>
+            </div>
+        </section>
 
         <!-- The gap -->
         <section id="gap">
