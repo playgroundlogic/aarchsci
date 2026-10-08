@@ -151,6 +151,14 @@ nwchem exits 255 hunting for `sto-3g` under
 `apptainer exec` now genuinely breaks — the smoke test asserts that variable precisely so
 this cannot regress unnoticed. Use `run`.
 
+**As of 2026-10-05 `dft` has a second reason to need `run`, and this one costs you the
+parallelism rather than an error you can't miss.** gpaw 26.7 made its C MPI backend
+opt-in (upstream's own interface is a `gpaw python` wrapper), so the image exports
+`GPAW_MPI_BACKEND=cgpaw` from `activate.d`. With it, `mpiexec -n N python script.py` works
+exactly as documented above. Without activation, gpaw falls back to a serial communicator
+and `mpiexec -n 2 python` exits 1 — measured. The smoke test asserts the variable directly
+([issue #19](https://github.com/playgroundlogic/aarchsci/issues/19)). Use `run`.
+
 Also measured on that host, so you don't have to find out the hard way:
 
 - **The writable-overlay path works** (`--writable-tmpfs`, via `fuse-overlayfs`).

@@ -3,6 +3,43 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-05
+
+### Fixed — `dft`: gpaw 26.7 made its MPI backend opt-in, breaking the documented parallel interface (issue #19)
+- **`publish` had failed every day since 2026-09-20** (16 consecutive runs; last success
+  2026-09-19), always the same two jobs: `dft` and `md`. The other seven envs passed every
+  time. No broken image was ever tagged — the D3 gate refused each time, so the published
+  images were never affected; what was frozen was *currency*. `md` is a separate,
+  unrelated glibc problem tracked in #18 and still open.
+- **The real regression:** gpaw 25.7.0 → 26.7.0 made the C MPI backend **opt-in**.
+  Measured on `26.7.0 py314_mpi_openmpi_omp_3` (the pinned OpenMPI build):
+  unset, `python` gets a `SerialCommunicator` and **`mpiexec -n 2 python` exits 1**; with
+  `GPAW_MPI_BACKEND=cgpaw`, `python` gets an `MPI` communicator of size 1 and
+  `mpiexec -n 2 python` gives `MPI` size 2 on both ranks. That broke a promise this repo
+  publishes — the README's `docker run ... dft:latest mpiexec -n 4 python script.py` — so
+  the fix belongs in the image, not in the test.
+- **`builder/Dockerfile` now exports `GPAW_MPI_BACKEND=cgpaw` from `activate.d`**, guarded
+  on `/opt/conda/bin/gpaw` so it is a no-op in the other twelve envs (the same idiom as the
+  existing gromacs `GMXRC.bash` repair). Verified the variable reaches ranks **without**
+  `mpiexec -x`, so the documented one-liner needs no change. `activate.d` rather than `ENV`
+  because `dft` already requires entrypoint activation for nwchem's basis path — no new
+  constraint, and README now records that `exec` costs the parallelism as well.
+- **A self-correction, and the more useful half of this entry.** The D3 check read
+  `assert getattr(gpaw.mpi, "have_mpi", False)`. gpaw 26.7 *removed* `have_mpi`, and that
+  falsy **default** silently converted "the upstream API changed" into the confident, wrong
+  message "this is a nompi gpaw" — pointing 16 days of failures at a flavour flip that
+  never happened, while the build-string check beside it was passing and correctly
+  reporting `py314_mpi_openmpi_omp_3` the whole time. Replaced with assertions on the
+  current API: the env var, plus `world` not being a `SerialCommunicator` — which still
+  distinguishes an MPI build from a nompi one *serially*, since with the backend on a
+  single process gets a real `MPI` communicator. The rule is now written in the file:
+  never probe an upstream attribute with a falsy default and then assert on it, because a
+  removed attribute and a false attribute mean different things.
+- Verified by a full native-arm64 build + D3: 236 packages, lock-hash `s7869e8b04a41`
+  (the same hash CI computed on the failing run, so local and CI resolve identically).
+  gpaw 2-rank now agrees with serial to 5.92e-08 eV, nwchem to 0.0e+00 Hartree, qe to
+  1.0e-08 Ry.
+
 ## 2026-09-14
 
 ### Added — `cfd-fv`, the catalog's 13th env: SU2 finite-volume CFD (issue #16)

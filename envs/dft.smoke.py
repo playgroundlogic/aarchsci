@@ -76,9 +76,13 @@ if CHILD:
     # energy. The parent's "parallel matches serial" check would then pass while nothing
     # parallel had happened. Refusing to proceed unless the communicator is actually
     # larger than 1 is what closes that hole.
+    # Two ways to land here, so name both: the nompi build ties on build number (see the
+    # pin in dft.yaml), and from gpaw 26.7 an mpi_openmpi build still runs serial unless
+    # GPAW_MPI_BACKEND=cgpaw is exported (set by builder/Dockerfile's activate.d).
     assert world.size > 1, (
-        f"child sees world.size={world.size} under mpiexec -n 2 — gpaw is not an MPI "
-        "build (the nompi variant ties on build number; see the pin in dft.yaml)"
+        f"child sees world.size={world.size} under mpiexec -n 2 — gpaw is not running "
+        f"parallel. Either it is the nompi build (see the pin in dft.yaml), or the MPI "
+        f"backend is off: GPAW_MPI_BACKEND={os.environ.get('GPAW_MPI_BACKEND')!r}"
     )
     e = si_energy()
     if world.rank == 0:
@@ -139,15 +143,38 @@ def _native():
     print(f"       ({os.path.basename(_gpaw.__file__)}, world.size={world.size})")
 
 
-@check("gpaw is the MPI build, not the nompi one")
+@check("gpaw is the MPI build with its MPI backend enabled, not the nompi one")
 def _gpaw_is_mpi():
     import gpaw.mpi
-    # Two independent statements of the same fact: the compile-time flag, and the type
-    # of the world communicator (a nompi gpaw hands out a SerialCommunicator).
-    assert getattr(gpaw.mpi, "have_mpi", False), \
-        "gpaw.mpi.have_mpi is False — this is a nompi gpaw and this env's whole premise"
-    assert type(gpaw.mpi.world).__name__ != "SerialCommunicator", \
-        f"gpaw world communicator is {type(gpaw.mpi.world).__name__}, not an MPI one"
+    # READ THIS BEFORE "SIMPLIFYING" THIS CHECK BACK.
+    #
+    # This check used to read `assert getattr(gpaw.mpi, "have_mpi", False)`, and that
+    # getattr DEFAULT was a bug that cost real time. gpaw 26.7 REMOVED the `have_mpi`
+    # attribute entirely, so the default silently turned "the upstream API changed" into
+    # the confident, wrong message "this is a nompi gpaw and this env's whole premise".
+    # It sent us hunting a flavour flip that had not happened — the build-string check
+    # immediately below passed the whole time, reporting `py314_mpi_openmpi_omp_3`.
+    # Never probe an upstream attribute with a falsy default and then assert on it: a
+    # removed attribute and a false attribute mean completely different things.
+    #
+    # So assert on what the current API actually exposes. With the image's
+    # GPAW_MPI_BACKEND=cgpaw (set in builder/Dockerfile), the world communicator is a
+    # real MPI communicator even in a single process — measured `MPI`, size 1 — whereas a
+    # nompi gpaw hands out a `SerialCommunicator`. That keeps the original intent (catch a
+    # serial gpaw in an env whose whole premise is parallel) and is observable serially,
+    # which matters because the 2-rank leg in section 7 cannot run if this is wrong.
+    backend = os.environ.get("GPAW_MPI_BACKEND")
+    assert backend == "cgpaw", (
+        f"GPAW_MPI_BACKEND is {backend!r}, expected 'cgpaw' — the activate.d script from "
+        "builder/Dockerfile did not run, and without it gpaw 26.7+ falls back to serial "
+        "and `mpiexec -n N python` fails outright (use `run`, not `exec`)"
+    )
+    world = type(gpaw.mpi.world).__name__
+    assert world != "SerialCommunicator", (
+        f"gpaw world communicator is {world}, not an MPI one — this is a nompi gpaw "
+        "(or the MPI backend is disabled) and this env's whole premise"
+    )
+    print(f"       (GPAW_MPI_BACKEND={backend}, world={world}, size={gpaw.mpi.world.size})")
 
 
 @check("MPI-flavor build strings are what the spec pinned (conda-meta, not the lock)")

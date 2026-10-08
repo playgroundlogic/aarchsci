@@ -85,6 +85,37 @@ RUN for rc in /opt/conda/bin.*/GMXRC.bash; do \
       echo "[builder] patched unsafe completion glob in $rc"; \
     done
 
+# Enable gpaw's MPI backend, without which this image's DOCUMENTED parallel interface
+# is broken. Like the gromacs repair above, the guard makes this a no-op in every env
+# that doesn't install gpaw.
+#
+# gpaw 26.7 changed how MPI is activated. Through 25.7 an `mpi_openmpi` build was simply
+# MPI-capable under plain `python`. From 26.7 the C MPI backend is opt-in: upstream's
+# primary interface is the `gpaw python` wrapper, with `GPAW_MPI_BACKEND=cgpaw` as the
+# documented alternative. Unset, measured on 26.7.0 `py314_mpi_openmpi_omp_3`:
+#   python                   -> gpaw.mpi.world is a SerialCommunicator (size 1)
+#   mpiexec -n 2 python      -> FAILS, exit 1
+# With the variable exported:
+#   python                   -> MPI communicator, size 1
+#   mpiexec -n 2 python      -> MPI, size 2 on both ranks
+# and it propagates to ranks without needing `mpiexec -x`, so the README's
+# `docker run ... dft:latest mpiexec -n 4 python script.py` works untouched. That
+# promise is the whole reason this is set in the image rather than left to the caller.
+#
+# Why activate.d rather than a plain `ENV`: the variable is meaningless to the other
+# twelve envs, and `dft` already requires entrypoint activation anyway (nwchem resolves
+# its basis-set path there), so this adds no new constraint — `apptainer run`, not
+# `exec`, remains the rule for this env. The tradeoff is that skipping activation
+# reverts gpaw to serial; that fails LOUDLY (`mpiexec` exits 1) rather than silently
+# computing a wrong answer, and dft.smoke.py asserts the variable directly so a
+# regression fails the build instead of shipping.
+RUN if [ -x /opt/conda/bin/gpaw ]; then \
+      mkdir -p /opt/conda/etc/conda/activate.d; \
+      printf '%s\n' '#!/bin/sh' 'export GPAW_MPI_BACKEND=cgpaw' \
+        > /opt/conda/etc/conda/activate.d/aarchsci_gpaw_mpi.sh; \
+      echo "[builder] enabled gpaw MPI backend (GPAW_MPI_BACKEND=cgpaw)"; \
+    fi
+
 # Make the env's binaries the default PATH.
 ENV PATH=/opt/conda/bin:$PATH
 
