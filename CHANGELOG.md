@@ -3,6 +3,60 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-08 (doc-count rot, fixed permanently)
+
+### Fixed — the docs' package counts now derive from the locks instead of being retyped
+- **New `builder/sync-doc-counts.py`.** The locks are the single source of truth; the
+  counts in README.md, `docs/llms.txt` and `docs/index.html` are generated from them.
+  `--check` exits non-zero on any disagreement, so a hand-edited count is a failure rather
+  than something noticed months later.
+- **New `sync-docs` job in `publish.yml`** (`needs: build`, `if: !cancelled()`), which
+  regenerates and commits the counts after the matrix finishes. **Deliberately a separate
+  job, not part of the per-env lock commit:** that matrix runs up to six envs concurrently
+  and its push-retry loop is safe *because* each leg touches only its own lock file. Six
+  legs editing one README would conflict constantly. `publish.yml` is also the only
+  workflow that writes locks — `reconcile.yml` only reads them to compare hashes — so
+  self-healing there covers the whole rot mechanism.
+- **Why this was needed.** The reconciler keeps locks current and left every *claim* about
+  them behind. After ~6 weeks of normal operation, eight of fifteen counts were wrong, and
+  `index.html` had drifted to a third distinct value for two envs (236 for
+  earth-observation, 287 for pointcloud). Nobody mistyped them — they were correct when
+  written and the channel moved underneath. That is a structural consequence of having a
+  daily reconciler, not carelessness, which is why the fix is automation rather than
+  another careful pass.
+- Verified both directions: `--check` passes against the hand-corrected docs (so the tool
+  and the manual pass agree independently), and a deliberate corruption of four values
+  across all three files was detected, reported per-file, repaired, and left byte-identical
+  to the hand-corrected state.
+- Scope is deliberately narrow — only numbers mechanically derivable from the locks
+  (per-env package counts, and the count of published envs, honouring the existing
+  `# aarchsci-unpublished:` marker so `apptainer` is excluded). Prose, package lists and
+  caveats are left alone: they carry judgement a script cannot regenerate, and silently
+  rewriting them would be worse than letting them age.
+
+### Corrected — my claim about aarchbio's scope was wrong (#17, #20 reopened)
+- In closing #17 and #20 I asserted that aarchbio "already ships conda-forge-sourced
+  packages," inferring it from a `channel=conda-forge` entry in its scanpy image's
+  `conda-meta`. That is a *dependency-channel* fact, not a scope fact — bioconda is
+  layered on conda-forge, so every bioconda package shows it. aarchbio's README states it
+  "operates at **exactly one layer**: it rebuilds **bioconda tool packages**," with
+  conda-forge explicitly out of scope. I read a build string as a capability claim, the
+  same error class this repo keeps catching elsewhere.
+- **Consequence: #20 reopened.** bioconda's `r-seurat` is stranded at 3.0.2, so current
+  Seurat can only come from conda-forge curation — aarchsci's layer, not aarchbio's. My
+  redirect pointed at a charter that excludes it, creating exactly the dead end I had said
+  in the same comment I wanted to avoid.
+- **#17 stands** — it closed on the stronger, measured reason (aarchbio publishes a
+  working scanpy 1.12.4 that passes the issue's own smoke chain at ARI 1.0).
+- **#26 unaffected, and firmer than argued.** Its reasoning was that afni/dipy/nibabel/
+  nilearn are absent from bioconda — which under aarchbio's actual "bioconda tools only"
+  scope puts them outside its layer more clearly, not less.
+- **The real finding, now surfaced rather than rediscovered per-request:**
+  conda-forge-sourced *bioinformatics* belongs to neither project by the letter of both
+  charters — aarchbio excludes conda-forge curation, aarchsci excludes bioinformatics.
+  Current Seurat and current scanpy fall in that gap. Awaiting a cross-project decision on
+  #20; not resolved unilaterally because it changes what both projects are for.
+
 ## 2026-10-08 (envs 14 and 15)
 
 ### Added — `optimization` (issue #23) and `neuroimaging` (issue #26)
