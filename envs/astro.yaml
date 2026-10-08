@@ -58,3 +58,19 @@ dependencies:
   # also make the build fail on someone else's outage. See astro.smoke.py.
   - astroquery
   - specutils
+  # --- simulation, not just analysis (issue #22) ---
+  # rebound is an N-body gravitational integrator. Everything else in this env is
+  # ANALYSIS (astropy, photutils, healpy, yt read and reduce data); rebound is the first
+  # package here that computes a dynamical trajectory, and the catalog had no ODE
+  # integrator at all.
+  #
+  # The python-ABI question was checked, not assumed, because this is exactly where su2
+  # (capped at py311) bit the fem-cfd spec: rebound 5.0.1 has aarch64 builds for
+  # py310 through py314, so it does NOT cap this env — the joint solve keeps python 3.14
+  # and moves no pin.
+  #
+  # Offline by construction, which matters for an env that is deliberately network-free:
+  # `sim.add("outer solar system")` resolves to a dataset compiled into the extension,
+  # so there is no Horizons query at run time (contrast astropy's IERS tables, disabled
+  # in astro.smoke.py).
+  - rebound

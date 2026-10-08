@@ -74,6 +74,7 @@ HEADLINE = [
     # astroquery is import-only on purpose — see the module docstring and astro.yaml.
     "astroquery",
     "specutils",
+    "rebound",
 ]
 print("[smoke] 1. imports")
 for mod in HEADLINE:
@@ -455,6 +456,73 @@ def _astroquery():
     assert hasattr(Simbad, "query_object"), "Simbad has no query_object"
     import astroquery
     print(f"       (astroquery {astroquery.__version__}, no network touched)")
+
+
+# --- 9. N-body dynamics: rebound (issue #22) -----------------------------------------
+# The first SIMULATION in this env — everything above reduces data, this integrates an
+# ODE. The check is a method-discriminating ladder rather than one tolerance, which is
+# what makes it worth having: energy is a conserved quantity of the N-body problem, so
+# each integrator must conserve it to roughly its own documented order. A miscompiled or
+# mis-vectorised high-order integrator does not merely drift slightly — it lands in the
+# accuracy class of a cruder method, which a single loose bound would not catch.
+#
+# Measured on aarch64 over 1000 Jupiter orbits of the outer solar system (0.2 s):
+#   IAS15     |dE/E| = 5.0e-15   (adaptive 15th order — machine precision)
+#   WHFast    |dE/E| = 6.1e-08   (2nd-order symplectic, fixed step)
+#   leapfrog  |dE/E| = 3.8e-05   (2nd order, non-symplectic drift)
+# Ten orders of magnitude between the ends, so the ordering itself is the assertion.
+#
+# Runs fully offline: `add("outer solar system")` is compiled into the extension, so no
+# Horizons network call — consistent with this env's deliberate network-free stance.
+print("[smoke] 9. N-body dynamics (rebound)")
+
+REBOUND_ORBITS = 1000.0
+REBOUND_RESULTS = {}   # IAS15's result, so the ladder check can order against it
+
+
+def _rebound_dE(integrator, dt_frac=None):
+    """|dE/E| for `integrator` over REBOUND_ORBITS Jupiter orbits. Offline."""
+    import rebound
+    sim = rebound.Simulation()
+    sim.integrator = integrator
+    sim.add("outer solar system")   # builtin dataset: Sun + Jupiter..Neptune, N=5
+    sim.move_to_com()
+    period = sim.particles[1].P     # Jupiter, ~74.55 time units (G=1)
+    if dt_frac:
+        sim.dt = dt_frac * period   # fixed-step methods need an explicit step
+    e0 = sim.energy()
+    sim.integrate(REBOUND_ORBITS * period)
+    e1 = sim.energy()
+    return abs((e0 - e1) / e1), sim.N
+
+
+@check("rebound IAS15 conserves energy to machine precision over 1000 Jupiter orbits")
+def _rebound_ias15():
+    rel, n = _rebound_dE("ias15")
+    assert n == 5, f"outer solar system should be 5 bodies, got {n}"
+    # rebound's own test suite asserts < 1e-14 for IAS15 on this exact problem.
+    assert rel < 1e-13, f"IAS15 |dE/E| = {rel:.3e}, expected < 1e-13 (machine precision)"
+    REBOUND_RESULTS["ias15"] = rel
+    print(f"       (IAS15 |dE/E| = {rel:.2e} over {REBOUND_ORBITS:.0f} Jupiter orbits)")
+
+
+@check("rebound integrator accuracy ladder orders correctly (IAS15 << WHFast << leapfrog)")
+def _rebound_ladder():
+    whfast, _ = _rebound_dE("whfast", dt_frac=0.01)
+    leapfrog, _ = _rebound_dE("leapfrog", dt_frac=0.01)
+    ias15 = REBOUND_RESULTS.get("ias15")
+    assert ias15 is not None, "IAS15 check did not run; nothing to order against"
+    # Each rung must be physical in its own right...
+    assert whfast < 1e-5, f"WHFast |dE/E| = {whfast:.3e}, unphysically large"
+    assert leapfrog < 1e-2, f"leapfrog |dE/E| = {leapfrog:.3e}, unphysically large"
+    # ...and the ORDERING is the real check: the high-order method must actually be
+    # orders better, not merely inside a generous bound.
+    assert ias15 < whfast / 100.0, (
+        f"IAS15 ({ias15:.3e}) is not decisively better than WHFast ({whfast:.3e}) — "
+        "the high-order integrator is not behaving like one")
+    assert whfast < leapfrog, (
+        f"WHFast ({whfast:.3e}) should beat non-symplectic leapfrog ({leapfrog:.3e})")
+    print(f"       (IAS15 {ias15:.1e} < WHFast {whfast:.1e} < leapfrog {leapfrog:.1e})")
 
 
 # --- verdict ----------------------------------------------------------------------

@@ -72,6 +72,29 @@ dependencies:
   - petsc=*=real_*
   - petsc4py
   - slepc=*=real_*
+  # --- solid mechanics / structural FEA (issue #24) ---
+  # calculix (ccx) is an implicit FEA solver that reads Abaqus-style `.inp` decks — the
+  # input format most FEA users actually hold. dolfinx above solves PDEs you write
+  # yourself in UFL; ccx solves the standard engineering problem set (elasticity,
+  # contact, modal) from a deck. Different interface, different audience, same env
+  # because they share nothing that conflicts: ccx has no `py` in its build string
+  # (`pl5321h874b4c1_8`, perl), so it is transparent to this env's python, and the joint
+  # solve moved no pin.
+  #
+  # gmsh was requested alongside this and is DELIBERATELY NOT HERE — measured, not
+  # assumed. gmsh on linux-aarch64 has no headless/nogui variant (checked all 13 build
+  # strings at 4.15.2), so it drags in the full GUI/CAD stack: qt6-main (63 MB),
+  # vtk-base (84 MB), occt (26 MB), fltk, viskores and the xorg set. That took this env
+  # from 129 to 329 packages — the catalog's leanest solver image to its heaviest — for a
+  # mesher. `python-gmsh` is no escape: it is noarch but simply depends on the same full
+  # `gmsh`, and is stale at 4.9.5. See issue #24; if a headless gmsh appears upstream, or
+  # a separate meshing env is wanted, that is the way in.
+  #
+  # Not having a mesher costs this env's D3 nothing, because a MESH IS GEOMETRY the test
+  # can generate — the same precedent as cfd-fv.smoke.py writing its own SU2 mesh. That
+  # is categorically different from pseudopotentials or Slater-Koster files, which are
+  # fitted physical data we cannot fabricate (hence siesta's and dftbplus's exclusions).
+  - calculix
   #
   # --- BLAS/LAPACK: this env gets NVPL, and it is deliberately left alone ---
   # Measured 2026-09-05: this is the FIRST env in the catalog whose BLAS is not

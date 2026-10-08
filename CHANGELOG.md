@@ -3,6 +3,61 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-08
+
+### Added — `gsw` to climate (#21), `rebound` to astro (#22), `calculix` to fem-cfd (#24)
+Three additions to existing envs, each verified by a full native-arm64 build + D3. All
+three joint solves moved no existing pin and kept python 3.14.
+
+- **`climate` + gsw 3.6.23 — 262 packages, lock `scde9f6327e52`.** The TEOS-10 Gibbs
+  SeaWater toolbox: this env covered the atmosphere (metpy/eccodes/cdo/nco) and had no
+  ocean equation of state. It is the cheapest strong verification in the catalog because
+  the package ships its own published reference data — the official TEOS-10 check-value
+  table is inside the wheel (`gsw/tests/gsw_cv_v3_0.npz`, 641,918 bytes, **822 arrays**).
+  So D3 reproduces a published number offline with nothing staged: `gsw.rho` matches the
+  check value to **3.79e-11** against a documented tolerance of 2.9e-10, plus
+  salinity/temperature round-trip identities.
+- **`astro` + rebound 5.0.1 — 364 packages, lock `sdb3722654df8`.** The env's first
+  *simulation* code; everything else in it reduces data, and the catalog had no ODE
+  integrator at all. The python-ABI risk was **checked rather than assumed**, because
+  this is exactly where `su2` (py311 cap) bit `fem-cfd`: rebound has aarch64 builds for
+  py310–py314, so it does not cap the env. Verification is a method-discriminating
+  ladder over 1000 Jupiter orbits of the outer solar system — IAS15 **4.98e-15**, WHFast
+  6.1e-08, leapfrog 3.8e-05 — and the **ordering** is asserted, not just a bound, because
+  a high-order integrator that has silently degraded lands in a cruder method's accuracy
+  class and a single loose tolerance would not notice. Runs offline: the solar-system
+  dataset is compiled into the extension, so no Horizons query.
+- **`fem-cfd` + calculix 2.23 — 131 packages, lock `s50561942648c`.** ccx reads
+  Abaqus-style `.inp` decks, covering the standard engineering problem set from the
+  format most FEA users actually hold, where dolfinx solves PDEs written in UFL. No `py`
+  in its build string, so it is transparent to the env's interpreter. D3 deliberately
+  mixes one exact and one loose check: **global force equilibrium is exact** — the
+  clamped-face reactions sum to **100.000000 N** against 100 N applied (Fx 1.3e-11,
+  Fy 4.0e-11), a conservation identity the solver cannot approximate around — while the
+  Euler-Bernoulli tip-deflection comparison is **intentionally wide** (measured FE
+  0.166823 mm vs EB 0.190476 mm, ratio 0.876), because linear C3D8 bricks on an L/h = 10
+  beam lock in bending and legitimately come out ~12% stiffer. The smoke test says so, so
+  nobody tightens it expecting agreement.
+
+### Not done, with the measurement — `gmsh` (part of #24) and `dftbplus` (#25)
+- **`gmsh` was requested alongside calculix and is excluded.** No headless/nogui build
+  exists on linux-aarch64 (checked all 13 build strings at 4.15.2), so it pulls the full
+  GUI/CAD stack — qt6-main 63 MB, vtk-base 84 MB, occt 26 MB, fltk, viskores and the xorg
+  set — taking this env from **131 to 329 packages**, the catalog's leanest solver image
+  to its heaviest, for a mesher. `python-gmsh` is no escape: noarch, but it depends on the
+  same full `gmsh` and is stale at 4.9.5. It costs D3 nothing, because **a mesh is
+  geometry the test can generate** (the precedent set by `cfd-fv.smoke.py` writing its own
+  SU2 mesh) — categorically unlike pseudopotentials or Slater-Koster files, which are
+  fitted physical data nobody can fabricate.
+- **`dftbplus` (#25) declined on the siesta grounds, now measured directly.** dftb+ 25.1
+  `mpi_openmpi_h934af07_0` installs and the binary runs, but ships **0 `.skf` files**, and
+  no Slater-Koster data package exists anywhere on conda-forge (`dftbplus-data`, `slako`,
+  `dftb-sk`, `3ob`, `mio` all absent). So it could only reach siesta-level verification,
+  which is why GAPS.md excluded it. Unlike `sssp` — an openly licensed conda-forge package
+  that rescued `qe` — SK parameter sets are distributed through dftb.org under
+  click-through terms, so bundling them is a licensing question rather than an engineering
+  one.
+
 ## 2026-10-05
 
 ### Fixed — `dft`: gpaw 26.7 made its MPI backend opt-in, breaking the documented parallel interface (issue #19)

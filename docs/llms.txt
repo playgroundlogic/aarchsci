@@ -39,9 +39,13 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
   - `geo-ml` (381 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
   - `climate` (262 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
-    esmpy, netcdf4, zarr, cdo, nco; atmospheric/climate analysis with GRIB + regridding.
-    cdo and nco are the netCDF/GRIB command-line operators — the CLI complement to the
-    Python stack; both are serial/OpenMP with no MPI, so they add no flavor to the env).
+    esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
+    regridding, plus ocean thermodynamics. cdo and nco are the netCDF/GRIB command-line
+    operators — the CLI complement to the Python stack; both are serial/OpenMP with no
+    MPI, so they add no flavor to the env. gsw is the TEOS-10 Gibbs SeaWater toolbox (the
+    ocean equation of state); it ships the official TEOS-10 check-value table inside the
+    package, so its verification reproduces published reference numbers offline rather
+    than asserting a tolerance band).
   - `pointcloud` (245 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
   - `comp-chem` (210 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
@@ -75,17 +79,33 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
     rendering goes via GLX against Xvfb, which ships in the image).
-  - `astro` (377 pkgs — astropy, photutils, sunpy, healpy, yt, regions, reproject,
-    specutils, astroquery; astronomy/astrophysics analysis. Not an MPI env — this is
+  - `astro` (364 pkgs — astropy, photutils, sunpy, healpy, yt, regions, reproject,
+    specutils, astroquery, rebound; astronomy/astrophysics analysis plus N-body
+    gravitational dynamics (rebound is the env's only simulation code — everything else
+    reduces data). Verified by a method-discriminating energy-conservation ladder over
+    1000 Jupiter orbits of the outer solar system: IAS15 5.0e-15, WHFast 6.1e-08,
+    leapfrog 3.8e-05, and the ORDERING is asserted, so a high-order integrator that has
+    silently degraded to a cruder accuracy class fails. Runs offline — the solar-system
+    dataset is compiled into the extension, no Horizons query. Not an MPI env — this is
     throughput work over many independent images/spectra/catalogs, which is the shape
     that suits cheaper cores. Deliberately offline: the smoke test sets
     `astropy.utils.iers.conf.auto_download = False` and verifies the bundled IERS tables
     instead, so re-enable auto-download yourself if you need sub-ms UT1 for recent dates.
     `astroquery` is the one package in the catalog verified by import alone, because its
     job is querying remote archives).
-  - `fem-cfd` (130 pkgs — fenics-dolfinx, fenics-basix, fenics-ufl, petsc + petsc4py,
-    slepc + slepc4py, openmpi, mpi4py, hdf5/adios2; finite-element PDE solving,
-    MPI-parallel. Verified by solving Poisson on the unit square with an exact-in-the-
+  - `fem-cfd` (131 pkgs — fenics-dolfinx, fenics-basix, fenics-ufl, petsc + petsc4py,
+    slepc + slepc4py, calculix, openmpi, mpi4py, hdf5/adios2; finite-element PDE solving
+    and structural FEA, MPI-parallel. calculix (ccx) reads Abaqus-style `.inp` decks, so
+    it covers the standard engineering problem set from the format most FEA users hold,
+    where dolfinx solves PDEs you write yourself in UFL. Its verification is an exact
+    conservation identity — the clamped-face reaction forces must sum to the applied load
+    to round-off (measured 100.000000 N against 100 N) — plus a deliberately loose
+    Euler-Bernoulli tip-deflection sanity check, loose because linear C3D8 bricks on a
+    stubby beam legitimately come out ~12% stiffer than the slender-beam formula. gmsh is
+    deliberately NOT included: no headless build exists on linux-aarch64, so it would
+    pull qt6/vtk/occt/fltk/xorg and take this env from 131 to 329 packages; the smoke
+    test generates its own mesh instead, which is legitimate because a mesh is geometry
+    rather than fitted physical data. Verified by solving Poisson on the unit square with an exact-in-the-
     space quadratic: P2 must hit L2 error ~1e-14, and P1 must converge at the O(h^2) rate
     (measured ratio 4.000), serially and again on 2 ranks. Two things to know: it
     JIT-compiles C at runtime — FFCx builds a C extension per variational form, which is

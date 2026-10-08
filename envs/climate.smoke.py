@@ -33,7 +33,7 @@ def check(name):
 HEADLINE = [
     "numpy", "pandas", "xarray", "dask", "netCDF4", "zarr",
     "cartopy", "cartopy.crs", "cfgrib", "eccodes", "metpy", "metpy.calc",
-    "xesmf", "esmpy", "cftime", "pyproj",
+    "xesmf", "esmpy", "cftime", "pyproj", "gsw",
 ]
 print("[smoke] 1. imports")
 for mod in HEADLINE:
@@ -189,6 +189,61 @@ def _nco():
         cdo_arr = _mean_field(cdo_out)
         assert np.allclose(nco_arr, cdo_arr), \
             f"cdo {cdo_arr!r} and nco {nco_arr!r} disagree"
+
+
+# --- 5. ocean: TEOS-10 seawater thermodynamics (issue #21) ----------------------
+# gsw is verified against its OWN shipped reference data rather than against a band we
+# invented. The official TEOS-10 check-value table lives inside the installed package
+# (`gsw/tests/gsw_cv_v3_0.npz`), so this reproduces a published number offline, with
+# nothing staged — the standard nwchem's basis sets and sssp's pseudopotentials set.
+print("[smoke] 5. ocean: TEOS-10 (gsw)")
+
+# From the TEOS-10 check values. Documented tolerance on rho is 2.9467628337e-10, so
+# this is an exact-reproduction assertion, not a plausibility range.
+GSW_SA, GSW_CT, GSW_P = 34.4682364305, 27.9964364121, 0.0
+GSW_RHO_EXPECT, GSW_RHO_TOL = 1021.8863044505, 2.9467628337e-10
+
+
+@check("gsw ships the official TEOS-10 check-value table on disk")
+def _gsw_refdata():
+    from pathlib import Path as _P
+    import gsw
+    tbl = _P(gsw.__file__).parent / "tests" / "gsw_cv_v3_0.npz"
+    assert tbl.is_file(), f"TEOS-10 check-value table missing: {tbl}"
+    import numpy as np
+    with np.load(str(tbl)) as d:
+        n = len(d.files)
+    # Presence of the table on disk IS the no-runtime-download check.
+    assert n > 500, f"check-value table has only {n} arrays, expected ~822"
+    print(f"       ({tbl.name}, {tbl.stat().st_size} bytes, {n} arrays)")
+
+
+@check("gsw.rho reproduces the published TEOS-10 check value")
+def _gsw_rho():
+    import gsw
+    rho = float(gsw.rho(GSW_SA, GSW_CT, GSW_P))
+    delta = abs(rho - GSW_RHO_EXPECT)
+    # The published tolerance is ~2.9e-10; allow the quoted value's own 1e-10 rounding
+    # on top of it rather than asserting tighter than the reference is printed.
+    assert delta < max(GSW_RHO_TOL, 1e-9), (
+        f"gsw.rho({GSW_SA}, {GSW_CT}, {GSW_P}) = {rho!r}, expected {GSW_RHO_EXPECT} "
+        f"(delta {delta:.3e}, tolerance {GSW_RHO_TOL:.3e})")
+    print(f"       (rho = {rho:.10f} kg/m^3, delta from published {delta:.2e})")
+
+
+@check("gsw conversions round-trip and respect a physical identity")
+def _gsw_identity():
+    import gsw
+    # Practical salinity -> Absolute salinity -> back must round-trip, and conservative
+    # temperature from in-situ must inverse exactly. Independent of the table above.
+    SP, t, p, lon, lat = 35.0, 15.0, 100.0, -20.0, 40.0
+    SA = gsw.SA_from_SP(SP, p, lon, lat)
+    SP_back = gsw.SP_from_SA(SA, p, lon, lat)
+    assert abs(SP_back - SP) < 1e-9, f"SP round-trip {SP} -> {SA} -> {SP_back}"
+    CT = gsw.CT_from_t(SA, t, p)
+    t_back = gsw.t_from_CT(SA, CT, p)
+    assert abs(t_back - t) < 1e-9, f"t round-trip {t} -> {CT} -> {t_back}"
+    print(f"       (SA={float(SA):.6f} g/kg, CT={float(CT):.6f} C, both round-trip)")
 
 
 # --- verdict --------------------------------------------------------------------

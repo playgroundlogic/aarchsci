@@ -278,7 +278,7 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                 </div>
                 <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
                   <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">climate</span><br>
-                  <strong>262 packages</strong> — atmospheric / climate analysis (GRIB + regridding)
+                  <strong>262 packages</strong> — atmospheric / climate analysis (GRIB + regridding) + ocean thermodynamics
                 </p>
                 <div class="catalog">
                     <span class="chip">xarray</span>
@@ -289,6 +289,7 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                     <span class="chip">xesmf / esmpy</span>
                     <span class="chip">netcdf4 · zarr</span>
                     <span class="chip">cdo · nco</span>
+                    <span class="chip">gsw (TEOS-10)</span>
                 </div>
                 <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
                   <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">pointcloud</span><br>
@@ -424,7 +425,7 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                 </p>
                 <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
                   <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">astro</span><br>
-                  <strong>377 packages</strong> &mdash; the Astropy ecosystem, for astronomy and astrophysics
+                  <strong>364 packages</strong> &mdash; the Astropy ecosystem, for astronomy and astrophysics, plus N-body dynamics
                 </p>
                 <div class="catalog">
                     <span class="chip">astropy 8</span>
@@ -436,6 +437,7 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                     <span class="chip">reproject</span>
                     <span class="chip">specutils</span>
                     <span class="chip">astroquery</span>
+                    <span class="chip">rebound (N-body)</span>
                 </div>
                 <p class="footer-note" style="margin-top:0.75rem;">
                   Astronomy is unusually kind to a functional test, because so many of its numbers
@@ -451,7 +453,7 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                 </p>
                 <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
                   <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">fem-cfd</span><br>
-                  <strong>130 packages</strong> &mdash; FEniCSx: finite-element PDE solving, MPI-parallel
+                  <strong>131 packages</strong> &mdash; FEniCSx + CalculiX: finite-element PDE solving and structural FEA, MPI-parallel
                 </p>
                 <div class="catalog">
                     <span class="chip">fenics-dolfinx</span>
@@ -462,6 +464,7 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                     <span class="chip">OpenMPI</span>
                     <span class="chip">mpi4py</span>
                     <span class="chip">HDF5 / ADIOS2</span>
+                    <span class="chip">CalculiX</span>
                 </div>
                 <p class="footer-note" style="margin-top:0.75rem;">
                   The finite-element method hands you a way to test it exactly: if the PDE's true

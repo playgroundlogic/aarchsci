@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.10.07.143955   Builder: 0dbc90e
-# lock-hash: b1f81078a193   packages: 363
+# Source spec: envs/astro.yaml   Built: 2026.10.08.004818   Builder: c7372fe
+# lock-hash: db3722654df8   packages: 364
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -181,7 +181,7 @@ libgcc-ng 16.2.0
 libgdal-core 3.13.3
 libgfortran 16.2.0
 libgfortran5 16.2.0
-libglib 2.90.0
+libglib 2.90.1
 libgomp 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
@@ -299,6 +299,7 @@ qhull 2020.2
 rasterio 1.5.2
 re2 2025.11.05
 readline 8.3
+rebound 5.0.1
 regions 0.12
 reproject 0.21.0
 requests 2.34.2

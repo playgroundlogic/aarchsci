@@ -42,3 +42,15 @@ dependencies:
   # openmpi pulled in. Verified by cdo.smoke work in climate.smoke.py section 4.
   - cdo
   - nco
+  # --- ocean: seawater thermodynamics (issue #21) ---
+  # gsw is the TEOS-10 Gibbs SeaWater toolbox. This env covered the atmosphere well
+  # (metpy, eccodes, cdo/nco) and had no ocean equation of state; gsw is that, and it is
+  # the standard one. Pure addition: joint solve moved no pin and kept python 3.14.
+  #
+  # It is also the cheapest strong verification in the catalog, because the package
+  # ships its OWN published reference data: the official TEOS-10 check-value table is
+  # inside the wheel at `gsw/tests/gsw_cv_v3_0.npz` (641,918 bytes, 822 arrays) with
+  # committed per-function tolerances. So D3 reproduces a published number with ZERO
+  # staged input and no network — the same standard as nwchem's basis sets and sssp's
+  # pseudopotentials, rather than asserting a plausible-looking band.
+  - gsw

@@ -61,15 +61,15 @@ has the full retention policy and the four dead digests).
 | [`geospatial`](envs/geospatial.yaml) | 125 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
 | [`earth-observation`](envs/earth-observation.yaml) | 261 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr |
 | [`geo-ml`](envs/geo-ml.yaml) | 381 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader |
-| [`climate`](envs/climate.yaml) | 262 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco |
+| [`climate`](envs/climate.yaml) | 262 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
 | [`pointcloud`](envs/pointcloud.yaml) | 245 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
 | [`comp-chem`](envs/comp-chem.yaml) | 210 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb, vina |
 | [`dft`](envs/dft.yaml) | 239 | gpaw, siesta, psi4, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 227 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
 | [`viz`](envs/viz.yaml) | 245 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
 | [`r`](envs/r.yaml) | 328 | R 4.5 + tidyverse, data.table, arrow, sf, terra, glmnet, randomForest, caret, knitr/rmarkdown + pandoc, Rcpp |
-| [`astro`](envs/astro.yaml) | 377 | astropy, photutils, sunpy, healpy, yt, regions, reproject, specutils, astroquery |
-| [`fem-cfd`](envs/fem-cfd.yaml) | 130 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), OpenMPI, mpi4py, HDF5/ADIOS2 |
+| [`astro`](envs/astro.yaml) | 364 | astropy, photutils, sunpy, healpy, yt, regions, reproject, specutils, astroquery, rebound |
+| [`fem-cfd`](envs/fem-cfd.yaml) | 131 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), CalculiX, OpenMPI, mpi4py, HDF5/ADIOS2 |
 | [`cfd-fv`](envs/cfd-fv.yaml) | 57 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
 
 `dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes

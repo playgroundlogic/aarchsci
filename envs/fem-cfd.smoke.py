@@ -40,7 +40,9 @@ import platform
 import shutil
 import subprocess
 import sys
+import tempfile
 import traceback
+from pathlib import Path
 
 FAILURES = []
 CHILD = os.environ.get("AARCHSCI_MPI_CHILD") == "1"
@@ -536,6 +538,155 @@ def _io():
     n2 = msh2.topology.index_map(msh2.topology.dim).size_global
     assert n1 == n2 == 32, f"cell count changed across I/O: {n1} -> {n2} (expected 32)"
     print(f"       ({h5.stat().st_size} bytes HDF5, {n2} cells read back)")
+
+
+# --- 9. solid mechanics: CalculiX on a generated Abaqus deck (issue #24) -----------
+# ccx is driven as a BINARY on an `.inp` deck, which is how its users actually drive it.
+# conda-forge's calculix ships no meshes or example decks, and no mesher is installed
+# (see fem-cfd.yaml on why gmsh is excluded), so this test writes its own cantilever —
+# legitimate because a mesh is geometry, not fitted physical data. Same precedent as
+# cfd-fv.smoke.py generating its SU2 mesh; the opposite of siesta, where the missing
+# thing is a pseudopotential nobody can fabricate.
+#
+# TWO checks, and the distinction between them is the point:
+#
+#   1. EXACT — global force equilibrium. The sum of the z reaction forces at the clamped
+#      face must equal the applied load to round-off. That is a conservation identity the
+#      solver cannot approximate its way around, and it is the real assertion here
+#      (measured: sum = 100.0000 N against 100 N applied).
+#
+#   2. APPROXIMATE, and honestly labelled — Euler-Bernoulli tip deflection. The beam is
+#      L/h = 10 and meshed with linear C3D8 bricks, which lock in bending, so the FE
+#      answer is legitimately ~12% STIFFER than the slender-beam formula (measured FE
+#      0.1668 mm vs EB 0.1905 mm). The tolerance is therefore wide ON PURPOSE. Do not
+#      tighten it expecting agreement; the physics of linear bricks on a stubby beam
+#      says they will not agree. It is a magnitude/sign sanity check, nothing more.
+print("[smoke] 9. solid mechanics (CalculiX on a generated deck)")
+
+CCX_L, CCX_B, CCX_H = 100.0, 10.0, 10.0      # mm
+CCX_E, CCX_NU = 210000.0, 0.3                # MPa (steel)
+CCX_LOAD = 100.0                             # N, downward at the free end
+CCX_NX, CCX_NY, CCX_NZ = 20, 2, 2
+
+
+def _ccx_deck(path):
+    """Write a clamped-free cantilever of C3D8 bricks. Returns (nodes, elems, tipnodes)."""
+    nid, nodes, n = {}, [], 0
+    for k in range(CCX_NZ + 1):
+        for j in range(CCX_NY + 1):
+            for i in range(CCX_NX + 1):
+                n += 1
+                nid[(i, j, k)] = n
+                nodes.append((n, CCX_L * i / CCX_NX, CCX_B * j / CCX_NY, CCX_H * k / CCX_NZ))
+    els = []
+    for k in range(CCX_NZ):
+        for j in range(CCX_NY):
+            for i in range(CCX_NX):
+                # C3D8 ordering: bottom face counter-clockwise, then the top face.
+                els.append((len(els) + 1, [
+                    nid[(i, j, k)],     nid[(i + 1, j, k)],
+                    nid[(i + 1, j + 1, k)], nid[(i, j + 1, k)],
+                    nid[(i, j, k + 1)], nid[(i + 1, j, k + 1)],
+                    nid[(i + 1, j + 1, k + 1)], nid[(i, j + 1, k + 1)],
+                ]))
+    fix = [nid[(0, j, k)] for k in range(CCX_NZ + 1) for j in range(CCX_NY + 1)]
+    tip = [nid[(CCX_NX, j, k)] for k in range(CCX_NZ + 1) for j in range(CCX_NY + 1)]
+    with open(path, "w") as f:
+        f.write("*NODE\n")
+        for i, x, y, z in nodes:
+            f.write(f"{i}, {x:.6f}, {y:.6f}, {z:.6f}\n")
+        f.write("*ELEMENT, TYPE=C3D8, ELSET=EALL\n")
+        for i, c in els:
+            f.write(f"{i}, " + ", ".join(str(v) for v in c) + "\n")
+        f.write("*NSET, NSET=FIX\n" + ",\n".join(str(i) for i in fix) + "\n")
+        f.write("*NSET, NSET=TIP\n" + ",\n".join(str(i) for i in tip) + "\n")
+        f.write(f"*MATERIAL, NAME=STEEL\n*ELASTIC\n{CCX_E}, {CCX_NU}\n")
+        f.write("*SOLID SECTION, ELSET=EALL, MATERIAL=STEEL\n")
+        f.write("*STEP\n*STATIC\n*BOUNDARY\nFIX, 1, 3, 0.\n")
+        f.write(f"*CLOAD\nTIP, 3, {-CCX_LOAD / len(tip):.10f}\n")
+        f.write("*NODE PRINT, NSET=TIP\nU\n*NODE PRINT, NSET=FIX\nRF\n*END STEP\n")
+    return len(nodes), len(els), len(tip)
+
+
+def _ccx_blocks(dat_text):
+    """Parse ccx .dat into {'displacements': [(node, x, y, z)], 'forces': [...]}."""
+    out, cur = {}, None
+    for line in dat_text.splitlines():
+        low = line.strip().lower()
+        if low.startswith("displacements"):
+            cur = out.setdefault("displacements", []); continue
+        if low.startswith("forces"):
+            cur = out.setdefault("forces", []); continue
+        parts = line.split()
+        if cur is not None and len(parts) == 4:
+            try:
+                cur.append((int(parts[0]), *(float(v) for v in parts[1:])))
+            except ValueError:
+                pass
+    return out
+
+
+CCX_RESULT = {}
+
+
+@check("calculix solves a generated cantilever deck to a clean exit")
+def _ccx_run():
+    ccx = shutil.which("ccx") or shutil.which("ccx_2.23")
+    assert ccx, "no ccx binary on PATH"
+    d = Path(tempfile.mkdtemp())
+    nn, ne, nt = _ccx_deck(d / "beam.inp")
+    proc = subprocess.run([ccx, "beam"], cwd=str(d), capture_output=True, text=True,
+                          timeout=900)
+    out = proc.stdout + proc.stderr
+    assert "Job finished" in out, f"ccx did not finish cleanly (rc={proc.returncode}):\n{out[-1200:]}"
+    dat = (d / "beam.dat")
+    assert dat.is_file(), "ccx produced no .dat results file"
+    blocks = _ccx_blocks(dat.read_text())
+    assert blocks.get("displacements"), f"no displacements in .dat:\n{dat.read_text()[:600]}"
+    assert blocks.get("forces"), "no reaction forces in .dat"
+    CCX_RESULT.update(blocks=blocks, nn=nn, ne=ne, nt=nt)
+    print(f"       ({nn} nodes, {ne} C3D8 elements, {nt} loaded tip nodes)")
+
+
+@check("calculix reaction forces balance the applied load exactly (equilibrium identity)")
+def _ccx_equilibrium():
+    b = CCX_RESULT.get("blocks")
+    assert b, "ccx run did not produce results; nothing to check"
+    fz = sum(r[3] for r in b["forces"])
+    fx = sum(r[1] for r in b["forces"])
+    fy = sum(r[2] for r in b["forces"])
+    # Newton's third law, not an approximation: the clamped face must react exactly the
+    # load applied at the tip. Relative tolerance only to absorb print precision.
+    assert abs(fz - CCX_LOAD) / CCX_LOAD < 1e-6, (
+        f"z reactions sum to {fz:.6f} N, applied load is {CCX_LOAD} N — equilibrium "
+        "violated, the solve is wrong")
+    # No load was applied in x or y, so those reactions must cancel.
+    assert abs(fx) / CCX_LOAD < 1e-6, f"spurious x reaction {fx:.3e} N"
+    assert abs(fy) / CCX_LOAD < 1e-6, f"spurious y reaction {fy:.3e} N"
+    print(f"       (sum Fz = {fz:.6f} N vs {CCX_LOAD} N applied; Fx={fx:.1e}, Fy={fy:.1e})")
+
+
+@check("calculix tip deflection is physical and near the Euler-Bernoulli estimate")
+def _ccx_deflection():
+    b = CCX_RESULT.get("blocks")
+    assert b, "ccx run did not produce results; nothing to check"
+    wz = [r[3] for r in b["displacements"]]
+    tip = sum(wz) / len(wz)
+    # Closed form for an end-loaded cantilever: delta = P L^3 / (3 E I), I = b h^3 / 12.
+    I = CCX_B * CCX_H ** 3 / 12.0
+    eb = CCX_LOAD * CCX_L ** 3 / (3.0 * CCX_E * I)
+    assert tip < 0, f"tip deflected {tip:+.6f} mm — wrong sign for a downward load"
+    # 30% band, and deliberately wide: see the section comment. Linear C3D8 bricks on an
+    # L/h = 10 beam lock in bending, measured ~12% stiffer than the slender-beam formula.
+    ratio = abs(tip) / eb
+    assert 0.7 < ratio < 1.3, (
+        f"tip deflection {tip:.6f} mm vs Euler-Bernoulli {-eb:.6f} mm (ratio {ratio:.3f}) "
+        "— outside the band even allowing for linear-brick stiffening")
+    # The loaded cross-section should stay essentially planar.
+    spread = (max(wz) - min(wz)) / abs(tip)
+    assert spread < 0.01, f"tip cross-section not planar: spread {spread:.2%}"
+    print(f"       (tip {tip:.6f} mm vs EB {-eb:.6f} mm, ratio {ratio:.3f}, "
+          f"section spread {spread:.3%})")
 
 
 # --- verdict ----------------------------------------------------------------------
