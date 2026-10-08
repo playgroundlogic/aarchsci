@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.10.08.032350   Builder: 206d96a
-# lock-hash: dd975a7ffb44   packages: 345
+# Source spec: envs/single-cell.yaml   Built: 2026.10.08.144556   Builder: ab42cc8
+# lock-hash: ff275bd07c2f   packages: 345
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -139,7 +139,7 @@ openjpeg 2.5.4
 openssl 3.6.5
 packaging 26.3
 pandas 3.0.6
-pandoc 3.12
+pandoc 3.12.1
 pango 1.58.2
 patsy 1.0.3
 pcre2 10.47
