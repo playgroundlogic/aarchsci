@@ -3,6 +3,70 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-08 (later)
+
+### Changed — base image bumped to Debian 13 / glibc 2.41, unblocking `md` (#18)
+**All 13 envs rebuilt and re-verified on the new base. 13 of 13 pass D3; zero failures.**
+
+- **`builder/Dockerfile`: `mambaorg/micromamba:1.5.8` → `2.9.0-debian13`** — Debian 12
+  (glibc 2.36) → Debian 13 trixie (glibc **2.41**). conda-forge's lammps aarch64 build
+  began requiring `GLIBC_2.38`, so `liblammps.so.0` could not load and `md` failed the D3
+  gate every day from 2026-09-20 (18 consecutive publish failures). Measured with the
+  *identical* package build `cpu_py314_h690e7ab_mpi_openmpi_6`: exit 1 with
+  ``version `GLIBC_2.38' not found`` on 2.36, exit 0 on 2.41 — glibc was the sole
+  discriminator. `2.0.5` and `2.3.0` are still bookworm/2.36, so this needed a distro
+  bump, not just a newer micromamba.
+- **The tag pins micromamba version AND distro on purpose.** `latest` had already moved
+  Debian 12 → 13 underneath us; a shared base drifting silently is exactly what this
+  project exists to catch, so the glibc floor is now explicit and changing it is a
+  deliberate edit.
+
+**The bump needed two more fixes that only appeared by building, and both are worth
+recording because neither failure pointed at the base image.**
+
+- **`builder/build-env.sh`: the lock reader now accepts both `list --json` shapes.**
+  micromamba 2.x changed the output from a bare array to
+  `{"log_history": [...], "packages": [...]}`. The old parser iterated the dict's *keys*,
+  hit `AttributeError` on a string, and died with "could not read installed package list"
+  — which would have broken lock generation for **all 13 envs**, with a message naming
+  nothing relevant.
+- **`builder/Dockerfile`: delete dangling symlinks under `pkgs` before `clean`.**
+  micromamba 2.9's cleaner stats every file and *aborts* on a broken symlink
+  (`critical libmamba filesystem error: cannot get file size`). conda-forge's ambertools
+  ships `bin/amber.conda` and `bin/amber.python` pointing at paths it does not contain
+  (37 dangling links under `pkgs` on `md`, from ambertools plus sysroot and freetype).
+  micromamba 1.5.8 tolerated them. So `md` — the sole ambertools env, and the entire
+  reason for this bump — failed at **install** time rather than in D3. Scoped to
+  `/opt/conda/pkgs`, which is deleted on the next line anyway, so the runtime prefix is
+  untouched; the prefix keeps its 2 pre-existing ambertools dangling links, which every
+  published `md` has always shipped. Chosen over `clean --all --yes || true` so that
+  `clean` can still fail the build for a genuine reason instead of being blanket-ignored.
+
+**Checked rather than assumed:** `geospatial` dropped 125 → 110 packages, which looked
+like the lock might have stopped recording the full resolved set — a silent
+reproducibility regression. It had not: on a control install `conda-meta` records == 30 ==
+`list --json` packages, so `micromamba list` still reports everything and the drop is a
+genuine resolve change on the newer base.
+
+**What the bump actually changed, separated from what was merely mis-documented** — the
+first draft of this entry credited the bump with every count change, which was wrong.
+Comparing package lists rather than totals:
+
+- **Moved by the rebuild:** `md` 227 → **245** (+18 — lammps's dependency tree now
+  resolving properly) and `fem-cfd` 131 → 130. Five more changed package *content* at an
+  unchanged total: `climate`, `comp-chem`, `geo-ml`, `r`, `viz`.
+- **Already current in the locks; the docs were stale:** `geospatial` (README said 125,
+  lock already 110), `earth-observation` (261 → 246), `geo-ml` (381 → 367), `pointcloud`
+  (245 → 234), `comp-chem` (210 → 207), `cfd-fv` (57 → 56), `viz` (245 → 244), and `dft`
+  (239 → 236 — stale within hours of being written this morning).
+
+That second list is a systemic issue rather than a one-off: the reconciler updates
+`envs/*.lock.txt` on every drift, but the package counts in README, `docs/llms.txt` and
+`docs/index.html` are hand-written and nothing reconciles them, so they rot silently.
+`docs/index.html` had drifted furthest — it claimed 236 for `earth-observation` and 287
+for `pointcloud`. All three documents are now generated from the locks and correct; making
+that automatic is the real fix and is not done here.
+
 ## 2026-10-08
 
 ### Added — `gsw` to climate (#21), `rebound` to astro (#22), `calculix` to fem-cfd (#24)

@@ -32,11 +32,11 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
 
 - Direct pull: `docker pull quay.io/aarchsci/<env>:latest`
 - Available envs (all native arm64, verified, signed, public):
-  - `geospatial` (125 pkgs — gdal, proj, geos, rasterio, fiona, shapely, pyproj,
+  - `geospatial` (110 pkgs — gdal, proj, geos, rasterio, fiona, shapely, pyproj,
     scikit-image, numpy, scipy).
-  - `earth-observation` (261 pkgs — geospatial base + xarray, dask, rioxarray,
+  - `earth-observation` (246 pkgs — geospatial base + xarray, dask, rioxarray,
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
-  - `geo-ml` (381 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
+  - `geo-ml` (367 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
   - `climate` (262 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
@@ -46,12 +46,12 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     ocean equation of state); it ships the official TEOS-10 check-value table inside the
     package, so its verification reproduces published reference numbers offline rather
     than asserting a tolerance band).
-  - `pointcloud` (245 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
+  - `pointcloud` (234 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
-  - `comp-chem` (210 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
+  - `comp-chem` (207 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, xtb-python, vina; cheminformatics + MD + quantum chemistry
     + docking).
-  - `dft` (239 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
+  - `dft` (236 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
     libvdwxc, elpa, scalapack, fftw, openmpi, mpi4py, spglib, phonopy, pymatgen; plane-wave/
     LCAO density-functional theory plus Gaussian-basis quantum chemistry, MPI-parallel. Run
     in parallel with
@@ -64,7 +64,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     nwchem is pinned to the `mpi_ts` (two-sided) ARMCI network, which works on 1, 2 and 4
     ranks with a container's default 64 MB `/dev/shm`; the `mpi_pr` progress-ranks variant
     aborts on 1 rank and exhausts `/dev/shm` on 3).
-  - `md` (227 pkgs — gromacs, lammps, ambertools, openmpi, mpi4py, mdanalysis, mdtraj,
+  - `md` (245 pkgs — gromacs, lammps, ambertools, openmpi, mpi4py, mdanalysis, mdtraj,
     parmed; classical molecular dynamics, MPI-parallel. Two caveats: the gromacs binary
     is `gmx_mpi`, not `gmx`, and conda-forge builds it `ARM_NEON_ASIMD`, so it uses NEON
     and leaves SVE/SVE2 idle on Graviton 3+. `pmemd` is not included — paid Amber
@@ -75,7 +75,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the R 4.5 line on purpose: r-base reaches 4.6.1 on arm64 but ZERO of conda-forge's
     3162 linux-aarch64 `r-*` packages have an r46 build, and `r-base=4.6.1 r-tidyverse`
     does not solve at all).
-  - `viz` (245 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
+  - `viz` (244 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
     rendering goes via GLX against Xvfb, which ships in the image).
@@ -93,7 +93,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     instead, so re-enable auto-download yourself if you need sub-ms UT1 for recent dates.
     `astroquery` is the one package in the catalog verified by import alone, because its
     job is querying remote archives).
-  - `fem-cfd` (131 pkgs — fenics-dolfinx, fenics-basix, fenics-ufl, petsc + petsc4py,
+  - `fem-cfd` (130 pkgs — fenics-dolfinx, fenics-basix, fenics-ufl, petsc + petsc4py,
     slepc + slepc4py, calculix, openmpi, mpi4py, hdf5/adios2; finite-element PDE solving
     and structural FEA, MPI-parallel. calculix (ccx) reads Abaqus-style `.inp` decks, so
     it covers the standard engineering problem set from the format most FEA users hold,
@@ -113,7 +113,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     NVPL (NVIDIA Performance Libraries, CPU-only Arm math), the only env here where that
     is true. su2 is deliberately excluded from THIS env — its arm64 builds stop at py311
     and would cap the whole env's interpreter — and lives in its own `cfd-fv` env instead).
-  - `cfd-fv` (57 pkgs — su2 (SU2_CFD, finite-volume CFD), openmpi, mpi4py, on python 3.11;
+  - `cfd-fv` (56 pkgs — su2 (SU2_CFD, finite-volume CFD), openmpi, mpi4py, on python 3.11;
     compressible/aerodynamic CFD, MPI-parallel. A second CFD culture alongside fem-cfd's
     finite-element solving. Its own env because su2's arm64 builds cap python at 3.11.
     Verified by a real Euler solve on a self-generated DISTORTED mesh: free-stream must be

@@ -1,5 +1,5 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.10.08.004818   Builder: c7372fe
+# Source spec: envs/astro.yaml   Built: 2026.10.08.014728   Builder: 452fcfd
 # lock-hash: db3722654df8   packages: 364
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5

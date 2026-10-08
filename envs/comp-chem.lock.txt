@@ -1,13 +1,13 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.10.07.143952   Builder: 0dbc90e
-# lock-hash: 9c63ea9ff97d   packages: 207
+# Source spec: envs/comp-chem.yaml   Built: 2026.10.08.014316   Builder: 452fcfd
+# lock-hash: b917270f3e80   packages: 207
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
 ase 3.29.0
 aws-c-auth 1.0.0
 aws-c-cal 1.0.0
-aws-c-common 1.0.2
+aws-c-common 1.0.3
 aws-c-compression 1.0.0
 aws-c-http 1.0.0
 aws-c-io 1.0.0
@@ -88,7 +88,7 @@ libgcc 16.2.0
 libgcc-ng 16.2.0
 libgfortran 16.2.0
 libgfortran5 16.2.0
-libglib 2.90.0
+libglib 2.90.1
 libgomp 16.2.0
 libharfbuzz 14.6.0
 libiconv 1.18

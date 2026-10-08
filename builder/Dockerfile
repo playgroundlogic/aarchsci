@@ -14,7 +14,25 @@
 #
 # Base: micromamba (multi-arch). On a NATIVE arm64 host this resolves the
 # linux-aarch64 conda-forge packages with NO emulation (D1).
-ARG MAMBA_VERSION=1.5.8
+#
+# The tag names BOTH the micromamba version and the distro on purpose, so the glibc
+# floor is explicit and a distro bump is a deliberate edit rather than drift. Do not
+# use `latest`: it moved from Debian 12 to 13 under us, which is exactly the kind of
+# silent change this project is built to catch.
+#
+# Pinned to Debian 13 (trixie, glibc 2.41) as of 2026-10-08 — issue #18. The previous
+# base was `1.5.8` (Debian 12, glibc 2.36) and conda-forge's lammps aarch64 build began
+# requiring GLIBC_2.38, so `liblammps.so.0` would not load and `md` failed the D3 gate
+# every day from 2026-09-20. Measured with the IDENTICAL package build
+# (`cpu_py314_h690e7ab_mpi_openmpi_6`): exit 1 with "version `GLIBC_2.38' not found" on
+# 2.36, exit 0 on 2.41. Note `2.0.5` and `2.3.0` are still bookworm/2.36, so this needed
+# a distro bump, not merely a newer micromamba.
+#
+# Second-order cost of that bump, recorded because it cost real debugging: micromamba 2.x
+# changed `list --json` from a bare array to `{"log_history":..., "packages":[...]}`,
+# which silently broke the lock reader in build-env.sh for every env until that parser
+# was taught both shapes.
+ARG MAMBA_VERSION=2.9.0-debian13
 FROM mambaorg/micromamba:${MAMBA_VERSION}
 
 # Env identity — provided by build-env.sh.
@@ -54,7 +72,29 @@ COPY ${ENV_FILE} /opt/aarchsci/env.yaml
 # prefix and stored once in the layer tar, so the win is NOT the ~2.2GB `du -sm
 # /opt/conda/pkgs` suggests. Measured on `r`: 3.51GB -> 3.22GB, i.e. 290MB. Small, free,
 # and applies to every env.
+#
+# The `find -xtype l -delete` is NOT tidying, it is what lets `clean` run at all on the
+# 2.x base, and it is deliberately scoped to the pkgs cache. micromamba 2.9's cleaner
+# stats every file and ABORTS on a dangling symlink:
+#
+#   critical libmamba filesystem error: cannot get file size: No such file or directory
+#   [/opt/conda/pkgs/.../ambertools-26.0-.../bin/amber.conda]
+#
+# micromamba 1.5.8 tolerated those; 2.9 exits 1 and fails the whole build. conda-forge's
+# ambertools ships `bin/amber.conda` and `bin/amber.python` as symlinks to paths that do
+# not exist in the package, and sysroot/freetype contribute more (37 under pkgs on `md`).
+# Only `md` installs ambertools, so this bit exactly one env — and it bit at INSTALL time,
+# not in D3, which is a confusing place to debug a base-image change from.
+#
+# Scoped to `/opt/conda/pkgs` on purpose: that tree is deleted on the next line anyway, so
+# nothing in the runtime prefix is touched. The prefix keeps its own 2 dangling ambertools
+# symlinks, which are pre-existing, harmless, and present in every published `md` to date —
+# removing them would be an unrelated change to what the package ships.
+#
+# Chosen over `clean --all --yes || true` so that `clean` can still fail the build for a
+# genuine reason instead of being blanket-ignored.
 RUN micromamba install -y -n base -f /opt/aarchsci/env.yaml \
+    && find /opt/conda/pkgs -xtype l -delete \
     && micromamba clean --all --yes \
     && rm -rf /opt/conda/pkgs
 

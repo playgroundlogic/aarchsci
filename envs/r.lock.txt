@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.10.07.143952   Builder: 0dbc90e
-# lock-hash: 9988b13da86d   packages: 328
+# Source spec: envs/r.yaml   Built: 2026.10.08.013658   Builder: 452fcfd
+# lock-hash: 874e9308c22b   packages: 328
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -55,7 +55,7 @@ gxx_linux-aarch64 16.2.0
 harfbuzz 14.6.0
 icu 78.3
 json-c 0.18
-kernel-headers_linux-aarch64 5.14.0
+kernel-headers_linux-aarch64 6.12.0
 keyutils 1.6.3
 krb5 1.22.2
 ld_impl_linux-aarch64 2.46.1
@@ -88,7 +88,7 @@ libgcc-ng 16.2.0
 libgdal-core 3.13.3
 libgfortran 16.2.0
 libgfortran5 16.2.0
-libglib 2.90.0
+libglib 2.90.1
 libgomp 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
@@ -314,7 +314,7 @@ s2n 1.7.5
 sed 4.10
 snappy 1.2.2
 sqlite 3.53.4
-sysroot_linux-aarch64 2.34
+sysroot_linux-aarch64 2.39
 tk 8.6.13
 tktable 2.10
 tzdata 2026c

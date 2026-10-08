@@ -105,9 +105,18 @@ LIST_JSON="$(docker run --rm --platform "$PLATFORM" "$TMP_IMAGE" \
 RESOLVED="$(printf '%s' "$LIST_JSON" | "${PY[@]}" -c '
 import json, sys
 try:
-    pkgs = json.load(sys.stdin)
+    data = json.load(sys.stdin)
 except Exception:
     sys.exit(1)
+# Two shapes, because micromamba changed this between the 1.x and 2.x bases:
+#   1.5.x  ->  [ {name, version, ...}, ... ]            (bare array)
+#   2.9.x  ->  {"log_history": [], "packages": [...]}   (wrapped)
+# Accept either. This is load-bearing, not defensive padding: the base bump to
+# 2.9.0-debian13 (for lammps GLIBC_2.38, issue #18) changed the shape, and the old
+# parser did not fail cleanly on it — it iterated the dict KEYS, hit AttributeError on
+# a string, and the build died with "could not read installed package list" for EVERY
+# env. Tolerating both also means the parser is not pinned to one base image.
+pkgs = data.get("packages", []) if isinstance(data, dict) else data
 for p in sorted(pkgs, key=lambda x: x.get("name", "")):
     n, v = p.get("name", ""), p.get("version", "")
     if n:

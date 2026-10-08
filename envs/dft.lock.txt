@@ -1,5 +1,5 @@
 # dft — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/dft.yaml   Built: 2026.10.08.011929   Builder: 5276f04
+# Source spec: envs/dft.yaml   Built: 2026.10.08.014414   Builder: 452fcfd
 # lock-hash: 5a9e0591c5c7   packages: 236
 # Regenerate with: ./builder/build-env.sh dft
 _openmp_mutex 4.5
