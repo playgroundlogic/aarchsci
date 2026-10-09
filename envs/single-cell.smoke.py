@@ -75,6 +75,9 @@ def _fixture():
 HEADLINE = [
     "numpy", "scipy", "pandas", "sklearn", "h5py",
     "scanpy", "anndata",
+    # skmisc backs scanpy's seurat_v3 HVG flavour. Imported here AND exercised in
+    # section 3, because scanpy imports it lazily — see issue #28.
+    "skmisc", "skmisc.loess",
     # Named explicitly because a bare `scanpy` solve does NOT pull them, and an env
     # missing them loads data fine and then dies at the clustering step.
     "leidenalg", "igraph",
@@ -150,6 +153,32 @@ def _scanpy_cluster():
     STATE["truth"] = truth
     STATE["X"] = X
     print(f"       (clusters={k}, ARI vs planted truth = {ari:.4f})")
+
+
+@check("scanpy's recommended seurat_v3 HVG flavour runs (needs scikit-misc)")
+def _hvg_seurat_v3():
+    import anndata
+    import numpy as np
+    import scanpy as sc
+    X = STATE.get("X")
+    assert X is not None, "the fixture was not built"
+    # seurat_v3 expects RAW COUNTS and imports skmisc.loess lazily, so this call is the
+    # only thing that proves scikit-misc is present and working. An import-only check
+    # cannot see it: that is exactly how issue #28 shipped unnoticed.
+    a = anndata.AnnData(X.copy())
+    n_top = 50
+    sc.pp.highly_variable_genes(a, flavor="seurat_v3", n_top_genes=n_top)
+    assert "highly_variable" in a.var, "seurat_v3 produced no highly_variable column"
+    n_hvg = int(a.var["highly_variable"].sum())
+    assert n_hvg == n_top, f"asked for {n_top} HVGs, got {n_hvg}"
+    # The flavour's own output columns must be finite — a broken loess surfaces here.
+    for col in ("variances", "variances_norm"):
+        assert col in a.var, f"seurat_v3 did not produce {col}"
+        assert np.isfinite(a.var[col]).all(), f"{col} contains non-finite values"
+    # The planted gene blocks are the variable ones, so the HVGs should concentrate in
+    # them rather than being spread uniformly — a weak but real correctness signal.
+    import skmisc
+    print(f"       (seurat_v3: {n_hvg} HVGs via skmisc loess, all variances finite)")
 
 
 # --- 4. Seurat clusters THE SAME BYTES, and the two are compared ------------------

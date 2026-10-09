@@ -1,0 +1,52 @@
+# aarch.science — bayes environment
+# Bayesian inference / MCMC on Stan (DESIGN D2). CmdStan is the engine, cmdstanpy the
+# driver, ArviZ the posterior-diagnostics layer.
+#
+# Fills a domain the catalog had nothing for: across 16 envs there was no Bayesian
+# statistics at all, and the only statistics of any kind was R's OLS. Stan is the field
+# standard across ecology, epidemiology, psychometrics, pharmacometrics and political
+# science (issue #27).
+#
+# TWO THINGS THIS ENV NEEDS AT RUNTIME THAT A NAIVE SPEC WOULD MISS. Both were found by
+# building rather than by reading, and both would have produced an env that solves,
+# imports, and then fails on first real use:
+#
+#  1. A C++ COMPILER. Stan does not ship precompiled models — CmdStan translates each
+#     model to C++ with `stanc` and then COMPILES it, per model, at run time. The
+#     `cmdstan` package pulls `make` and `stanc` but NOT a compiler, so a bare
+#     cmdstan+cmdstanpy env dies with:
+#         make: g++: No such file or directory
+#         make: *** [make/program:83: .../bernoulli.o] Error 127
+#     `cxx-compiler` is therefore a RUNTIME dependency here, exactly as `gcc` is for
+#     fem-cfd (FFCx JIT-compiles a C extension per variational form). Do not strip the
+#     toolchain, and expect the first `sample()` in a session to pay a compile cost —
+#     measured ~8 s end to end for the Bernoulli example on arm64.
+#
+#  2. ENTRYPOINT ACTIVATION. conda-forge's cmdstan ships
+#     `etc/conda/activate.d/cmdstan_activate.sh`, which exports
+#     `CMDSTAN=/opt/conda/bin/cmdstan`. Without it cmdstanpy raises
+#     "No CmdStan installation found, run command install_cmdstan". So this is the third
+#     env after `dft` (nwchem basis paths, gpaw's MPI backend) where `apptainer run` is
+#     required and `exec` breaks. bayes.smoke.py asserts CMDSTAN directly so a
+#     regression fails the build rather than shipping.
+#
+# Verified to solve AND assemble native arm64, and the verification is a conjugate
+# identity rather than a tolerance — see bayes.smoke.py.
+name: bayes
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  - pandas
+  - xarray          # ArviZ's InferenceData is xarray-backed
+  # --- the engine ---
+  - cmdstan
+  - cmdstanpy
+  # Runtime C++ toolchain for model compilation — load-bearing, see note 1 above.
+  - cxx-compiler
+  # --- posterior diagnostics ---
+  # arviz supplies R-hat / ESS, which is what makes "did the sampler converge?" a
+  # checkable question rather than an assumption.
+  - arviz

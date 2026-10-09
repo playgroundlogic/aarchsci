@@ -54,6 +54,16 @@ dependencies:
   - leidenalg
   - python-igraph
   - umap-learn
+  # scikit-misc is required by scanpy's RECOMMENDED HVG flavour,
+  # `highly_variable_genes(flavor="seurat_v3")`, which imports `skmisc.loess` LAZILY.
+  # Without it the env solves, `import scanpy` succeeds, and the failure arrives only
+  # when that flavour is called — i.e. after the user has done the expensive part
+  # (issue #28, measured against the 2026.10.08 build of this image). scanpy's own
+  # tutorials steer users to `seurat_v3`, so an env that cannot run it is misleading
+  # rather than merely incomplete. Verified on linux-aarch64: 0.5.3, py311-py315.
+  # single-cell.smoke.py CALLS that flavour, because a lazy import is invisible to an
+  # import-only check.
+  - scikit-misc
   # Deliberately NOT included: `louvain`. Its newest aarch64 builds stop at py312
   # (py39/310/311/312 only), so it would cap this env two interpreter versions back —
   # the su2/fem-cfd trap. scanpy deprecates `sc.tl.louvain` in favour of `sc.tl.leiden`

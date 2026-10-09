@@ -168,7 +168,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     `ants` has no linux-aarch64 build at all and FSL/FreeSurfer/MRtrix3 are not on
     conda-forge, so registration-heavy and surface-based pipelines are out of reach;
     `templateflow` is excluded because it downloads atlases at runtime.)
-  - `single-cell` (345 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
+  - `single-cell` (346 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
     python 3.14, AND r-seurat 5.5 on R 4.5, in one image; single-cell transcriptomics in
     both ecosystems. Here because it is an ENVIRONMENT (DESIGN D5: the split with the
     sister project is artifact shape, not subject) — aarch.bio also ships a single-tool
@@ -183,6 +183,31 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     would pass a cross-check alone; ARI rather than label equality because cluster names
     are arbitrary. `louvain` is excluded — its aarch64 builds stop at py312 and scanpy
     deprecates it in favour of leiden.)
+  - `bayes` (125 pkgs — cmdstan 2.40 + cmdstanpy + arviz, xarray; Bayesian inference and
+    MCMC with Stan. Fills a domain the catalog had nothing for. TWO runtime requirements
+    that a naive spec misses, both found by building: (1) Stan ships NO precompiled models
+    — it translates each model to C++ with stanc and COMPILES it at run time, and the
+    cmdstan package pulls make and stanc but not a compiler, so `cxx-compiler` is a
+    runtime dependency exactly as gcc is for fem-cfd's FFCx; expect the first sample() in
+    a session to pay a compile cost (~8 s). (2) conda-forge's cmdstan exports CMDSTAN from
+    activate.d, so this is the third env after `dft` where `apptainer run` is required and
+    `exec` fails with "No CmdStan installation found". Verified against a CONJUGATE
+    IDENTITY rather than a tolerance: Bernoulli data with 2 successes of 10 under a
+    Beta(1,1) prior has posterior exactly Beta(3,9), mean 0.25 and sd 0.120096, and the
+    bound is computed from the draw count — measured 0.249395, i.e. 0.64 MCMC standard
+    errors, R-hat 1.0007.)
+  - `geoscience` (112 pkgs — obspy (seismology), modflow6 + flopy (groundwater flow),
+    numpy/scipy/pandas/matplotlib; solid-earth and subsurface, the complement to the
+    surface/atmosphere envs (climate, earth-observation, geospatial, pointcloud). Both
+    halves have an EXACT check. MODFLOW 6: one-dimensional steady confined flow between
+    fixed heads has a closed-form linear solution, and for a homogeneous 1-D domain the
+    finite-difference solution is exact at the nodes — so the expectation is machine
+    precision, measured max |numeric − analytic| = 1.8e-15, with the constant-head inflow
+    matching Darcy's K·A·Δh/L to 1.5e-15. ObsPy: `read()` with no argument returns the
+    bundled three-component example so nothing is downloaded, and detrend("demean") must
+    leave a mean of exactly zero (3.6e-15). flopy is included although only obspy and
+    modflow6 were requested: mf6 alone reads and writes its own formats, so the solver is
+    near-unusable without it, and flopy is noarch.)
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
@@ -265,8 +290,8 @@ hence the `single-cell` env.
 
 ## Facts
 
-- 16 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
-  comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell) —
+- 18 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+  comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience) —
   native arm64, verified
   (assemble+import+functional) + signed + public.
 - `dft` (gpaw, siesta, psi4, nwchem, quantum-espresso, ase, libxc, ELPA, ScaLAPACK,

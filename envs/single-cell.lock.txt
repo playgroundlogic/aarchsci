@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.10.09.143053   Builder: 6a88412
-# lock-hash: a7df461fb9cc   packages: 345
+# Source spec: envs/single-cell.yaml   Built: 2026.10.09.160223   Builder: 37363f8
+# lock-hash: 5e1903f0ce96   packages: 346
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -313,6 +313,7 @@ readline 8.3
 s2n 1.7.7
 scanpy 1.12.4
 scikit-learn 1.9.1
+scikit-misc 0.5.3
 scipy 1.18.1
 scverse-misc 0.1.6
 seaborn 0.13.2

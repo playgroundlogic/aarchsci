@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">16</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell</div>
+                    <div class="stat-num green">18</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -618,7 +618,7 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                 </p>
                 <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
                   <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">single-cell</span><br>
-                  <strong>345 packages</strong> &mdash; single-cell transcriptomics, both ecosystems in one image
+                  <strong>346 packages</strong> &mdash; single-cell transcriptomics, both ecosystems in one image
                 </p>
                 <div class="catalog">
                     <span class="chip">Scanpy</span>
@@ -640,6 +640,48 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   wrong answer would sail through a cross-check alone. ARI rather than label
                   equality, because cluster <em>names</em> are arbitrary &mdash; only the
                   partition means anything.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">bayes</span><br>
+                  <strong>125 packages</strong> &mdash; Bayesian inference &amp; MCMC with Stan
+                </p>
+                <div class="catalog">
+                    <span class="chip">CmdStan 2.40</span>
+                    <span class="chip">cmdstanpy</span>
+                    <span class="chip">ArviZ</span>
+                    <span class="chip">cxx-compiler</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  Checked against a <strong>conjugate identity</strong>, which is about as strong
+                  as a test gets: Bernoulli data with two successes in ten, under a Beta(1,1) prior,
+                  has posterior <em>exactly</em> Beta(3,&nbsp;9) &mdash; mean 0.25, sd 0.120096. No
+                  reference file, no band; the answer is derivable, and the tolerance is
+                  <em>computed</em> from the draw count rather than chosen. Measured 0.249395, which
+                  is 0.64 MCMC standard errors out, R-hat 1.0007. One thing to know: Stan ships no
+                  precompiled models &mdash; it <strong>compiles each model at run time</strong>,
+                  which is why a C++ compiler is a runtime dependency here and the first
+                  <code>sample()</code> in a session pays a few seconds.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">geoscience</span><br>
+                  <strong>112 packages</strong> &mdash; seismology &amp; groundwater flow (solid earth / subsurface)
+                </p>
+                <div class="catalog">
+                    <span class="chip">ObsPy</span>
+                    <span class="chip">MODFLOW 6</span>
+                    <span class="chip">FloPy</span>
+                    <span class="chip">numpy / scipy</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  The subsurface complement to the surface-and-atmosphere envs. Both halves get an
+                  <strong>exact</strong> check. One-dimensional steady flow between two fixed heads
+                  has a closed-form linear solution, and for a homogeneous 1-D domain the
+                  finite-difference answer is exact <em>at the nodes</em> &mdash; so the right
+                  expectation is machine precision, not a tolerance: measured
+                  <strong>1.8&times;10<sup>&minus;15</sup></strong>, with the constant-head inflow
+                  matching Darcy's law to 1.5&times;10<sup>&minus;15</sup>. ObsPy reads its bundled
+                  three-component example with no network, and <code>detrend("demean")</code> must
+                  leave a mean of exactly zero.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

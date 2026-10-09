@@ -1,0 +1,50 @@
+# aarch.science — geoscience environment
+# Solid-earth and subsurface geoscience (DESIGN D2): observational seismology with
+# ObsPy, and groundwater flow with MODFLOW 6 driven through FloPy.
+#
+# WHY A NEW ENV RATHER THAN EXTENDING `climate`, which issue #29 offered as the cheaper
+# option: the existing earth-science envs are all SURFACE AND ATMOSPHERE — `climate`
+# (atmospheric/ocean), `earth-observation` (remote sensing), `geospatial` (vector/raster
+# GIS), `pointcloud` (LiDAR/terrain). This is the solid-earth and subsurface complement:
+# waveforms and aquifers rather than rasters and reanalysis. Folding a Fortran
+# groundwater solver and a seismology stack into `climate` would have made that env's
+# name wrong and buried both from anyone not already reading it. 112 packages, so the
+# separation is cheap.
+#
+# The pairing of seismology with hydrogeology inside one env is a judgement call worth
+# naming: they are distinct subfields, but both are solid-earth/subsurface, both are
+# small here, and splitting them would produce two thin envs. If either grows a real
+# stack of its own, splitting later costs nothing.
+#
+# Verified to solve AND assemble native arm64, and both halves have an exact check
+# rather than a tolerance — see geoscience.smoke.py.
+name: geoscience
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib-base
+  # --- seismology ---
+  # obspy 1.5.1 has linux-aarch64 builds for python_abi 3.10 through 3.14, so it does
+  # not cap this env — checked, because this is where `su2` capped `fem-cfd` at py311.
+  # One trap worth recording: the NEWEST obspy on that subdir is `1.5.1rc1`, a
+  # prerelease, and a naive version sort puts it *after* 1.5.1 and reports py310 only.
+  # 1.5.1 stable is the right thing to resolve to, and it is what the solver picks.
+  # Ships its own example waveforms, so D3 needs no network and no staged data.
+  - obspy
+  # --- groundwater flow ---
+  # modflow6 is the Fortran `mf6` solver binary and declares NO python dependency at
+  # all (libgcc/libgfortran only), so it cannot perturb the python solve.
+  - modflow6
+  # flopy was not in the original request and is included deliberately: `mf6` alone
+  # reads and writes its own text/binary formats, so without flopy to build the inputs
+  # and parse the heads/budget output the solver is close to unusable. It is noarch and
+  # adds nothing beyond what the rest of the env already needs.
+  #
+  # Correcting the request's version note: it flagged conda-forge's flopy as lagging at
+  # 3.9.5 against PyPI's 3.11.0. conda-forge has caught up — the solve resolves 3.11.0,
+  # so there is no lag to work around.
+  - flopy

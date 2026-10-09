@@ -3,6 +3,75 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-09 (envs 17 and 18, plus a lazy-import gap closed)
+
+### Added — `bayes` (issue #27) and `geoscience` (issue #29); `scikit-misc` to single-cell (#28)
+
+- **`single-cell` + scikit-misc — 346 packages, lock `s5e1903f0ce96`.** The requester
+  flagged this as *unverified*, possibly an upstream gap. It isn't: scikit-misc 0.5.3 has
+  29 linux-aarch64 files covering py311–py315. The valuable part was their diagnosis of
+  *why* it slipped past — `skmisc.loess` is imported **lazily** by
+  `scanpy.pp.highly_variable_genes(flavor="seurat_v3")`, so the env solved, `import
+  scanpy` succeeded, and the failure only arrived when scanpy's own *recommended* HVG
+  flavour was called. An import-only check cannot see that, so D3 now **calls that
+  flavour** and asserts the HVG count and finite variances.
+
+- **`bayes` — 125 packages, lock `s941a349fd7db`.** cmdstan 2.40.0 + cmdstanpy 1.3.0 +
+  arviz 1.3.0. The catalog had no Bayesian statistics at all across 16 envs.
+  **Verified against a conjugate identity**, the strongest assertion shape available
+  anywhere here: Bernoulli data with 2 successes of 10 under a Beta(1,1) prior has
+  posterior *exactly* Beta(3,9) — mean 0.25, sd 0.120096 — and the tolerance is
+  **computed** from the draw count rather than chosen. Measured on arm64: sampled mean
+  0.249395, i.e. **0.64 MCMC standard errors**, R-hat 1.0007.
+- **Two runtime requirements for `bayes` that the request didn't mention, both found by
+  building rather than reading** — each would have shipped an env that solves, imports,
+  and dies on first use:
+  1. **No C++ compiler.** Stan ships no precompiled models: it translates each model to
+     C++ with `stanc` and **compiles it at run time**. `cmdstan` pulls `make` and `stanc`
+     but *not* a compiler, so a bare cmdstan+cmdstanpy env fails with
+     `make: g++: No such file or directory`. `cxx-compiler` is therefore a runtime
+     dependency here, exactly as `gcc` is for fem-cfd's FFCx.
+  2. **Activation dependency.** conda-forge's cmdstan exports `CMDSTAN` from
+     `activate.d`; without it cmdstanpy raises *"No CmdStan installation found"*. That
+     makes `bayes` the third env after `dft` where `apptainer run` is required and `exec`
+     breaks, so D3 asserts `CMDSTAN` directly.
+
+- **`geoscience` — 112 packages, lock `s0ac81cc7b2f4`.** obspy 1.5.1 (seismology) +
+  modflow6 6.8.1 + flopy 3.11.0 (groundwater). A new env rather than an extension of
+  `climate`, because the existing earth-science envs are all surface/atmosphere; this is
+  the solid-earth and subsurface complement. The seismology-plus-hydrogeology pairing is
+  named in the spec as a judgement call — both are small, and splitting later is free.
+- **Both halves get an exact check.** One-dimensional steady confined flow between fixed
+  heads has a closed-form linear solution, and for a homogeneous 1-D domain the
+  finite-difference solution is exact *at the nodes* — so machine precision is the right
+  expectation, not a tolerance: **max |numeric − analytic| = 1.8e-15**, with the
+  constant-head inflow matching Darcy's K·A·Δh/L to **1.5e-15**. Same shape as fem-cfd's
+  P2 check. ObsPy reads its bundled three-component example offline, and
+  `detrend("demean")` must leave a mean of exactly zero (3.6e-15).
+- Two notes on that request: `flopy` was added although only obspy and modflow6 were
+  asked for (mf6 alone reads and writes its own formats, so it is near-unusable without
+  it, and flopy is noarch and free), and its version warning is **corrected** — it
+  flagged conda-forge's flopy as lagging at 3.9.5 behind PyPI's 3.11.0, but conda-forge
+  has caught up and the solve resolves **3.11.0**. Its own catch about `1.5.1rc1` sorting
+  ahead of stable obspy was right and is recorded in the spec.
+
+### Fixed — two of my own smoke-test assertions, written against unverified output formats
+Both new envs failed D3 on the first build, and **neither failure was the env**:
+
+- `bayes` — every substantive check passed (CMDSTAN, compiler, compile, the posterior).
+  The job died on the *reporting line*: `idata.groups()`, where arviz 1.x makes `groups`
+  a tuple rather than a method. Now accepts either form, so the check is not pinned to
+  one arviz API.
+- `geoscience` — the exact groundwater and all obspy checks passed. My `mf6 -v` assertion
+  required the string `MODFLOW`; it actually prints `mf6: 6.8.1`. Now asserts a version
+  *number* and `major >= 6`, which is what the check was for.
+
+Recorded because the pattern is the point: in a session spent insisting on measurement
+over assumption, two assertions went in against output formats that had never been run.
+The D3 gate caught both and refused to tag — it cannot distinguish "env broken" from
+"test wrong", which is correct behaviour and the reason the suite is trustworthy. Both
+fixes carry a comment naming the wrong assertion so it is not reintroduced.
+
 ## 2026-10-08 (D5 corrected: the boundary is artifact shape)
 
 ### Changed — D5 rewritten after aarchbio#75 showed the channel rule was wrong

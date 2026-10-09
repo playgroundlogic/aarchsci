@@ -6,7 +6,7 @@ stack** — geospatial / earth-observation first. For Apple Silicon and AWS Grav
 Sister project to [aarch.bio](https://aarch.bio/), which rebuilds **bioconda tool
 packages**. aarch.science covers the **conda-forge** scientific stack.
 
-> **Status:** live. **16 verified, signed, public env images** on
+> **Status:** live. **18 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -105,7 +105,9 @@ has the full retention policy and the four dead digests).
 | [`cfd-fv`](envs/cfd-fv.yaml) | 56 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
 | [`optimization`](envs/optimization.yaml) | 61 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
 | [`neuroimaging`](envs/neuroimaging.yaml) | 229 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
-| [`single-cell`](envs/single-cell.yaml) | 345 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap — single-cell transcriptomics |
+| [`single-cell`](envs/single-cell.yaml) | 346 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
+| [`bayes`](envs/bayes.yaml) | 125 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
+| [`geoscience`](envs/geoscience.yaml) | 112 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
 
 `dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes
 further than the others': the smoke tests run the same calculation serially and again under
