@@ -122,7 +122,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     instead, so re-enable auto-download yourself if you need sub-ms UT1 for recent dates.
     `astroquery` is the one package in the catalog verified by import alone, because its
     job is querying remote archives).
-  - `fem-cfd` (130 pkgs — fenics-dolfinx, fenics-basix, fenics-ufl, petsc + petsc4py,
+  - `fem-cfd` (131 pkgs — fenics-dolfinx, fenics-basix, fenics-ufl, petsc + petsc4py,
     slepc + slepc4py, calculix, openmpi, mpi4py, hdf5/adios2; finite-element PDE solving
     and structural FEA, MPI-parallel. calculix (ccx) reads Abaqus-style `.inp` decks, so
     it covers the standard engineering problem set from the format most FEA users hold,

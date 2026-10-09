@@ -101,7 +101,7 @@ has the full retention policy and the four dead digests).
 | [`viz`](envs/viz.yaml) | 244 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
 | [`r`](envs/r.yaml) | 328 | R 4.5 + tidyverse, data.table, arrow, sf, terra, glmnet, randomForest, caret, knitr/rmarkdown + pandoc, Rcpp |
 | [`astro`](envs/astro.yaml) | 364 | astropy, photutils, sunpy, healpy, yt, regions, reproject, specutils, astroquery, rebound |
-| [`fem-cfd`](envs/fem-cfd.yaml) | 130 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), CalculiX, OpenMPI, mpi4py, HDF5/ADIOS2 |
+| [`fem-cfd`](envs/fem-cfd.yaml) | 131 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), CalculiX, OpenMPI, mpi4py, HDF5/ADIOS2 |
 | [`cfd-fv`](envs/cfd-fv.yaml) | 56 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
 | [`optimization`](envs/optimization.yaml) | 61 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
 | [`neuroimaging`](envs/neuroimaging.yaml) | 229 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
