@@ -1,6 +1,6 @@
 # hep — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/hep.yaml   Built: 2026.10.10.152902   Builder: 8fb0c16
-# lock-hash: 3f69b424b6ff   packages: 352
+# Source spec: envs/hep.yaml   Built: 2026.10.10.205243   Builder: 030b55e
+# lock-hash: 4f0bac796086   packages: 352
 # Regenerate with: ./builder/build-env.sh hep
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -27,7 +27,7 @@ aws-c-s3 1.0.0
 aws-c-sdkutils 1.0.0
 aws-checksums 1.0.1
 babel 2.18.0
-backports.zstd 1.7.0
+backports.zstd 1.8.0
 beautifulsoup4 4.15.0
 binutils_impl_linux-aarch64 2.46.1
 bleach 6.4.0
