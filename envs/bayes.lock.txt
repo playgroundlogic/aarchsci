@@ -1,6 +1,6 @@
 # bayes — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/bayes.yaml   Built: 2026.10.09.160657   Builder: 37363f8
-# lock-hash: 941a349fd7db   packages: 125
+# Source spec: envs/bayes.yaml   Built: 2026.10.10.135643   Builder: 4088b77
+# lock-hash: f84fca06ee06   packages: 125
 # Regenerate with: ./builder/build-env.sh bayes
 _openmp_mutex 4.5
 arviz 1.3.0
@@ -75,7 +75,7 @@ libpng 1.6.59
 libpython 3.14.8
 libraqm 0.11.0
 libsanitizer 15.3.0
-libsqlite 3.53.4
+libsqlite 3.54.0
 libstdcxx 16.2.0
 libstdcxx-devel_linux-aarch64 15.3.0
 libstdcxx-ng 16.2.0
