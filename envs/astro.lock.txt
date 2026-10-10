@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.10.09.143053   Builder: 6a88412
-# lock-hash: b4301a9d818c   packages: 364
+# Source spec: envs/astro.yaml   Built: 2026.10.10.135646   Builder: 4088b77
+# lock-hash: ed5afa726bbe   packages: 364
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -210,7 +210,7 @@ libre2-11 2025.11.05
 librttopo 1.1.0
 libsodium 1.0.22
 libspatialite 5.1.0
-libsqlite 3.53.4
+libsqlite 3.54.0
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
@@ -244,7 +244,7 @@ msgspec 0.22.0
 multidict 6.7.1
 munkres 1.1.4
 muparser 2.3.5
-narwhals 2.27.0
+narwhals 2.27.1
 ncurses 6.6
 ndcube 2.4.2
 nest-asyncio2 1.7.3
@@ -281,7 +281,7 @@ py2vega 0.7.0
 pyarrow 25.0.0
 pyarrow-core 25.0.0
 pyavm 0.9.9
-pycparser 3.1
+pycparser 3.11
 pyerfa 2.0.1.5
 pygments 2.21.0
 pyparsing 3.3.3
@@ -321,7 +321,7 @@ sortedcontainers 2.4.0
 soupsieve 2.10
 specutils 2.4.0
 spiceypy 8.2.0
-sqlite 3.53.4
+sqlite 3.54.0
 stack_data 0.6.3
 sunpy 8.0.0
 sympy 1.14.0
