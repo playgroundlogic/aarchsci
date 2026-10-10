@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">19</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k</div>
+                    <div class="stat-num green">20</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k, pathology</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -706,6 +706,30 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   &minus;21.04944231395054, tolerance 3&times;10<sup>&minus;13</sup>, measured
                   4.6&times;10<sup>&minus;14</sup> serially and 6.0&times;10<sup>&minus;14</sup> on
                   two ranks.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">pathology</span><br>
+                  <strong>208 packages</strong> &mdash; digital pathology / whole-slide imaging
+                </p>
+                <div class="catalog">
+                    <span class="chip">OpenSlide 4.0</span>
+                    <span class="chip">openslide-python</span>
+                    <span class="chip">tifffile + imagecodecs</span>
+                    <span class="chip">scikit-image</span>
+                    <span class="chip">zarr / dask</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  Whole-slide images are gigapixel pyramidal TIFFs, and the obvious way to test a
+                  reader is to download a real slide &mdash; which would mean a 546&nbsp;MB fetch
+                  every build. So this test <strong>generates its own slide</strong> with a planted
+                  region instead, and that turns out to be the stronger choice: the truth is
+                  planted rather than looked up. The pyramid must have dimensions exactly
+                  <em>W</em>/2<sup>k</sup> with downsamples exactly 2<sup>k</sup>; through lossless
+                  tiles <code>read_region</code> must return the planted pixels
+                  <strong>bit-exactly</strong> (measured: one unique colour in the region); and the
+                  same region measured at different pyramid levels must agree after scaling &mdash;
+                  relative error <strong>0.00</strong> at levels 0&ndash;2. A JPEG-tiled pyramid is
+                  checked too, because that is what real slides actually ship as.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

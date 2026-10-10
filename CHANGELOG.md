@@ -3,6 +3,68 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-10 (env 20 — digital pathology)
+
+### Added — `pathology` (issue #32), as its own env rather than inside `geospatial`
+- **208 packages, lock `sa15bfc8c58e5`.** openslide 4.0.1 + openslide-python 1.4.6,
+  tifffile + imagecodecs, scikit-image, zarr, dask. Opens a domain the catalog had no
+  coverage of at all.
+- **Declined the requested placement.** Issue #32 asked for these two packages in
+  `geospatial`, arguing that a whole-slide image *is* a tiled pyramidal TIFF and so shares
+  gdal/rasterio/libtiff's machinery. True, and insufficient: that is a **format** affinity,
+  not a domain one — by the same reasoning astronomy mosaics and electron microscopy would
+  belong there. It fails in both directions: GIS users would receive pathology libraries,
+  and nobody looking for pathology tooling would think to look in an env called
+  `geospatial`. Same objection that kept optimization out of `geo-ml` (#23) and `r-seurat`
+  out of `r` (#20).
+- **The request's counter-argument misread #31, and that is worth stating.** It pre-empted
+  a new env by invoking the thin-env objection used to decline `julia`. But julia was
+  declined because conda-forge packages **zero** Julia libraries, so its ecosystem can only
+  arrive by runtime download — not because the env would be small. Small is fine:
+  `optimization` is 61 packages, `cfd-fv` is 56. And measured, this is not two packages —
+  **208** with the imaging layer that makes gigapixel slides usable.
+- **Scope under D5:** bioconda carries openslide 3.4.1 and openslide-python 1.1.1 with
+  **zero** aarch64 files — fossils. conda-forge has 4.0.1 and 1.4.6 with py314. So it is
+  aarchsci's on both D5 tests: live version on conda-forge, and the artifact is an
+  environment rather than a single-tool image. (`fiji` does have a bioconda aarch64 build,
+  so the ImageJ side of this domain is aarchbio's — noted in #32.)
+
+### The verification replaces a 546 MB download with a generated slide, and gets stronger
+Issue #32 proposed checks against CAMELYON16 on the AWS Open Data Registry — genuinely
+well-pinned (the depositors publish md5s for all 963 files, and the issue verified that a
+multipart ETag is *not* the md5 for the 546 MB slide, which is a sharp catch). But it is a
+runtime fetch, the pattern that made `whitebox` a wontfix. So D3 **generates its own
+pyramidal slide** with a planted region, which turns the issue's own identities from
+published into exact. Measured in the built image:
+
+- pyramid dimensions exactly `W/2^k`, downsamples exactly `(1, 2, 4, 8)`
+- `read_region` returns the planted pixels **bit-exactly** through lossless tiles — one
+  unique colour in the region, so any tile-stitching, stride or channel-order bug shows up
+  as a changed value rather than a drifted average
+- the issue's **cross-level area identity** holds with relative error **0.00e+00** at
+  levels 0–2 (`400000 → 400000`, `100000 → 400000`, `25000 → 400000` against a planted
+  400000). Level 3 is asserted loosely *with the reason given*: at 1/8 scale a 500×800
+  block becomes 62.5×100 and cannot land on whole pixels, so ~1% aliasing is the geometry
+  rather than a defect
+- the issue's **slide-vs-mask identity** across two independently written files
+
+The CAMELYON16 work remains the right fixture for a cookbook recipe; it simply should not
+gate a build.
+
+### Found while probing — `imagecodecs` is load-bearing
+`tifffile` cannot encode or decode JPEG tiles without it
+(`KeyError: "<COMPRESSION.JPEG: 7> requires the 'imagecodecs' package"`), and real
+whole-slide images **are** JPEG-tiled. Without it the env could read slides through
+OpenSlide but not through tifffile — a confusing half-capability. It is in the spec for
+that reason, and D3 writes and reads a JPEG-tiled pyramid to prove it.
+
+### Recorded — `tiatoolbox` is the version-pin pattern, not a gap (GAPS.md)
+The request flagged it as available-but-incompatible rather than queueing it as easy, which
+was the right call: `numpy >=1.23.5,<2.0.0` against the catalog's 2.5.3, and
+`openslide-python <=1.4.1` excluding the 1.4.6 shipped here. Written into GAPS.md alongside
+`xtb-python`'s missing py314 and `louvain`'s py312 ceiling, because an arm64 gap and a
+version pin look identical in a solve failure and have completely different fixes.
+
 ## 2026-10-10 (env 19 — the longest-standing gap closed)
 
 ### Added — `cp2k` (issue #30); declined `julia` (issue #31)

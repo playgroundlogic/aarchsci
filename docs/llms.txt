@@ -224,6 +224,21 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     basis/pseudopotential files), though the package sets no CP2K_DATA_DIR — the builder
     exports it, so this is a third env after `dft` and `bayes` needing `apptainer run`
     rather than `exec`. Large: cp2k alone is ~445 MB.)
+  - `pathology` (208 pkgs — openslide 4.0.1 + openslide-python 1.4.6, tifffile +
+    imagecodecs, scikit-image, zarr, dask; digital pathology / whole-slide imaging. ITS OWN
+    env rather than an addition to `geospatial` as issue #32 proposed: a whole-slide image
+    is a tiled pyramidal TIFF, but that is a FORMAT affinity rather than a domain one, and
+    putting pathology in `geospatial` would give GIS users pathology libraries while hiding
+    the capability from anyone who would never look in an env with that name. Verified with
+    NOTHING staged and nothing downloaded — the test generates its own pyramidal slide with
+    a planted region, which makes the identities exact rather than published: pyramid
+    dimensions exactly W/2^k and downsamples exactly 2^k, `read_region` returning the
+    planted pixels BIT-EXACTLY through lossless tiles (one unique colour in the region),
+    and tumour area agreeing across pyramid levels after scaling with relative error
+    0.00e+00 at levels 0-2. imagecodecs is load-bearing, not a convenience: without it
+    tifffile cannot encode or decode JPEG tiles, and real whole-slide images are JPEG-tiled.
+    Note the py-ABI trap issue #32 flagged — openslide-python 1.4.6 has aarch64 builds for
+    py310 through py314, and selecting by highest build number lands on py310.)
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
@@ -306,8 +321,9 @@ hence the `single-cell` env.
 
 ## Facts
 
-- 19 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
-  comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k) —
+- 20 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+  comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k,
+  pathology) —
   native arm64, verified
   (assemble+import+functional) + signed + public.
 - `dft` (gpaw, siesta, psi4, nwchem, quantum-espresso, ase, libxc, ELPA, ScaLAPACK,

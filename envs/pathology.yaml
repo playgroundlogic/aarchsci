@@ -1,0 +1,62 @@
+# aarch.science — pathology environment
+# Digital pathology / whole-slide imaging (DESIGN D2): OpenSlide for reading gigapixel
+# vendor and generic-TIFF slides, plus the tiled-array and image-analysis layer needed to
+# do anything with them.
+#
+# WHY ITS OWN ENV AND NOT AN ADDITION TO `geospatial`, which is what issue #32 asked for.
+# The request's argument was a format affinity: a whole-slide image *is* a tiled pyramidal
+# TIFF with JPEG tiles, which is the machinery gdal/rasterio/libtiff already carry. True,
+# and not sufficient — that is a file-format coincidence, not a domain one. By the same
+# reasoning astronomy mosaics and electron microscopy would belong in `geospatial` too.
+#
+# Concretely it fails both ways round: someone pulling `geospatial` for GIS would receive
+# pathology libraries, and nobody looking for pathology tooling would ever think to look in
+# an env called `geospatial`. That is the same objection that kept optimization out of
+# `geo-ml` (issue #23) and `r-seurat` out of `r` (issue #20) — an env whose name stops
+# describing its contents hides the capability from everyone it was added for.
+#
+# The request pre-empted a new env by citing the thin-env objection from issue #31 (julia).
+# That objection does not transfer: julia was declined because conda-forge packages ZERO
+# Julia libraries, so its ecosystem can only arrive by runtime download — not because the
+# env would be small. Small is fine; `optimization` is 61 packages and `cfd-fv` is 56. And
+# measured, this is not two packages: 208 with the imaging layer that makes slides useful.
+#
+# SCOPE: conda-forge only — bioconda carries openslide 3.4.1 and openslide-python 1.1.1
+# with ZERO aarch64 files, i.e. fossils. So under D5 this is aarchsci's by both tests: the
+# live version is on conda-forge, and the artifact is an environment rather than a
+# single-tool image. (`fiji` has a bioconda aarch64 build, so the ImageJ side of this
+# domain is aarchbio's — noted in #32 and worth keeping straight.)
+#
+# Verified native arm64 with no staged or downloaded data — see pathology.smoke.py, which
+# generates its own pyramidal slide and checks bit-exact identities against it.
+name: pathology
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib-base
+  # --- whole-slide reading ---
+  # openslide is the only genuinely new native library here; openslide-python is a thin
+  # binding over it. Note the trap issue #32 correctly flagged: openslide-python 1.4.6 has
+  # aarch64 builds for python_abi 3.10/3.11/3.12/3.13/3.14, and selecting by highest build
+  # number lands on the py310 one. py314 first appears at 1.4.2, so anything older cannot
+  # enter a 3.14 env at all. The solve picks py314 correctly; nothing is pinned here
+  # because nothing needs to be.
+  - openslide
+  - openslide-python
+  # --- the image layer ---
+  # imagecodecs is LOAD-BEARING rather than a convenience, and this was measured: without
+  # it `tifffile` cannot encode or decode JPEG-compressed tiles —
+  #     KeyError: "<COMPRESSION.JPEG: 7> requires the 'imagecodecs' package"
+  # and real whole-slide images are JPEG-tiled. So an env missing it could read slides
+  # through OpenSlide and not through tifffile, which is a confusing half-capability.
+  - tifffile
+  - imagecodecs
+  - scikit-image
+  # Gigapixel slides do not fit in memory, so the tiled/lazy layer is part of the job
+  # rather than an extra: zarr for chunked arrays, dask for processing tiles in parallel.
+  - zarr
+  - dask

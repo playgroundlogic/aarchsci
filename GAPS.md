@@ -89,8 +89,8 @@ finding, and it's the inverse of the pip experience: the exact stack that fails
 `No matching distribution found for rasterio` on PyPI solves *and* assembles cleanly
 on conda-forge. Fifteen envs ship verified (geospatial, earth-observation, geo-ml,
 climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization,
-neuroimaging, single-cell, bayes, geoscience, cp2k), and every headline package in all
-nineteen assembles and does real work natively.
+neuroimaging, single-cell, bayes, geoscience, cp2k, pathology), and every headline
+package in all twenty assembles and does real work natively.
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
 changed: every solve-gap listed above is a **candidate we probed and declined**, not a
@@ -213,6 +213,32 @@ Mitigated in `envs/optimization.yaml` with `scip >=10.0,<10.1`. The fix belongs 
 at [`conda-forge/pyscipopt-feedstock`](https://github.com/conda-forge/pyscipopt-feedstock)
 — tighten the run export to the soname it actually links, or rebuild against 10.1. Not an
 arm64 gap: it reproduces identically on `linux-64`.
+
+### Not a gap at all: `tiatoolbox`, and the version-pin pattern (2026-10-10, issue #32)
+
+Recorded because it *looks* like low-hanging fruit and is not, and because the requester
+spotted it themselves rather than queueing it — which is the behaviour this file wants to
+encourage.
+
+`tiatoolbox` 1.6.0 is `noarch`, so it "installs everywhere" and reads as an easy addition
+to the new `pathology` env. Its pins make it incompatible with **any** current env here:
+
+```
+numpy >=1.23.5,<2.0.0          every aarchsci env ships numpy 2.5.3
+pytorch >=2.0.0,<=2.5.1
+openslide-python >=1.2.0,<=1.4.1   excludes the 1.4.6 that pathology ships
+```
+
+So this is the **version-pin pattern**, not an arm64 gap: nothing is missing on this
+architecture, the package simply pins an older ecosystem than the catalog targets. It
+would be a gap only if there were nothing newer to use, and there is. The distinction
+matters because the two look identical in a solve failure and have completely different
+fixes — an arm64 gap goes upstream to a feedstock, a version-pin waits for the package to
+loosen its bounds (or is declined).
+
+Same shape as `xtb-python` having no py314 build (which is why `psi4` lives in `dft`
+rather than `comp-chem`), and `louvain` stopping at py312 (why it is excluded from
+`single-cell`). No action, no skip-list entry — there is nothing to retry.
 
 ### Bugs D3 caught that are *not* arm64 gaps (2026-09, adding `md` and `viz`)
 
