@@ -74,7 +74,32 @@ read `depends`. `envs/fem-cfd.smoke.py` asserts dolfinx's lack of a `python_abi`
 directly, so the distinction is checked rather than remembered. This is the same trap
 family as noarch-vs-subdir: a name that looks like a platform claim and isn't.
 
-## Summary (as of 2026-08)
+**A third instance, 2026-10-10, adding `quantum` (issue #33): `qiskit`.** `qiskit 2.5.2`
+ships **only** a `py310` build on linux-aarch64 — and on linux-64, for the last seven
+releases — which reads as "no py314 build, therefore blocked". It isn't. It declares
+`_python_abi3_support 1.*`, `cpython >=3.10`, unpinned `python` and **no `python_abi`**, so
+it installs and runs on python 3.14.8 (verified in the built image). `qiskit-aer` is the
+contrast *inside the same env*: a true per-python C++ extension whose
+`cpu_py310h0dd71ee_203` build carries `python_abi 3.10.* *_cp310` **and** the highest build
+number, so "pick the newest build" lands on py310 — correct for aer, and wrong if you
+generalise it to qiskit. Because an abi3 mismatch crashes or returns garbage rather than
+raising `ImportError`, `envs/quantum.smoke.py` makes the compiled extension do real work
+(a rustworkx Dijkstra) instead of only importing it.
+
+**And a fourth shape, found adding `hep` (issue #34): a `py*` build that pins an
+interpreter and ships no Python API at all.** `geant4 11.4.2 py314h616aef8_0` installs
+13330 files of which **zero** are under `site-packages` — `Geant4` and `geant4_pybind` both
+raise `ModuleNotFoundError` — while declaring `python >=3.14,<3.15` and
+`python_abi 3.14.* *_cp314`. So the build string, the python pin and the `python_abi`
+dependency *all* say "this is the Python build", and there is no Python module behind any
+of them. The rule above still works but needs the extra step: `depends` tells you whether
+an interpreter is capped, and only the **file list** tells you whether a Python API exists.
+`hep` pins `geant4=*=noqt_*` as a result (11.4.3, `pydeps []`, headless), which is newer
+and declares no interpreter coupling for an API that isn't there. Not a gap — nothing is
+missing from arm64 — but it is the reason `hep` cannot verify Geant4 beyond its version and
+its physics datasets.
+
+## Summary (as of 2026-10)
 
 | Kind | Count | Notes |
 |------|------:|-------|
@@ -87,10 +112,10 @@ family as noarch-vs-subdir: a name that looks like a platform claim and isn't.
 **The curated science head is near-complete on arm64.** This is still the real
 finding, and it's the inverse of the pip experience: the exact stack that fails
 `No matching distribution found for rasterio` on PyPI solves *and* assembles cleanly
-on conda-forge. Fifteen envs ship verified (geospatial, earth-observation, geo-ml,
+on conda-forge. Twenty-two envs ship verified (geospatial, earth-observation, geo-ml,
 climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization,
-neuroimaging, single-cell, bayes, geoscience, cp2k, pathology), and every headline
-package in all twenty assembles and does real work natively.
+neuroimaging, single-cell, bayes, geoscience, cp2k, pathology, quantum, hep), and every
+headline package in all twenty-two assembles and does real work natively.
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
 changed: every solve-gap listed above is a **candidate we probed and declined**, not a

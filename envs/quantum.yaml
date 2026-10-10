@@ -1,0 +1,59 @@
+# aarch.science — quantum environment
+# Quantum circuit simulation (DESIGN D2): Qiskit as the SDK, Aer as the simulator, QuTiP
+# for open-system / master-equation work, plus the Qiskit application modules.
+#
+# Its own env, as issue #33 argued: the nearest existing env is `optimization`
+# (HiGHS/SCIP/CBC), which is classical mathematical programming. A quantum SDK there would
+# make that env two unrelated things. And the thin-env objection from #31 does not apply —
+# that was about `julia`, whose ecosystem is *unavailable* on conda-forge, not about size.
+#
+# THE abi3 POINT IS THE INTERESTING ONE, and issue #33 got it right where it would have
+# been easy to file a false gap. `qiskit 2.5.2` ships ONLY a `py310` build on
+# linux-aarch64 (and identically on linux-64, for the last seven releases). That reads as
+# "no py314 build, therefore blocked". It isn't, because the package is abi3:
+#
+#   qiskit 2.5.2 py310h6a1aec4_0:  _python_abi3_support 1.*, cpython >=3.10,
+#                                  python (unpinned), python_abi: NONE
+#
+# No `python_abi` constraint means no interpreter cap, so it installs on 3.14 — verified,
+# the solve puts `qiskit 2.5.2 py310h6a1aec4_0` alongside `python 3.14.8`. The same is true
+# of `rustworkx`, its one compiled dependency (which resolves to a `py311` build here).
+#
+# This is the same rule GAPS.md already records from `fenics-dolfinx`: a `py3NN` BUILD
+# STRING does not cap an interpreter; a `python_abi 3.N.* *_cpNN` DEPENDENCY does. Two
+# packages can wear identical-looking build strings and behave oppositely, and only
+# `depends` distinguishes them. `qiskit-aer` is the contrast in the same env — a true
+# per-python C++ extension whose `cpu_py310h0dd71ee_203` build really does carry
+# `python_abi 3.10.* *_cp310`, and which has the HIGHEST build number, so "pick the newest
+# build" lands on py310. The solver gets this right once python is 3.14; the trap is for
+# humans reading the file list.
+#
+# Verified native arm64 with no staged data — see quantum.smoke.py, which checks exact
+# amplitudes and unitarity rather than tolerances.
+name: quantum
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  - matplotlib-base
+  # --- SDK + simulator ---
+  - qiskit
+  # The `cpu_*` pin is future-proofing rather than protection, and worth being honest
+  # about: checked 2026-10-10, qiskit-aer's only aarch64 build prefix at 0.17.2 is `cpu`,
+  # so there is no GPU variant to guard against today. Kept because a `cuda_*` variant
+  # appearing later would be exactly the D4 trap that `libxc-c` and `lammps` needed pins
+  # for, and the cost of the pin is zero.
+  - qiskit-aer=*=cpu_*
+  # --- application layer (all noarch) ---
+  - qiskit-algorithms
+  - qiskit-optimization
+  - qiskit-machine-learning
+  - openfermion
+  - pylatexenc          # circuit drawing without a LaTeX install
+  # --- open quantum systems, independent of the Qiskit stack ---
+  # qutip is a genuinely separate implementation, which is what makes it useful here
+  # rather than redundant: its operators and eigenvalues can be checked against the same
+  # exact linear algebra Qiskit is checked against.
+  - qutip

@@ -3,6 +3,137 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-10 (envs 21 and 22 — quantum simulation and high-energy physics)
+
+### Added — `quantum` (issue #33)
+- **165 packages, lock `s99a89d5f1c5c`.** qiskit 2.5.2, qiskit-aer 0.17.2 (`cpu_*`),
+  qiskit-algorithms / -optimization / -machine-learning, openfermion, pylatexenc,
+  qutip 5.3.1, rustworkx 0.18.1 — on python 3.14.8.
+- **Its own env.** The nearest existing env is `optimization` (HiGHS/SCIP/CBC), which is
+  classical mathematical programming; a quantum SDK there would make one env two unrelated
+  things. The thin-env objection from #31 does not apply — julia was declined because
+  conda-forge packages *zero* Julia libraries, not because an env would be small.
+
+### `quantum`'s abi3 finding: a `py310`-only package that is not a gap
+`qiskit 2.5.2` ships **only** a `py310` build on linux-aarch64 (and identically on
+linux-64, for the last seven releases). That reads as "no py314 build, therefore blocked"
+and it is wrong, because the package is abi3:
+
+```
+qiskit 2.5.2 py310h6a1aec4_0:  _python_abi3_support 1.*, cpython >=3.10,
+                               python (unpinned), python_abi: NONE
+```
+
+No `python_abi` constraint means no interpreter cap. Verified in the built image: that
+exact build runs on python 3.14.8. This is the same rule GAPS.md already records from
+`fenics-dolfinx` — **a `py3NN` build string does not cap an interpreter; a
+`python_abi 3.N.* *_cpNN` dependency does** — and `qiskit-aer` is the contrast *inside the
+same env*: a true per-python C++ extension whose `cpu_py310h0dd71ee_203` build really does
+carry `python_abi 3.10.* *_cp310` *and* the highest build number, so "pick the newest
+build" lands on py310. The solver gets this right once python is 3.14; the trap is for
+humans reading a file list. Because an abi3 mismatch crashes rather than raising
+`ImportError`, D3 does not merely import — it makes the compiled extension do work
+(a rustworkx Dijkstra).
+
+### Corrected issue #33's central verification claim: the two Aer methods do **not** agree bit-for-bit
+The request proposed asserting that Aer's `stabilizer` and `statevector` methods "must
+agree bit-for-bit on the same circuit". They must not, and asserting it would have shipped
+a flaky gate: the two methods draw from different RNG streams, so seeding both identically
+still yields different **counts**. Measured on a 4-qubit Clifford circuit at 20000 shots
+with the same seed: **identical support, different counts.**
+
+What is genuinely required — and what D3 asserts — is stronger than the proposal in the
+way that matters: both sampled distributions must match the **exact** probabilities
+computed from the statevector, each judged against its own sampling error
+`sqrt(p(1-p)/N)` rather than a hand-picked band. Worst deviation measured **1.67 sigma**
+across 4 outcomes and both methods. Equal counts would only ever have been a coincidence
+of implementation.
+
+The rest of the suite is equalities rather than tolerances, which is why #33 called this
+the strongest verification target queued:
+
+- a Bell state's amplitudes are **exactly** 1/√2 — measured `|a| - 1/sqrt(2) == 0.0`,
+  with the two forbidden amplitudes exactly zero
+- `U†U = I` to 5.6e-16 on a 3-qubit circuit
+- `qutip`, an independent implementation, returns σ_z eigenvalues of exactly ±1 and the
+  same Bell amplitude to 1e-15
+
+### Added — `hep` (issue #34)
+- **352 packages, lock `s3f69b424b6ff`.** ROOT 6.40.04, pythia8 8.312, geant4 11.4.3
+  `noqt_*` plus its twelve physics datasets (43526 files, largest `G4NEUTRONHPDATA` with
+  16092), hepmc3 3.3.1, fastjet 3.5.2, lhapdf 6.5.6, yoda 2.1.4, uproot 5.7.7,
+  awkward 2.14.0.
+- **Its own env**, as #34 argued: nothing in the catalog is close, and ROOT alone is a
+  large self-contained framework.
+
+### Inverted issue #34's central recommendation: `noqt_*`, not `11.4.2=py*`
+The request asked to pin geant4 **11.4.2** because 11.4.3 ships only `noqt_*`/`qt_*` C++
+builds, "so an env that resolves newest geant4 gets a library with no python bindings".
+The version observation is correct. The conclusion is not, because **the `py*` builds have
+no python bindings either**:
+
+```
+geant4 11.4.2 py314h616aef8_0:  13330 files, site-packages files = 0,
+                                depends: python >=3.14,<3.15, python_abi 3.14.* *_cp314
+```
+
+Nothing importable — `Geant4` and `geant4_pybind` both raise `ModuleNotFoundError` — while
+the package nonetheless pins `python_abi` to 3.14. So choosing `py*` buys an interpreter
+coupling for an API that does not exist. `geant4=*=noqt_*` resolves `11.4.3 noqt_2543bd4_0`
+with `pydeps []`: newer, headless (what a container wants), and no python constraint at
+all.
+
+**What that costs, stated plainly rather than papered over:** the per-event
+energy-conservation identity #34 proposed (deposited + escaped + remaining == primary)
+**is not delivered**, and cannot be from inside this image — there are no bindings in any
+variant, Geant4's examples ship as C++ source, and this project does not build from source
+(DESIGN non-goals). Geant4 therefore gets this env's **weakest** verification, the same
+shape `siesta` gets in `dft`: the library version, and that all twelve physics datasets are
+present and wired through their `G4*DATA` variables. That is real work — a missing dataset
+is Geant4's commonest runtime failure, where the library loads, the application starts and
+the first event aborts, and it is 43526 files across the twelve — and it is honestly weaker
+than ROOT's checks. The README says so too; nothing here should imply a simulation runs.
+
+One correction made while writing that check: it first counted dataset contents with a
+top-level `iterdir` and reported "6512 files", which is wrong by a factor of seven because
+several datasets keep their content in subdirectories. It counts files recursively now, so
+the number the shipped test prints is the number that is actually there.
+
+### ROOT is the verifiable centre, and the strongest check is cross-implementation
+Not ROOT reading its own file, which would only prove self-consistency. **ROOT writes a
+histogram and `uproot` reads it** — an independent pure-Python/NumPy implementation of the
+ROOT file format that shares none of ROOT's I/O code — and the two must agree on the exact
+per-bin counts. Measured: `[3, 1, 4, 1, 5, 9, 2, 6, 5, 3]` planted, the same read back out
+of a 3748-byte file. Also:
+
+- a `TH1D` filled with 1000 entries at a bin centre has integral **exactly** 1000.0 and
+  RMS exactly 0
+- a Gaussian fit recovers its own generated parameters judged against **the fit's own
+  reported uncertainty** rather than a hand-picked band: μ 1.49995 ± 0.00167 vs 1.5,
+  σ 0.74779 ± 0.00118 vs 0.75
+- Pythia8's summed final-state charge equals the incoming beam charge event by event, an
+  integer identity with no tolerance
+
+### Found by failing D3 once — read the expectation out of the data, not out of your head
+The first hep build **failed the gate on the Pythia8 check, and the env was not at fault.**
+The assertion said an e+e− initial state has total charge 0; measured, every event came
+back +2, because Pythia's default beams are protons and the test set `Beams:eCM` without
+ever setting `Beams:idA`/`idB`. Charge *was* exactly conserved for the pp collision that
+actually ran. The fix is the general lesson rather than the specific number: the check now
+reads the expected charge out of the event record's own beam entries, so it is an identity
+the data supplies rather than a constant someone typed. Same failure mode as `bayes`
+(`idata.groups()`) and `geoscience` (`mf6 -v`): three D3 failures now whose cause was the
+smoke test's assumption about an output, not the environment.
+
+### Housekeeping
+- **`sync-doc-counts.py` now owns a third copy of the env count.** The "which project has
+  it" router's unit row (`a curated multi-package env (N)`) was hand-written in both
+  README.md and docs/index.html and had already rotted — it said **16** while 20 envs were
+  published. Same number, same source of truth, so it is generated now and `--check` fails
+  the build if someone retypes it.
+- **Corrected the cp2k data-file count in the builder comment**, 98 → 68. The 98 came from
+  a `find` that counted the same files twice, once under `pkgs/`.
+
 ## 2026-10-10 (env 20 — digital pathology)
 
 ### Added — `pathology` (issue #32), as its own env rather than inside `geospatial`

@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">20</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k, pathology</div>
+                    <div class="stat-num green">22</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k, pathology, quantum, hep</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -153,7 +153,7 @@
                   <tr style="border-bottom:1px solid var(--border);">
                     <td style="padding:0.5rem 0.75rem;"><strong>unit</strong></td>
                     <td style="padding:0.5rem 0.75rem;">one tool per image (~503)</td>
-                    <td style="padding:0.5rem 0.75rem;">a curated multi-package env (16)</td>
+                    <td style="padding:0.5rem 0.75rem;">a curated multi-package env (22)</td>
                   </tr>
                   <tr style="border-bottom:1px solid var(--border);">
                     <td style="padding:0.5rem 0.75rem;"><strong>example</strong></td>
@@ -730,6 +730,60 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   same region measured at different pyramid levels must agree after scaling &mdash;
                   relative error <strong>0.00</strong> at levels 0&ndash;2. A JPEG-tiled pyramid is
                   checked too, because that is what real slides actually ship as.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">quantum</span><br>
+                  <strong>165 packages</strong> &mdash; quantum circuit simulation
+                </p>
+                <div class="catalog">
+                    <span class="chip">Qiskit 2.5</span>
+                    <span class="chip">Aer (CPU)</span>
+                    <span class="chip">qiskit-algorithms</span>
+                    <span class="chip">OpenFermion</span>
+                    <span class="chip">QuTiP 5.3</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  Quantum state vectors are exact linear algebra, so almost nothing here is a
+                  tolerance: a Bell state's amplitudes are
+                  <strong>exactly 1/&radic;2</strong> &mdash; measured
+                  |<em>a</em>|&nbsp;&minus;&nbsp;1/&radic;2 <strong>== 0.0</strong>, with the
+                  forbidden amplitudes exactly zero &mdash; a circuit unitary satisfies
+                  <em>U</em><sup>†</sup><em>U</em>&nbsp;=&nbsp;<em>I</em> to
+                  5.6&times;10<sup>&minus;16</sup>, and QuTiP, an entirely separate
+                  implementation, returns &sigma;<sub>z</sub> eigenvalues of exactly &plusmn;1.
+                  The packaging trap worth knowing: Qiskit ships <em>only</em> a
+                  <code>py310</code> build for aarch64, which reads as a gap and isn't &mdash;
+                  it is <code>abi3</code>, so it installs and runs on Python 3.14. A
+                  <code>py3NN</code> build <em>string</em> caps nothing; a
+                  <code>python_abi</code> <em>dependency</em> does.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">hep</span><br>
+                  <strong>352 packages</strong> &mdash; high-energy physics
+                </p>
+                <div class="catalog">
+                    <span class="chip">ROOT 6.40</span>
+                    <span class="chip">Pythia8</span>
+                    <span class="chip">Geant4 11.4 (headless)</span>
+                    <span class="chip">FastJet / LHAPDF / YODA</span>
+                    <span class="chip">uproot + awkward</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  The strongest check in this env is <strong>cross-implementation</strong>:
+                  ROOT writes a histogram and <code>uproot</code> &mdash; an independent
+                  pure-Python reader of the ROOT format, sharing none of ROOT's I/O code
+                  &mdash; reads back the exact per-bin counts that were planted. ROOT reading
+                  its own file would only prove self-consistency. ROOT's own arithmetic is
+                  checked as an identity too (a histogram of 1000 entries at a bin centre has
+                  integral <strong>exactly 1000</strong>), and a Gaussian fit is judged against
+                  the fit's <em>own</em> reported uncertainty rather than a band we picked.
+                  <strong>One thing this image does not do:</strong> run a Geant4 simulation.
+                  conda-forge ships no working Python bindings for Geant4 in any variant
+                  &mdash; the <code>py*</code> builds install <em>zero</em> files into
+                  site-packages while still pinning an interpreter &mdash; so the headless
+                  <code>noqt</code> build is what's here, with all twelve physics datasets
+                  present and wired. Library and data, verified; no simulation driven from
+                  Python. We'd rather say that than imply otherwise.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

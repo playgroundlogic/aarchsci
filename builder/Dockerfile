@@ -152,7 +152,7 @@ RUN for rc in /opt/conda/bin.*/GMXRC.bash; do \
 # Point CP2K at the basis sets and pseudopotentials it already ships. Guarded, so it is
 # a no-op in every env without cp2k.
 #
-# conda-forge's cp2k installs 98 data files (BASIS_MOLOPT, GTH_POTENTIALS and the rest)
+# conda-forge's cp2k installs 68 data files (BASIS_MOLOPT, GTH_POTENTIALS and the rest)
 # under share/cp2k/data, and then does NOT tell cp2k where they are — it ships no
 # activate.d and sets no CP2K_DATA_DIR. The binary aborts on the first real calculation
 # as a result. So unlike siesta and dftbplus, whose data genuinely does not exist in the

@@ -239,6 +239,56 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     tifffile cannot encode or decode JPEG tiles, and real whole-slide images are JPEG-tiled.
     Note the py-ABI trap issue #32 flagged — openslide-python 1.4.6 has aarch64 builds for
     py310 through py314, and selecting by highest build number lands on py310.)
+  - `quantum` (165 pkgs — qiskit 2.5.2 + qiskit-aer (CPU), qiskit-algorithms/-optimization/
+    -machine-learning, openfermion, pylatexenc, qutip 5.3.1; quantum circuit simulation.
+    ITS OWN env: the nearest existing env is `optimization` (HiGHS/SCIP/CBC), which is
+    classical mathematical programming. The interesting finding is an abi3 one that looks
+    exactly like a gap and is not: qiskit 2.5.2 ships ONLY a `py310` build on linux-aarch64,
+    but it is abi3 (`_python_abi3_support`, `cpython >=3.10`, unpinned `python`,
+    python_abi NONE) so it installs and runs on python 3.14.8 — verified by making its
+    compiled dependency rustworkx 0.18.1 do real graph work, since an abi3 mismatch crashes
+    rather than raising ImportError. A `py3NN` BUILD STRING does not cap an interpreter; a
+    `python_abi 3.N.* *_cpNN` DEPENDENCY does, and qiskit-aer is the contrast in the same
+    env — a true per-python C++ extension that carries the pin and the highest build number.
+    Almost nothing in the verification is a tolerance: a Bell state's amplitudes are exactly
+    1/sqrt(2) (measured |a| − 1/sqrt2 == 0.0, the forbidden amplitudes exactly 0),
+    U†U = I to 5.6e-16, qutip's sigma_z eigenvalues exactly ±1. One correction to the
+    request (issue #33): Aer's `stabilizer` and `statevector` methods do NOT agree
+    bit-for-bit on counts even with identical seeds — they draw from different RNG streams.
+    Measured: identical support, different counts. So D3 asserts the two methods agree on
+    the support exactly and that both sampled distributions match the EXACT statevector
+    probabilities within their own sampling error, sqrt(p(1−p)/N) — worst deviation
+    1.67 sigma at 20000 shots.)
+  - `hep` (352 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
+    datasets, hepmc3, fastjet, lhapdf, yoda, uproot, awkward; high-energy physics. ITS OWN
+    env — nothing existing is close, and ROOT alone is a large self-contained framework.
+    GEANT4 IS PINNED `noqt_*`, WHICH INVERTS WHAT ISSUE #34 ASKED FOR, and the reason is
+    measured. The issue recommended pinning 11.4.2 because 11.4.3 ships only `noqt_*`/`qt_*`
+    C++ builds "so an env that resolves newest geant4 gets a library with no python
+    bindings". The version observation is right and the conclusion is not: the `py*` builds
+    have no python bindings either — geant4 11.4.2 `py314h616aef8_0` installs 13330 files of
+    which ZERO are under site-packages (both `Geant4` and `geant4_pybind` raise
+    ModuleNotFoundError), while still pinning `python_abi 3.14.* *_cp314`. So `py*` buys an
+    interpreter coupling for an API that does not exist; `noqt_*` at 11.4.3 is newer,
+    headless (what a container wants) and declares no python dependency at all. The honest
+    consequence: there is no way to drive a Geant4 simulation from this image — no bindings,
+    and this project does not build from source while Geant4's examples ship as C++ source
+    — so the per-event energy-conservation identity #34 proposed is NOT delivered. Geant4
+    gets this env's weakest verification, the `siesta` precedent: the library version, and
+    that all twelve physics datasets are present and wired through their G4*DATA variables.
+    That is real (a missing dataset is Geant4's commonest runtime failure — the library
+    loads, the app starts, the first event aborts — and it is 43526 files across the twelve,
+    largest G4NEUTRONHPDATA with 16092) and honestly weaker than ROOT's checks.
+    ROOT is the verifiable centre instead, and the strongest check here is CROSS-
+    IMPLEMENTATION: ROOT writes a histogram and `uproot` — an independent pure-Python/NumPy
+    reader that shares none of ROOT's I/O code — reads back the exact per-bin counts that
+    were planted ([3,1,4,1,5,9,2,6,5,3] from a 3748-byte file). ROOT reading its own file
+    would only prove self-consistency. Also exact: a TH1 filled with 1000 entries at a bin
+    centre has integral exactly 1000.0 and RMS exactly 0; a Gaussian fit recovers the
+    generated mu=1.5/sigma=0.75 within the fit's OWN reported uncertainty rather than a
+    hand-picked band (1.49995+/-0.00167, 0.74779+/-0.00118); and Pythia8's final-state
+    charge equals the incoming beam charge event by event as an integer identity, with the
+    expected value read out of the event record rather than assumed.)
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
@@ -321,9 +371,9 @@ hence the `single-cell` env.
 
 ## Facts
 
-- 20 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+- 22 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
   comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k,
-  pathology) —
+  pathology, quantum, hep) —
   native arm64, verified
   (assemble+import+functional) + signed + public.
 - `dft` (gpaw, siesta, psi4, nwchem, quantum-espresso, ase, libxc, ELPA, ScaLAPACK,

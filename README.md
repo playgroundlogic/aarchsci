@@ -6,7 +6,7 @@ stack** — geospatial / earth-observation first. For Apple Silicon and AWS Grav
 Sister project to [aarch.bio](https://aarch.bio/), which rebuilds **bioconda tool
 packages**. aarch.science covers the **conda-forge** scientific stack.
 
-> **Status:** live. **20 verified, signed, public env images** on
+> **Status:** live. **22 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -18,7 +18,7 @@ Two questions decide it, and the first one usually settles it:
 
 | | aarch.bio | aarch.science |
 |---|---|---|
-| **unit** | one tool per image (~503) | a curated multi-package env (16) |
+| **unit** | one tool per image (~503) | a curated multi-package env (22) |
 | **example** | `samtools`, `bwa`, `bcftools` | `geospatial`, `dft`, `astro`, `single-cell` |
 | **source** | bioconda / BioContainers | conda-forge |
 | **you want it when** | "I need *this tool* in a pipeline step" | "I need a *working stack* I can import against" |
@@ -110,6 +110,8 @@ has the full retention policy and the four dead digests).
 | [`geoscience`](envs/geoscience.yaml) | 112 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
 | [`cp2k`](envs/cp2k.yaml) | 111 | CP2K 2026.2 (Gaussian + plane-wave DFT, ab-initio MD), OpenMPI — MPI-parallel |
 | [`pathology`](envs/pathology.yaml) | 208 | OpenSlide + openslide-python, tifffile/imagecodecs, scikit-image, zarr, dask — whole-slide imaging |
+| [`quantum`](envs/quantum.yaml) | 165 | Qiskit + Aer (CPU), qiskit-algorithms/optimization/machine-learning, openfermion, QuTiP — quantum circuit simulation |
+| [`hep`](envs/hep.yaml) | 352 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
 
 `dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes
 further than the others': the smoke tests run the same calculation serially and again under
@@ -123,7 +125,18 @@ in parallel the same way:
 docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python your_script.py
 ```
 
-Five caveats worth knowing before you use them, all measured rather than assumed:
+Six caveats worth knowing before you use them, all measured rather than assumed:
+
+- **`hep`: Geant4 is here as a library and its data, not as something you can drive from
+  Python.** conda-forge ships **no working Python bindings for Geant4 in any variant** —
+  the `py*` builds install *zero* files into `site-packages` (both `Geant4` and
+  `geant4_pybind` raise `ModuleNotFoundError`) while still pinning `python_abi`, so this
+  image takes the newer, headless `noqt_*` build, which at least declares no interpreter
+  coupling for an API that does not exist. You get `geant4-config`, the shared libraries,
+  the headers and all twelve physics datasets wired through their `G4*DATA` variables —
+  everything a C++ application needs. You do **not** get a simulation you can run with
+  `python`, and this project does not compile from source, so don't expect one. ROOT,
+  Pythia8, uproot and the jet/PDF layer are fully usable from Python.
 
 - **`dft`, on NWChem's ARMCI network:** conda-forge ships two arm64 runtime variants and
   this image pins the two-sided one (`mpi_ts`). Measured on a container's default 64 MB

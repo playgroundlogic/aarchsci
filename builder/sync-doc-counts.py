@@ -33,7 +33,9 @@ own lock file. Six legs editing one README is a rebase conflict, so the sync is 
 follow-up job instead.
 
 SCOPE, deliberately narrow: this tool owns numbers that are mechanically derivable from
-the locks — per-env package counts, and the count of published envs. It does not touch
+the locks — per-env package counts, and the count of published envs (which is written in
+three places: the status line, the headline stat, and the "which project has it" router's
+unit row, where it had already rotted to 16 against 20 published). It does not touch
 prose, package lists, or the caveats, because those carry judgement a script cannot
 regenerate and silently rewriting them would be worse than letting them age.
 """
@@ -110,6 +112,12 @@ def sync(counts: dict[str, int], n_published: int) -> dict[Path, tuple[str, list
     s = _sub(s, r"\*\*(\d+) verified, signed, public env images\*\*",
              lambda m: f"**{n_published} verified, signed, public env images**",
              "README status", edits)
+    # The "which project has it" router's unit row: `a curated multi-package env (N)`.
+    # Same number, written in a second place and already rotted once — it said 16 while
+    # 20 envs were published. Appears in README.md and docs/index.html both.
+    s = _sub(s, r"a curated multi-package env \((\d+)\)",
+             lambda m: f"a curated multi-package env ({n_published})",
+             "README router", edits)
     if s != orig:
         result[p] = (s, edits)
 
@@ -138,6 +146,9 @@ def sync(counts: dict[str, int], n_published: int) -> dict[Path, tuple[str, list
     s = _sub(s, r'<div class="stat-num green">(\d+)</div>',
              lambda m: f'<div class="stat-num green">{n_published}</div>',
              "index stat", edits)
+    s = _sub(s, r"a curated multi-package env \((\d+)\)",
+             lambda m: f"a curated multi-package env ({n_published})",
+             "index router", edits)
     if s != orig:
         result[p] = (s, edits)
 

@@ -1,0 +1,63 @@
+# aarch.science — hep environment
+# High-energy physics (DESIGN D2): ROOT as the analysis framework and file format, Pythia8
+# for event generation, Geant4 for detector transport, plus the jet/PDF/analysis layer and
+# the columnar readers the field has moved to.
+#
+# Its own env, as issue #34 argued — nothing existing is close, and ROOT alone is a large
+# self-contained framework.
+#
+# GEANT4 IS PINNED TO `noqt_*`, WHICH IS THE OPPOSITE OF WHAT THE REQUEST ASKED FOR, and
+# the reason is measured. Issue #34's central recommendation was to pin **11.4.2** because
+# 11.4.3 "ships only noqt_*/qt_* C++ builds, so an env that resolves newest geant4 gets a
+# library with no python bindings". The version observation is correct; the conclusion is
+# not, because the `py*` builds have no python bindings either:
+#
+#   geant4 11.4.2 py314h616aef8_0:  13330 files, site-packages files = 0,
+#                                   depends: python >=3.14,<3.15, python_abi 3.14.* *_cp314
+#
+# Nothing importable — no `Geant4`, no `geant4_pybind`, nothing under site-packages — while
+# the package nonetheless pins `python_abi` to 3.14. So choosing `py*` buys an interpreter
+# coupling for a Python API that does not exist. `noqt_*` at 11.4.3 is newer, headless
+# (which is what a container wants), and declares no python dependency at all. Verified:
+# `geant4 11.4.3 noqt_2543bd4_0`, pydeps `[]`, `geant4-config --version` -> 11.4.3.
+#
+# CONSEQUENCE FOR VERIFICATION, STATED PLAINLY: Geant4 therefore gets the weakest
+# verification in this env — the `siesta` precedent. There is no way to drive a transport
+# simulation from this container, because the Python bindings do not exist and this project
+# does not compile from source (DESIGN non-goals), and Geant4's examples ship as source. So
+# the energy-conservation identity issue #34 proposed is NOT delivered. What is verified is
+# the library version, and that all twelve physics datasets are present and wired — which
+# is real (a missing dataset is Geant4's commonest runtime failure, and these are tens of
+# thousands of files) and honestly weaker than ROOT's checks. Do not let the README imply a
+# simulation runs.
+#
+# ROOT is the verifiable centre instead, and the strongest check here is a cross-
+# implementation one: ROOT writes a histogram and `uproot` — an independent pure-Python
+# reader of the ROOT format — reads it back. Two unrelated implementations agreeing on the
+# same bytes is a real check on the format, where ROOT reading its own file would only be
+# self-consistency.
+name: hep
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  - pandas
+  # --- analysis framework + format ---
+  - root
+  # --- event generation ---
+  - pythia8
+  - hepmc3
+  # --- jets, PDFs, analysis objects ---
+  - fastjet
+  - lhapdf
+  - yoda
+  # --- columnar readers: independent implementations of the ROOT format ---
+  # uproot and awkward are pure Python/NumPy and do not use ROOT's own I/O code, which is
+  # exactly why they are here rather than redundant with ROOT.
+  - uproot
+  - awkward
+  # --- detector transport ---
+  # noqt (headless, no python coupling) rather than py* — see the note above.
+  - geant4=*=noqt_*
