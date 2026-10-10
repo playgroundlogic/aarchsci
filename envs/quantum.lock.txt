@@ -1,6 +1,6 @@
 # quantum — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/quantum.yaml   Built: 2026.10.10.152301   Builder: 8fb0c16
-# lock-hash: 99a89d5f1c5c   packages: 165
+# Source spec: envs/quantum.yaml   Built: 2026.10.10.205245   Builder: 030b55e
+# lock-hash: 0134d92cdcd5   packages: 165
 # Regenerate with: ./builder/build-env.sh quantum
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -14,7 +14,7 @@ aws-c-io 1.0.0
 aws-c-s3 1.0.0
 aws-c-sdkutils 1.0.0
 aws-checksums 1.0.1
-backports.zstd 1.7.0
+backports.zstd 1.8.0
 brotli 1.2.0
 brotli-bin 1.2.0
 brotli-python 1.2.0
