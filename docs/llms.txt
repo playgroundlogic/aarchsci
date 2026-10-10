@@ -288,7 +288,12 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     generated mu=1.5/sigma=0.75 within the fit's OWN reported uncertainty rather than a
     hand-picked band (1.49995+/-0.00167, 0.74779+/-0.00118); and Pythia8's final-state
     charge equals the incoming beam charge event by event as an integer identity, with the
-    expected value read out of the event record rather than assumed.)
+    expected value read out of the event record rather than assumed. FOURTH env needing
+    `apptainer run` rather than `exec`, after dft, bayes and cp2k — root, pythia8 and all
+    twelve geant4 data packages ship activate.d scripts. Measured without activation: ROOT
+    still works, every G4*DATA is unset, and Pythia8 aborts with a misleading
+    "unmatched version numbers : in code 8.312 but in XML 0.000" whose real cause is an
+    unset PYTHIA8DATA.)
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.

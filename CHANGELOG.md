@@ -6,7 +6,9 @@ versioned per-image (date + content-hash tags); this records project-level miles
 ## 2026-10-10 (envs 21 and 22 — quantum simulation and high-energy physics)
 
 ### Added — `quantum` (issue #33)
-- **165 packages, lock `s99a89d5f1c5c`.** qiskit 2.5.2, qiskit-aer 0.17.2 (`cpu_*`),
+- **165 packages, lock `s0134d92cdcd5`**, digest
+  `sha256:e5c1c0d16a917464386b9c5ad288b109747d423b04e369daf1b9a7b359243f10`. qiskit 2.5.2,
+  qiskit-aer 0.17.2 (`cpu_*`),
   qiskit-algorithms / -optimization / -machine-learning, openfermion, pylatexenc,
   qutip 5.3.1, rustworkx 0.18.1 — on python 3.14.8.
 - **Its own env.** The nearest existing env is `optimization` (HiGHS/SCIP/CBC), which is
@@ -59,7 +61,9 @@ the strongest verification target queued:
   same Bell amplitude to 1e-15
 
 ### Added — `hep` (issue #34)
-- **352 packages, lock `s3f69b424b6ff`.** ROOT 6.40.04, pythia8 8.312, geant4 11.4.3
+- **352 packages, lock `s4f0bac796086`**, digest
+  `sha256:f7d374cfb0c39168ac45edf16b624044b67f42d2bcb2290328a852a52fadc68d`. ROOT 6.40.04,
+  pythia8 8.312, geant4 11.4.3
   `noqt_*` plus its twelve physics datasets (43526 files, largest `G4NEUTRONHPDATA` with
   16092), hepmc3 3.3.1, fastjet 3.5.2, lhapdf 6.5.6, yoda 2.1.4, uproot 5.7.7,
   awkward 2.14.0.
@@ -124,6 +128,25 @@ reads the expected charge out of the event record's own beam entries, so it is a
 the data supplies rather than a constant someone typed. Same failure mode as `bayes`
 (`idata.groups()`) and `geoscience` (`mf6 -v`): three D3 failures now whose cause was the
 smoke test's assumption about an output, not the environment.
+
+### `hep` is the fourth env that needs `apptainer run` rather than `exec`
+After `dft` (nwchem's basis path, gpaw's MPI backend), `bayes` (`CMDSTAN`) and `cp2k`
+(`CP2K_DATA_DIR`). Measured on the **published** image with activation skipped
+(`--entrypoint python`, the `exec` equivalent):
+
+- **ROOT still works** — histograms, the Gaussian fit and the uproot round-trip all pass
+  with `ROOTSYS` unset.
+- **Geant4 loses all twelve `G4*DATA` variables.** Loud, and the test names it.
+- **Pythia8 aborts with an error that points nowhere near the cause**, which is the
+  expensive one: `PYTHIA Abort from Pythia::checkVersion: unmatched version numbers : in
+  code 8.312 but in XML 0.000`. That reads as a packaging version mismatch. The actual
+  cause is that `PYTHIA8DATA` — the XML data path, set from `activate.d` — is unset.
+
+The smoke test now asserts `PYTHIA8DATA` **before** calling `init()`, so the failure says
+what it is, in the same shape as `dft`'s `GPAW_MPI_BACKEND` and `cp2k`'s `CP2K_DATA_DIR`
+assertions. That assertion is in the repo and will travel with the next build of `hep`;
+the published image (`s4f0bac796086`) carries the version that fails on the same condition
+with the less helpful message, and is not being republished for a string.
 
 ### Housekeeping
 - **`sync-doc-counts.py` now owns a third copy of the env count.** The "which project has

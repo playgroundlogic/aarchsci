@@ -211,6 +211,22 @@ exactly as documented above. Without activation, gpaw falls back to a serial com
 and `mpiexec -n 2 python` exits 1 — measured. The smoke test asserts the variable directly
 ([issue #19](https://github.com/playgroundlogic/aarchsci/issues/19)). Use `run`.
 
+**`hep` is the fourth env that needs `run`** (after `dft`, `bayes` and `cp2k`), and it is
+worth knowing *which* of its failures without activation is the dangerous one. Measured on
+the published image with activation skipped:
+
+- **ROOT still works.** Histograms, fits and the uproot round-trip all pass without
+  `ROOTSYS` set.
+- **Geant4 loses all twelve `G4*DATA` variables** — unset, so an application finds no
+  physics data. Loud, and the smoke test names it.
+- **Pythia8 aborts with a misleading error**, which is the one that will cost you an hour:
+  `PYTHIA Abort from Pythia::checkVersion: unmatched version numbers : in code 8.312 but
+  in XML 0.000`. Nothing in that says the real cause, which is simply that `PYTHIA8DATA`
+  (the XML data path, set from `activate.d`) is unset. The smoke test now asserts that
+  variable *before* calling `init()`, so the failure reads as what it is.
+
+Use `run`.
+
 Also measured on that host, so you don't have to find out the hard way:
 
 - **The writable-overlay path works** (`--writable-tmpfs`, via `fuse-overlayfs`).

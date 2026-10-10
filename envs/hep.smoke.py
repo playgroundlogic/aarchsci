@@ -26,6 +26,12 @@
 # the single most common Geant4 runtime failure, and these are tens of thousands of files
 # — and it is honestly weaker than ROOT's checks. Same shape as `siesta` in `dft`.
 #
+# THIS ENV NEEDS ACTIVATION — `apptainer run`, not `exec`, and it is the fourth such env
+# after dft, bayes and cp2k. root, pythia8 and all twelve geant4 data packages ship
+# activate.d scripts, and measured on the published image with activation skipped: ROOT
+# still works, Pythia8 aborts on a *misleading* version-mismatch error, and every G4*DATA
+# variable is unset. Both failures are asserted below so a regression fails the build.
+#
 # Pure stdlib + the env's own packages. Exit 0 = functionally sound.
 import os
 import platform
@@ -181,6 +187,21 @@ def _pythia():
     # initial state that was never configured, and measured +2 for the pp default. The
     # physics was right and the expectation was not, which is the failure mode an
     # identity read from the data cannot have.
+    # Assert the activation variable FIRST, because Pythia's own symptom for a missing
+    # PYTHIA8DATA is actively misleading. Measured in the published image with activation
+    # skipped (`--entrypoint python`, the Apptainer `exec` equivalent):
+    #
+    #   PYTHIA Error in Settings::mode: unknown key Tune:ee
+    #   PYTHIA Abort from Pythia::checkVersion: unmatched version numbers :
+    #           in code 8.312 but in XML 0.000
+    #
+    # Nothing there says "the XML data path is unset" — it reads as a packaging version
+    # mismatch, which is a long way from the real cause. Same reason dft asserts
+    # GPAW_MPI_BACKEND and cp2k asserts CP2K_DATA_DIR directly.
+    xmldoc = os.environ.get("PYTHIA8DATA")
+    assert xmldoc and Path(xmldoc).is_dir(), (
+        f"PYTHIA8DATA is {xmldoc!r} — Pythia8's XML data path comes from the package's "
+        "activate.d, so activation did not run; use `apptainer run`, not `exec`")
     for setting in ("Beams:eCM = 91.2", "WeakSingleBoson:ffbar2gmZ = on",
                     "PhaseSpace:mHatMin = 80.", "Random:setSeed = on",
                     "Random:seed = 12345", "Print:quiet = on"):
