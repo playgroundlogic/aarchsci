@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.10.08.144531   Builder: ab42cc8
-# lock-hash: cb9f1e6acf0c   packages: 328
+# Source spec: envs/r.yaml   Built: 2026.10.10.135645   Builder: 4088b77
+# lock-hash: d98eb9641259   packages: 328
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -115,7 +115,7 @@ libre2-11 2025.11.05
 librttopo 1.1.0
 libsanitizer 16.2.0
 libspatialite 5.1.0
-libsqlite 3.53.4
+libsqlite 3.54.0
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-devel_linux-aarch64 16.2.0
@@ -313,7 +313,7 @@ readline 8.3
 s2n 1.7.5
 sed 4.10
 snappy 1.2.2
-sqlite 3.53.4
+sqlite 3.54.0
 sysroot_linux-aarch64 2.39
 tk 8.6.13
 tktable 2.10
