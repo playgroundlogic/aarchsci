@@ -6,7 +6,7 @@ stack** — geospatial / earth-observation first. For Apple Silicon and AWS Grav
 Sister project to [aarch.bio](https://aarch.bio/), which rebuilds **bioconda tool
 packages**. aarch.science covers the **conda-forge** scientific stack.
 
-> **Status:** live. **18 verified, signed, public env images** on
+> **Status:** live. **19 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -108,6 +108,7 @@ has the full retention policy and the four dead digests).
 | [`single-cell`](envs/single-cell.yaml) | 346 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
 | [`bayes`](envs/bayes.yaml) | 125 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
 | [`geoscience`](envs/geoscience.yaml) | 112 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
+| [`cp2k`](envs/cp2k.yaml) | 111 | CP2K 2026.2 (Gaussian + plane-wave DFT, ab-initio MD), OpenMPI — MPI-parallel |
 
 `dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes
 further than the others': the smoke tests run the same calculation serially and again under

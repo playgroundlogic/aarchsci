@@ -208,6 +208,22 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     leave a mean of exactly zero (3.6e-15). flopy is included although only obspy and
     modflow6 were requested: mf6 alone reads and writes its own formats, so the solver is
     near-unusable without it, and flopy is noarch.)
+  - `cp2k` (111 pkgs — cp2k 2026.2 `mpi_openmpi`, openmpi, mpi4py; Gaussian-and-plane-waves
+    DFT, ab-initio MD, QM/MM. Closes what GAPS.md had called "the one most worth upstream
+    effort" since the first coverage probe: cp2k had NO linux-aarch64 build at all, and
+    conda-forge now ships one. ITS OWN ENV rather than part of `dft`, and the obstacle was
+    not the expected one — `qe 7.5` hard-pins elpa >=2025.6.1,<2025.6.2 while cp2k needs
+    elpa >=2026.2.2, and every qe aarch64 build pins an old elpa minor, so the two cannot
+    share an env until qe is rebuilt upstream (gpaw and siesta were NOT the problem: gpaw's
+    elpa requirement is version-unpinned and siesta uses no elpa). Verified by reproducing
+    UPSTREAM'S OWN regtest reference at UPSTREAM'S OWN tolerance: cp2k ships 344 Quickstep
+    regtest dirs whose TEST_FILES.toml carries committed energies and tolerances, and D3
+    reads both from that TOML at run time rather than hardcoding them — Ar.inp
+    ref −21.04944231395054, tol 3e-13, measured 4.6e-14 serial and 6.0e-14 on 2 ranks,
+    the two agreeing to 1.4e-14. Unlike siesta and dftbplus it ships its data (68
+    basis/pseudopotential files), though the package sets no CP2K_DATA_DIR — the builder
+    exports it, so this is a third env after `dft` and `bayes` needing `apptainer run`
+    rather than `exec`. Large: cp2k alone is ~445 MB.)
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
@@ -290,8 +306,8 @@ hence the `single-cell` env.
 
 ## Facts
 
-- 18 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
-  comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience) —
+- 19 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+  comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k) —
   native arm64, verified
   (assemble+import+functional) + signed + public.
 - `dft` (gpaw, siesta, psi4, nwchem, quantum-espresso, ase, libxc, ELPA, ScaLAPACK,

@@ -3,6 +3,66 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-10 (env 19 — the longest-standing gap closed)
+
+### Added — `cp2k` (issue #30); declined `julia` (issue #31)
+
+- **`cp2k` — 111 packages, lock `sd4f840224c26`.** CP2K 2026.2 `mpi_openmpi_hc9fd102_8`,
+  OpenMPI 5.0.11, elpa 2026.02.002. **This retires the oldest entry in GAPS.md**: cp2k was
+  recorded from the very first coverage probe as "the one most worth upstream effort" — a
+  major Gaussian/plane-wave DFT code with *no* linux-aarch64 build at all while every
+  comparable engine had one. conda-forge now ships it, so this is the first gap in this
+  file closed by upstream rather than by a decision here. GAPS.md's solve-gap count drops
+  16 → 15.
+
+- **Its own env, not an addition to `dft` — and the obstacle was not the predicted one.**
+  Issue #30 expected the `elpa >=2026.2.2` requirement to collide with `gpaw` and `siesta`.
+  Measured, it doesn't: gpaw asks for `elpa * mpi_openmpi_*` with **no version bound**, and
+  siesta needs no elpa at all. **`qe` is the blocker** — `qe 7.5` hard-pins
+  `elpa >=2025.6.1,<2025.6.2.0a0`, and *every* qe linux-aarch64 build pins an old elpa
+  minor (7.4/7.2 → 2021.11.x). So it is structural rather than a bump away, and dropping
+  `qe` to make room would have removed a working plane-wave engine published three weeks
+  earlier (#14) with a real SCF. Issue #30 pre-authorised this fallback. Revisit a merge
+  back into `dft` if conda-forge rebuilds qe against elpa 2026.
+
+- **The strongest verification in the catalog, and not one this project invented.** cp2k
+  ships 344 Quickstep regtest directories whose `TEST_FILES.toml` carries a committed
+  reference energy **and** a committed tolerance:
+  `"Ar.inp" = [{matcher="E_total", tol=3e-13, ref=-21.04944231395054}]`. D3 reproduces that
+  reference at that tolerance, **reading both out of the TOML at run time** rather than
+  copying them into the test — so if the package updates its reference the check follows it
+  instead of asserting a remembered value. Measured in the built image: **4.62e-14** serial
+  and **6.04e-14** on 2 ranks against a 3e-13 bound, the two agreeing to **1.42e-14**.
+  Also asserts `cp2kflags` contains `parallel`, `elpa`, `scalapack` and `libxc`, since a
+  serial or elpa-less build would be a different thing wearing the same name and the lock
+  file cannot record that (DESIGN OQ2).
+
+- **One packaging bug found and fixed in the builder.** conda-forge's cp2k installs 68
+  basis-set and pseudopotential files under `share/cp2k/data` and then sets no
+  `CP2K_DATA_DIR` and ships no `activate.d`, so the binary **aborts on the first
+  calculation**. `builder/Dockerfile` now exports it, guarded on cp2k being present so it
+  is a no-op elsewhere. Unlike `siesta` and `dftbplus`, whose data genuinely is not in the
+  package, cp2k's data was present and merely unwired — a one-line fix rather than a reason
+  to ship a crippled env. Third env after `dft` and `bayes` where `apptainer run` is
+  required and `exec` breaks.
+
+### Declined — `julia` (#31), with the reasoning the author asked for
+julia 1.13.0 does now have a linux-aarch64 build, which retires the original objection.
+Declined anyway, on a different ground: **conda-forge packages only `julia` and `juliaup`
+— zero Julia libraries.** The ecosystem comes from Julia's own `Pkg`, which downloads from
+the General registry at run time, i.e. the `whitebox` pattern this project treats as a
+wontfix. That is categorically unlike `r`, where conda-forge packages 3000+ `r-*` and the
+env ships 328 packages of working science; a `julia` env would be a bare runtime plus
+stdlib.
+
+Stated fairly, because the request was honest about this being "a packaging-policy question
+more than a capability gap": for the author's actual use case — measuring JIT start-up and
+compile latency — the bare runtime *is* sufficient, and Julia's `Manifest.toml` pins exact
+versions and hashes, so a reproducible Julia project is entirely possible. It is just
+*fetched* rather than baked, which is a different guarantee from the one this catalog
+makes. The upstream tarball route the author identified remains the right answer, and they
+offered to record it.
+
 ## 2026-10-09 (envs 17 and 18, plus a lazy-import gap closed)
 
 ### Added — `bayes` (issue #27) and `geoscience` (issue #29); `scikit-misc` to single-cell (#28)

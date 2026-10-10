@@ -1,0 +1,56 @@
+# aarch.science — cp2k environment
+# CP2K: Gaussian-and-plane-waves DFT, ab-initio molecular dynamics, and the mixed
+# QM/MM and linear-scaling machinery around them (DESIGN D2). MPI-parallel.
+#
+# This closes the gap GAPS.md has named "the one most worth upstream effort" since the
+# first coverage probe: cp2k had NO linux-aarch64 build at all, which is why it was the
+# highest-value absence in the catalog. conda-forge now ships one, in both MPI flavours
+# (issue #30).
+#
+# WHY ITS OWN ENV AND NOT AN ADDITION TO `dft`, which is what issue #30 asked for. The
+# request predicted the obstacle would be the elpa bump "touching gpaw and siesta". It
+# isn't — measured, the blocker is `qe`:
+#
+#   cp2k 2026.2   requires  elpa >=2026.2.2 *mpi_openmpi_*
+#   gpaw 26.7.0   requires  elpa * mpi_openmpi_*          (version-unpinned, fine)
+#   siesta 5.4.2  requires  no elpa at all                 (fine)
+#   qe 7.5        requires  elpa >=2025.6.1,<2025.6.2.0a0  <-- mutually exclusive
+#
+# And it is structural rather than a bump away: EVERY qe linux-aarch64 build hard-pins an
+# old elpa minor (7.5 `hc91ee90_1` -> 2025.6.1; 7.5 `h8f6a5eb_0`, 7.4 and 7.2 -> 2021.11.x).
+# So cp2k and qe cannot share an env today. Dropping `qe` to make room would remove a
+# working, published plane-wave engine that landed three weeks earlier (issue #14) with a
+# real SCF — a bad trade. Issue #30 pre-authorised this fallback: "If it turns out the elpa
+# bump is disruptive... a separate env would be a reasonable answer."
+#
+# Revisit if conda-forge rebuilds qe against elpa 2026, at which point the two could merge
+# back into `dft`. That is a qe-feedstock matter, not something to force here.
+#
+# CP2K SHIPS ITS OWN DATA, which is what makes full verification possible and separates it
+# from siesta and dftbplus: 98 basis-set and pseudopotential files under share/cp2k/data,
+# plus 344 Quickstep regtest directories whose TEST_FILES.toml carries committed reference
+# energies AND committed tolerances. cp2k.smoke.py reproduces one of those references at
+# upstream's own tolerance — see that file.
+#
+# One thing the package gets wrong and the builder fixes: it installs the data but sets no
+# CP2K_DATA_DIR and ships no activate.d, so cp2k aborts on the first calculation.
+# builder/Dockerfile exports it (guarded on cp2k being present), which makes this the third
+# env after `dft` and `bayes` where `apptainer run` is required and `exec` breaks.
+#
+# Large by nature: cp2k alone is ~445 MB.
+name: cp2k
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  # --- MPI flavor lock: LOAD-BEARING ---
+  # conda-forge ships cp2k on arm64 in BOTH flavours — `mpi_mpich_h3e4aace_108` and
+  # `mpi_openmpi_hc9fd102_8`. An unpinned solve could take the MPICH side, which is the
+  # same conflict that still blocks `abinit` (mpich-only on aarch64, see GAPS.md). Pinning
+  # OpenMPI keeps this env consistent with every other MPI env in the catalog and keeps
+  # elpa/fftw/hdf5/dbcsr/sirius on one flavour.
+  - mpi=*=openmpi
+  - openmpi
+  - mpi4py
+  - cp2k=*=mpi_openmpi*

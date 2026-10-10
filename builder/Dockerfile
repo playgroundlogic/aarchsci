@@ -149,6 +149,26 @@ RUN for rc in /opt/conda/bin.*/GMXRC.bash; do \
 # reverts gpaw to serial; that fails LOUDLY (`mpiexec` exits 1) rather than silently
 # computing a wrong answer, and dft.smoke.py asserts the variable directly so a
 # regression fails the build instead of shipping.
+# Point CP2K at the basis sets and pseudopotentials it already ships. Guarded, so it is
+# a no-op in every env without cp2k.
+#
+# conda-forge's cp2k installs 98 data files (BASIS_MOLOPT, GTH_POTENTIALS and the rest)
+# under share/cp2k/data, and then does NOT tell cp2k where they are — it ships no
+# activate.d and sets no CP2K_DATA_DIR. The binary aborts on the first real calculation
+# as a result. So unlike siesta and dftbplus, whose data genuinely does not exist in the
+# package, cp2k's data is present and merely unwired, which is a one-line fix rather than
+# a reason to ship a crippled env.
+#
+# Third instance of this shape in the catalog, after nwchem's basis path and gpaw's MPI
+# backend, so it reinforces the same operational rule: `apptainer run`, not `exec`.
+# cp2k.smoke.py asserts CP2K_DATA_DIR directly so a regression fails the build.
+RUN if [ -x /opt/conda/bin/cp2k ] && [ -d /opt/conda/share/cp2k/data ]; then \
+      mkdir -p /opt/conda/etc/conda/activate.d; \
+      printf '%s\n' '#!/bin/sh' 'export CP2K_DATA_DIR=/opt/conda/share/cp2k/data' \
+        > /opt/conda/etc/conda/activate.d/aarchsci_cp2k_data.sh; \
+      echo "[builder] pointed CP2K_DATA_DIR at the shipped basis/potential data"; \
+    fi
+
 RUN if [ -x /opt/conda/bin/gpaw ]; then \
       mkdir -p /opt/conda/etc/conda/activate.d; \
       printf '%s\n' '#!/bin/sh' 'export GPAW_MPI_BACKEND=cgpaw' \

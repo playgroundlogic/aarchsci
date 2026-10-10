@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">18</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience</div>
+                    <div class="stat-num green">19</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -682,6 +682,30 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   matching Darcy's law to 1.5&times;10<sup>&minus;15</sup>. ObsPy reads its bundled
                   three-component example with no network, and <code>detrend("demean")</code> must
                   leave a mean of exactly zero.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">cp2k</span><br>
+                  <strong>111 packages</strong> &mdash; CP2K: Gaussian + plane-wave DFT and ab-initio MD, MPI-parallel
+                </p>
+                <div class="catalog">
+                    <span class="chip">CP2K 2026.2</span>
+                    <span class="chip">ELPA</span>
+                    <span class="chip">ScaLAPACK</span>
+                    <span class="chip">SIRIUS</span>
+                    <span class="chip">OpenMPI</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  This one was the catalog's longest-standing gap &mdash; recorded from the first
+                  coverage probe as the single package most worth upstream effort, because CP2K had
+                  <em>no</em> arm64 build at all while every comparable DFT engine did. conda-forge
+                  now ships one. It also gets the strongest check here, and we didn't invent it:
+                  CP2K ships 344 regression tests whose manifests carry a committed reference energy
+                  <em>and</em> a committed tolerance, so the test reproduces
+                  <strong>upstream's own number at upstream's own bound</strong> &mdash; both read
+                  out of that manifest at run time rather than copied into our test. Reference
+                  &minus;21.04944231395054, tolerance 3&times;10<sup>&minus;13</sup>, measured
+                  4.6&times;10<sup>&minus;14</sup> serially and 6.0&times;10<sup>&minus;14</sup> on
+                  two ranks.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

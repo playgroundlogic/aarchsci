@@ -78,7 +78,7 @@ family as noarch-vs-subdir: a name that looks like a platform claim and isn't.
 
 | Kind | Count | Notes |
 |------|------:|-------|
-| **solve-gap** | 16 | No `linux-aarch64` build at all. Engines/potentials: `cp2k`, `sisl`, `asap3`, `kimpy`, `openkim-models`, `quippy`, `chgnet`, `m3gnet`. Phonons/transport: `phono3py`, `alamode`, `dynaphopy`, `boltztrap2`, `kwant`. DMFT: `triqs`, `triqs_dft_tools`, `edrixs`. All surfaced while scoping `dft` and probing its neighborhood; **none blocks a shipping env** — they are candidates we probed and declined. `cp2k` is the highest-value target, `phono3py` the cheapest. |
+| **solve-gap** | 15 | No `linux-aarch64` build at all. Engines/potentials: ~~`cp2k`~~ (**RESOLVED 2026-10-10 — see below**), `sisl`, `asap3`, `kimpy`, `openkim-models`, `quippy`, `chgnet`, `m3gnet`. Phonons/transport: `phono3py`, `alamode`, `dynaphopy`, `boltztrap2`, `kwant`. DMFT: `triqs`, `triqs_dft_tools`, `edrixs`. All surfaced while scoping `dft` and probing its neighborhood; **none blocks a shipping env** — they are candidates we probed and declined. `cp2k` was the highest-value target and is now shipping as its own env; `phono3py` is the cheapest of what remains. |
 | **assemble-gap** | 1 | `whitebox` — solves, imports, but fetches an amd64 binary at runtime (wontfix); see below |
 | **MPI-flavor conflict** | 1 | `abinit` — has an arm64 build, solves standalone, but MPICH-only (stuck); see below |
 | **python-ABI collision** | 2 | `psi4` in `comp-chem` — no py313 arm64 build; relocated to `dft` (py314) instead of downgrading 13 packages. `su2` in `fem-cfd` — arm64 builds stop at py311, which would cap the whole env; declined. Neither is a gap in any shipping image; see below |
@@ -89,8 +89,8 @@ finding, and it's the inverse of the pip experience: the exact stack that fails
 `No matching distribution found for rasterio` on PyPI solves *and* assembles cleanly
 on conda-forge. Fifteen envs ship verified (geospatial, earth-observation, geo-ml,
 climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization,
-neuroimaging, single-cell, bayes, geoscience), and every headline package in all
-eighteen assembles and does real work natively.
+neuroimaging, single-cell, bayes, geoscience, cp2k), and every headline package in all
+nineteen assembles and does real work natively.
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
 changed: every solve-gap listed above is a **candidate we probed and declined**, not a
@@ -103,9 +103,33 @@ is informative: the *engines* mostly have arm64 builds (`gpaw`, `qe`, `siesta`, 
 `psi4`, `dftbplus`, `lammps`, `elk`, `yambo`, `wannier90`), while the tooling layered
 around them often doesn't.
 
-`cp2k` remains the one most worth upstream effort — a major plane-wave/Gaussian DFT code,
-entirely absent on `linux-aarch64` while all of those engines have builds. `phono3py` is
-the cheapest, since `phonopy` already builds on arm64. See the neighborhood probe below.
+**`cp2k` is RESOLVED as of 2026-10-10 (issue #30), and it is the first entry in this file
+to be retired by upstream rather than by us.** It was recorded here from the first coverage
+probe as "the one most worth upstream effort" — a major plane-wave/Gaussian DFT code,
+entirely absent on `linux-aarch64` while every comparable engine had a build. conda-forge
+now ships `cp2k 2026.2` for aarch64 in **both** MPI flavours, and it is published as its
+own env (111 packages, lock `sd4f840224c26`).
+
+Two things that fell out of building it are worth keeping:
+
+- **It is in its own env rather than in `dft`, and the obstacle was not the expected one.**
+  Issue #30 predicted the `elpa >=2026.2.2` requirement would collide with `gpaw` and
+  `siesta`. Measured, it does not: gpaw asks for `elpa * mpi_openmpi_*` with no version
+  bound, and siesta needs no elpa at all. **`qe` is the blocker** — `qe 7.5` hard-pins
+  `elpa >=2025.6.1,<2025.6.2.0a0`, and *every* qe linux-aarch64 build pins an old elpa
+  minor (7.5 `h8f6a5eb_0`, 7.4, 7.2 → 2021.11.x). So this is structural, not a bump away,
+  and the two codes cannot share an env until conda-forge rebuilds qe against elpa 2026.
+- **cp2k ships its own data, which is why it gets full verification where `siesta` cannot.**
+  68 basis-set and pseudopotential files under `share/cp2k/data`, plus 344 Quickstep
+  regtest directories whose `TEST_FILES.toml` carries committed reference energies *and*
+  committed tolerances. D3 reproduces one at upstream's own tolerance
+  (`Ar.inp`: ref −21.04944231395054, tol 3e-13; measured 4.6e-14 serial, 6.0e-14 on 2
+  ranks). One packaging bug found and fixed in `builder/Dockerfile`: the package installs
+  that data and sets no `CP2K_DATA_DIR`, so cp2k aborts on the first calculation until the
+  variable is exported.
+
+`phono3py` is now the cheapest remaining target, since `phonopy` already builds on arm64.
+See the neighborhood probe below.
 
 ### The R layer — the first gap that is a percentage, not a list (2026-09-04, issue #8)
 
@@ -305,8 +329,8 @@ The first probe to return real gaps. Resolving native arm64 on conda-forge:
 `spglib` · `phonopy` · `pymatgen` · `siesta` · `dftbplus` · `lammps` · `nwchem` ·
 `psi4` · `nglview`
 
-**No `linux-aarch64` build (solve-gap):** `cp2k` · `sisl` · `asap3` · `kimpy` ·
-`openkim-models`
+**No `linux-aarch64` build (solve-gap):** `sisl` · `asap3` · `kimpy` · `openkim-models`
+(`cp2k` was on this list until 2026-10-10; conda-forge now ships it and it has its own env)
 
 **Arm64 build exists but MPICH-only (MPI-flavor conflict):** `abinit`
 
@@ -429,9 +453,10 @@ Two of these deserve attention:
   the same version, and has no arm64 build. Because phonopy already builds, this is
   plausibly the lowest effort-per-value fix available
   ([`conda-forge/phono3py-feedstock`](https://github.com/conda-forge/phono3py-feedstock)).
-- **`libxsmm` 2.1.0 *does* have an arm64 build**, so it does not explain `cp2k`'s
-  absence. The obvious excuse for the highest-value gap is gone, and the real fix may be
-  more tractable than assumed.
+- **`libxsmm` 2.1.0 *does* have an arm64 build**, so it never explained `cp2k`'s absence.
+  That reasoning held up: the gap was more tractable than assumed, and conda-forge shipped
+  `cp2k 2026.2` for aarch64 — with libxsmm among its compiled-in features. Resolved
+  2026-10-10, see above.
 
 **A data package that changed a scoping call — now acted on (issue #14):** `sssp` — the
 Standard Solid State Pseudopotentials library — is on conda-forge as a **`noarch`,
