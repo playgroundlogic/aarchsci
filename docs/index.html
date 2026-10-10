@@ -111,7 +111,7 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">22</div>
+                    <div class="stat-num green">23</div>
                     <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k, pathology, quantum, hep</div>
                 </div>
                 <div class="stat">
@@ -153,7 +153,7 @@
                   <tr style="border-bottom:1px solid var(--border);">
                     <td style="padding:0.5rem 0.75rem;"><strong>unit</strong></td>
                     <td style="padding:0.5rem 0.75rem;">one tool per image (~503)</td>
-                    <td style="padding:0.5rem 0.75rem;">a curated multi-package env (22)</td>
+                    <td style="padding:0.5rem 0.75rem;">a curated multi-package env (23)</td>
                   </tr>
                   <tr style="border-bottom:1px solid var(--border);">
                     <td style="padding:0.5rem 0.75rem;"><strong>example</strong></td>
@@ -784,6 +784,36 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   <code>noqt</code> build is what's here, with all twelve physics datasets
                   present and wired. Library and data, verified; no simulation driven from
                   Python. We'd rather say that than imply otherwise.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">pic</span><br>
+                  <strong>166 packages</strong> &mdash; particle-in-cell plasma physics
+                </p>
+                <div class="catalog">
+                    <span class="chip">WarpX 26.10</span>
+                    <span class="chip">AMReX / pyAMReX</span>
+                    <span class="chip">openPMD</span>
+                    <span class="chip">yt</span>
+                    <span class="chip">OpenMP-threaded</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  The package ships <strong>62 of upstream's own input decks</strong>, so
+                  this env is verified against WarpX's own Langmuir test rather than a
+                  fixture we invented &mdash; and that deck carries its own answer:
+                  the analytic plasma frequency is written into its parameters, so the
+                  reference is a closed form, not a number someone committed. Measured:
+                  Gauss's law <code>ε₀·divE = ρ</code> holds as a discrete identity to
+                  <strong>7×10<sup>&minus;10</sup></strong>, and the oscillation sits within
+                  <strong>3.6×10<sup>&minus;4</sup></strong> of the closed-form frequency
+                  &mdash; stable to four digits whether you watch it for 1 or 12 plasma
+                  periods. The best check is an <strong>exact</strong> one: WarpX writes the
+                  same step twice through two unrelated writers, and <code>yt</code> and
+                  <code>openpmd-api</code> read the two files back
+                  <strong>bit-for-bit identical</strong>. <strong>No MPI, deliberately</strong>
+                  &mdash; conda-forge's WarpX is <code>nompi</code> on every architecture, so
+                  adding an MPI stack would dress a single-node code as a cluster code. It is
+                  still parallel: OpenMP across a Graviton's cores, with the thread count
+                  asserted.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

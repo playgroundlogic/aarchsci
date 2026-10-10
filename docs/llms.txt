@@ -294,6 +294,36 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     still works, every G4*DATA is unset, and Pythia8 aborts with a misleading
     "unmatched version numbers : in code 8.312 but in XML 0.000" whose real cause is an
     unset PYTHIA8DATA.)
+  - `pic` (166 pkgs — warpx 26.10 (electromagnetic particle-in-cell) + amrex/pyamrex,
+    openpmd-api, yt, numpy/scipy/matplotlib; plasma physics. ITS OWN ENV rather than an
+    addition to `cfd-fv` as issue #35 preferred, and the reason is a python cap rather than
+    the thin-env argument: `cfd-fv` is capped at python 3.11 BY SU2 (the very reason it is
+    its own env), so putting warpx there lands it on a py311 build three python minors back
+    — measured, in-cfd-fv gives python 3.11.17 / numpy 2.4.6 / scipy 1.17.1 against
+    standalone's 3.14.8 / 2.5.3 / 1.18.1. Same as the psi4 relocation to `dft`. The
+    request's MPI-flavour worry was unfounded and it was right not to assert it without a
+    solve: option A does solve, because warpx's amrex/pyamrex/openpmd-api/fftw are all
+    `nompi_*` and declare no MPI, so they coexist with `mpi=*=openmpi` (not the ABINIT
+    shape, which is mpich-ONLY). NO MPI IN THE SPEC, deliberately — conda-forge warpx is
+    nompi on every arch since 21.03, and adding openmpi would dress a single-node code as a
+    cluster code. But nompi is NOT serial: the binaries are `warpx.*.NOMPI.OMP.*` and the
+    smoke test asserts WarpX reports `OMP initialized with 2 OMP threads`, so this env is
+    OpenMP-threaded single-node parallel. Verified on UPSTREAM'S OWN decks with nothing
+    downloaded — the package ships 62 input decks under etc/conda/test-files, including
+    Tests/langmuir, whose analytic plasma frequency is written into the deck itself
+    (`wp = sqrt(2*n0*q_e**2/(epsilon0*m_e))`), so the reference is a closed form rather
+    than a committed number. Note the Regression/Checksum/benchmarks_json reference
+    checksums issue #35 proposed verifying against are NOT in the package (0 of 151 files).
+    Measured: Gauss's law eps0*divE == rho to 7.1e-10 relative as a discrete identity; the
+    fitted plasma frequency within 3.59e-4 of the closed form, stable to four digits over
+    1.2 / 4.8 / 12 plasma periods; one grid refinement (dz and dt halving together) at
+    order 2.12. The strongest check is CROSS-IMPLEMENTATION and is an EQUALITY: WarpX writes
+    the same step through two unrelated writers (an AMReX plotfile and openPMD/BP5) and yt
+    and openpmd-api read them back with max|yt - openPMD| = 0.0 exactly. Energy drift is
+    bounded and reported (0.22% over 80 steps) rather than asserted tight, because a PIC
+    scheme is not symplectic. One thing NOT asserted: a multi-level convergence ladder —
+    the error floors near 3e-5 and wanders (3.59e-4, 8.25e-5, 3.25e-5, 7.08e-5 for n_cell
+    128..1024), so only one refinement step is claimed.)
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
@@ -376,9 +406,9 @@ hence the `single-cell` env.
 
 ## Facts
 
-- 22 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+- 23 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
   comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k,
-  pathology, quantum, hep) —
+  pathology, quantum, hep, pic) —
   native arm64, verified
   (assemble+import+functional) + signed + public.
 - `dft` (gpaw, siesta, psi4, nwchem, quantum-espresso, ase, libxc, ELPA, ScaLAPACK,

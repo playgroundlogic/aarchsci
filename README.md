@@ -6,7 +6,7 @@ stack** — geospatial / earth-observation first. For Apple Silicon and AWS Grav
 Sister project to [aarch.bio](https://aarch.bio/), which rebuilds **bioconda tool
 packages**. aarch.science covers the **conda-forge** scientific stack.
 
-> **Status:** live. **22 verified, signed, public env images** on
+> **Status:** live. **23 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -18,7 +18,7 @@ Two questions decide it, and the first one usually settles it:
 
 | | aarch.bio | aarch.science |
 |---|---|---|
-| **unit** | one tool per image (~503) | a curated multi-package env (22) |
+| **unit** | one tool per image (~503) | a curated multi-package env (23) |
 | **example** | `samtools`, `bwa`, `bcftools` | `geospatial`, `dft`, `astro`, `single-cell` |
 | **source** | bioconda / BioContainers | conda-forge |
 | **you want it when** | "I need *this tool* in a pipeline step" | "I need a *working stack* I can import against" |
@@ -112,6 +112,7 @@ has the full retention policy and the four dead digests).
 | [`pathology`](envs/pathology.yaml) | 208 | OpenSlide + openslide-python, tifffile/imagecodecs, scikit-image, zarr, dask — whole-slide imaging |
 | [`quantum`](envs/quantum.yaml) | 165 | Qiskit + Aer (CPU), qiskit-algorithms/optimization/machine-learning, openfermion, QuTiP — quantum circuit simulation |
 | [`hep`](envs/hep.yaml) | 352 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
+| [`pic`](envs/pic.yaml) | 166 | WarpX (electromagnetic particle-in-cell) + AMReX/pyAMReX, openPMD, yt — plasma physics, OpenMP-threaded |
 
 `dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes
 further than the others': the smoke tests run the same calculation serially and again under
@@ -125,7 +126,18 @@ in parallel the same way:
 docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python your_script.py
 ```
 
-Six caveats worth knowing before you use them, all measured rather than assumed:
+Seven caveats worth knowing before you use them, all measured rather than assumed:
+
+- **`pic` has no MPI, and that is the package's choice rather than ours.** conda-forge's
+  WarpX is `nompi` on *every* architecture and has been since 21.03, so this is not an
+  arm64 gap. We deliberately did **not** add openmpi/mpi4py to the spec: dressing a
+  single-node code in an MPI stack is exactly what the rank-count checks in the other
+  parallel envs exist to prevent. But **nompi is not serial** — the binaries are
+  `warpx.{1d,2d,3d,rz,rcylinder,rsphere}.NOMPI.OMP.*` and WarpX reports
+  `OMP initialized with N OMP threads`, so it scales across a Graviton's cores with
+  `OMP_NUM_THREADS`, just not across nodes. The smoke test asserts the thread count, so
+  the claim is earned rather than assumed. Also: `pywarpx.__version__` is `None` and the
+  banner prints `WarpX (Unknown)` — get the version from conda metadata, not the binary.
 
 - **`hep`: Geant4 is here as a library and its data, not as something you can drive from
   Python.** conda-forge ships **no working Python bindings for Geant4 in any variant** —

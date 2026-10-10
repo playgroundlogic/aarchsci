@@ -1,0 +1,66 @@
+# aarch.science — pic environment
+# Particle-in-cell plasma physics (DESIGN D2): WarpX as the electromagnetic PIC solver,
+# AMReX underneath it, openPMD + yt for reading what it writes.
+#
+# ITS OWN ENV, WHICH IS NOT WHAT ISSUE #35 PREFERRED, and the reason is a python cap
+# rather than the thin-env argument the request expected to have to beat. #35 preferred
+# adding warpx to `cfd-fv` on the grounds that a `pic` env would ship "essentially one
+# package". Measured, both halves of that are wrong:
+#
+#   in cfd-fv:    python 3.11.17  warpx np2py311h78c57af_0  numpy 2.4.6  scipy 1.17.1   99 pkgs
+#   standalone:   python 3.14.8   warpx np2py314h16d739f_0  numpy 2.5.3  scipy 1.18.1  166 pkgs
+#
+# `cfd-fv` is capped at python 3.11 BY SU2 — that cap is the whole reason cfd-fv is its own
+# env (issue #16). So Option A would have made warpx pay su2's interpreter cap for nothing,
+# landing it three python minors back and on a different build than the one #35 itself
+# named. That is the `psi4` precedent: psi4 moved to `dft` at py314 rather than dragging
+# `comp-chem` down. And 166 packages is not "essentially one".
+#
+# The request's actual worry — an MPI-flavour collision — turned out to be unfounded, and
+# it was right not to assert it without a solve. Option A DOES solve: warpx pulls
+# `amrex`/`pyamrex`/`openpmd-api`/`fftw` in their `nompi_*` variants, those declare no MPI,
+# and they coexist with `mpi=*=openmpi` + openmpi + mpi4py + su2 with no mpich anywhere.
+# Not the ABINIT shape (ABINIT is mpich-ONLY, a genuine mutually-exclusive conflict).
+#
+# NO MPI IN THIS SPEC, DELIBERATELY. conda-forge's warpx is nompi on every arch and has
+# been since 21.03, so shipping openmpi/mpi4py here would dress a single-node code as a
+# cluster code — exactly what the rank-count checks in dft/md/fem-cfd/cfd-fv exist to stop
+# anyone doing. But "nompi" is NOT "serial", and the distinction matters for the Graviton
+# pitch: the binaries are `warpx.{1d,2d,3d,rz,rcylinder,rsphere}.NOMPI.OMP.*` and the
+# banner prints `OMP initialized with N OMP threads`. This env is OpenMP-threaded
+# single-node parallel, and pic.smoke.py asserts the thread count so the claim is earned.
+#
+# Verified against UPSTREAM'S OWN input decks with nothing downloaded: the package ships 62
+# of them under etc/conda/test-files/warpx/1/Examples/, including Tests/langmuir. Note what
+# it does NOT ship, since #35 proposed building the verification on it: the
+# Regression/Checksum/benchmarks_json/ reference checksums are in WarpX's GitHub repo and
+# are 0 of the 151 installed files. The decks are better anyway — the Langmuir deck carries
+# the analytic plasma frequency in its own parameters, so the reference is a closed form
+# rather than a committed number. See pic.smoke.py.
+name: pic
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  - matplotlib-base
+  # --- the PIC solver + its framework ---
+  # warpx brings amrex, pyamrex, blaspp, lapackpp and fftw, all nompi_*.
+  - warpx
+  # --- reading what it writes ---
+  # openpmd-api and yt are NOT redundant with each other, and that is the point of having
+  # both. WarpX writes the same step twice, by two unrelated writers: an AMReX plotfile and
+  # an openPMD/BP5 file. yt reads the former, openpmd-api the latter. Two independent
+  # writer+reader paths agreeing is a real check on the data; one of them round-tripping
+  # through itself would only be self-consistency. Measured bit-exact — see the smoke test.
+  - openpmd-api
+  - yt
+  # The nompi pin is redundant TODAY and kept anyway, with the reason stated so nobody
+  # removes it as noise: warpx already forces `openpmd-api * nompi_*` through its own
+  # depends, so the solver cannot pick an MPI variant while warpx is in the env. It is here
+  # because openpmd-api DOES ship mpi_* variants, and a future member of this env pulling
+  # one would be an unsolvable conflict rather than a silent downgrade — the same
+  # zero-cost-guard reasoning as `qiskit-aer=*=cpu_*` in `quantum` and the MPI flavour
+  # locks in dft/md.
+  - openpmd-api=*=nompi_*

@@ -3,6 +3,94 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-10 (env 23 — particle-in-cell plasma physics)
+
+### Added — `pic` (issue #35), as its own env rather than inside `cfd-fv`
+- **166 packages, lock `sbf42d7d6c3f2`.** warpx 26.10 `np2py314h16d739f_0` (electromagnetic
+  PIC) with amrex/pyamrex 26.10, openpmd-api 0.17.1, yt, numpy/scipy/matplotlib — on
+  python 3.14.8. Passed D3 on the first build.
+- **Declined the requested placement, and the reason is not the thin-env argument.** Issue
+  #35 preferred adding warpx to `cfd-fv` because a `pic` env would ship "essentially one
+  package". Both halves are wrong when measured. `cfd-fv` is capped at **python 3.11 by
+  su2** — the very reason it is its own env (#16) — so Option A lands warpx on a py311
+  build three python minors back, and specifically *not* the `np2py314h16d739f_0` build the
+  request itself named:
+
+  | | in `cfd-fv` | standalone |
+  |---|---|---|
+  | python | 3.11.17 | **3.14.8** |
+  | warpx | `np2py311h78c57af_0` | **`np2py314h16d739f_0`** |
+  | numpy / scipy | 2.4.6 / 1.17.1 | **2.5.3 / 1.18.1** |
+  | packages | 99 | 166 |
+
+  That is the `psi4` precedent: relocate rather than drag an env's interpreter down. And
+  166 is not "essentially one package" — it is the analysis layer that makes the output
+  readable. Recorded in GAPS.md as a third python-ABI collision shape, an **inherited**
+  cap: the first two were found by reading the candidate's builds, this one is only visible
+  by reading the destination env's resolved python.
+- **The request's actual worry was unfounded, and it was right not to assert it.** #35
+  flagged that warpx pulls `nompi`-flavoured amrex/pyamrex/openpmd-api into an
+  `mpi=*=openmpi` env and asked for a solve rather than guessing. Option A **does** solve
+  (99 pkgs, no mpich anywhere): the `nompi` variants declare no MPI, so they coexist with
+  the flavour lock. Not the ABINIT shape, which is mpich-**only** and therefore a genuine
+  mutually-exclusive conflict.
+- **No MPI in the spec, deliberately.** conda-forge's warpx is `nompi` on every
+  architecture and has been since 21.03, so this is not an arm64 gap. Adding
+  openmpi/mpi4py would dress a single-node code as a cluster code — precisely what the
+  rank-count checks in `dft`/`md`/`fem-cfd`/`cfd-fv` exist to prevent. **But nompi is not
+  serial**, and the request's "conda-forge warpx is serial everywhere" needs that
+  correction: the binaries are `warpx.{1d,2d,3d,rz,rcylinder,rsphere}.NOMPI.OMP.*` and
+  WarpX reports `OMP initialized with N OMP threads`. So the env is OpenMP-threaded
+  single-node parallel, and D3 asserts the thread count — this env's analogue of the
+  others' 2-rank MPI legs.
+
+### The verification runs on upstream's own decks, and the best check is an equality
+- **The reference checksums issue #35 proposed do not ship.**
+  `Regression/Checksum/benchmarks_json/` lives in WarpX's GitHub repo and is **0 of the 151
+  installed files**. What *does* ship is better: **62 upstream input decks** under
+  `etc/conda/test-files/warpx/1/Examples/`, including `Tests/langmuir`, plus upstream's own
+  `test.sh`. And the Langmuir deck carries its own answer —
+  `my_constants.wp = sqrt(2.*n0*q_e**2/(epsilon0*m_e))` — so the reference is a **closed
+  form** computed here from the deck's own `n0` and hardcoded SI constants, with nothing
+  read back out of WarpX to check WarpX.
+- **`yt` and `openpmd-api` agree bit-exactly.** WarpX writes the same step twice through
+  two unrelated writers (an AMReX plotfile and an openPMD/BP5 file), and those two readers
+  share no code. Measured `max|yt - openPMD| = 0.0` — asserted as an **equality**, not a
+  tolerance, because any difference at all would mean one path is transforming the data.
+  Same shape as ROOT/uproot in `hep`, tighter.
+- **Gauss's law as a discrete identity:** `max|ε₀·divE - ρ| / max|ρ| = 7.11e-10`, stable
+  across all 11 configurations probed.
+- **Plasma frequency:** fitted within **3.595e-04** of the closed form — and stable to four
+  digits over time windows of 1.2, 4.8 and 12 plasma periods, which is what shows it is a
+  real property of the discretisation rather than fit noise.
+- **Energy drift bounded and reported, not asserted tight:** 0.22% over 80 steps, bound set
+  at 5%. A PIC scheme is not symplectic, so asserting 1e-10 would be asserting a property
+  the method does not have; what the check catches is a diverging run.
+- **PICMI drives a run in-process** (upstream's shipped 1D laser-acceleration example,
+  rc 0), because a PIC env reachable only through the CLI would be a half-capability.
+
+### Not delivered: the convergence ladder, and why
+Issue #35 asked for a refinement ladder showing the error falling at the scheme's
+theoretical order. **One refinement step does, reproducibly** — 3.595e-04 → 8.252e-05,
+order **2.12**, the same to three digits across three separate probes, refining dz and dt
+together since the deck's CFL ties them. **A ladder does not.** Measured at ppc=2:
+
+```
+n_cell  128    256     512      1024
+err     3.59e-4 8.25e-5 3.25e-5  7.08e-5      order: 2.12, 1.34, -1.12
+```
+
+Both obvious explanations were tested and neither holds: raising particles-per-cell at
+fixed grid is also non-monotonic (8.3e-5, 3.4e-5, 2.4e-4, 2.4e-4), and lengthening the
+window does not move the 128-cell number at all. So D3 asserts one step at order ≥ 1.5 and
+the module comment says plainly not to extend it — asserting a clean asymptotic order
+across levels would be asserting something the measurement contradicts.
+
+### Also corrected
+`pywarpx.__version__` is `None` and the banner prints `WarpX (Unknown)`, so the version
+assertion reads conda metadata rather than the binary. Same class of trap as the geant4
+probe-prefix collision in `hep`: ask the package record, not the program.
+
 ## 2026-10-10 (envs 21 and 22 — quantum simulation and high-energy physics)
 
 ### Added — `quantum` (issue #33)
