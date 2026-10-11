@@ -88,6 +88,21 @@ expensive way — before the immutable tag existed, four manifests lost all thei
 that way and were garbage-collected ([issue #13](https://github.com/playgroundlogic/aarchsci/issues/13)
 has the full retention policy and the four dead digests).
 
+**Two different digests are both "the" digest, so be explicit about which you mean.** Every
+image here is published as an OCI image index, so there is an index digest *and* a
+per-architecture digest, and they are different objects — for `pic:latest`, measured:
+
+```
+index (manifest list)   sha256:3299b36b70841b0a2fe1be96d92fe5a6ffa21b67b450bbac296f068afe9b719c
+linux/arm64             sha256:e02db0b494ce602c6948104fe4a9085b6fc004611f501c48c27eed1874100b95
+```
+
+**Cosign signs the index digest**, which is what our build logs and release notes quote, so
+that is the one to verify against. The **per-arch digest** is the one to pin if you want a
+pull that resolves to exactly one platform with no index indirection. Neither is wrong and
+neither moves; comparing one against the other just looks like a mismatch when it isn't.
+(`docker buildx imagetools inspect <ref>` shows both.)
+
 | Env | Pkgs | What's in it |
 |-----|-----:|--------------|
 | [`geospatial`](envs/geospatial.yaml) | 110 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
@@ -149,6 +164,17 @@ Seven caveats worth knowing before you use them, all measured rather than assume
   everything a C++ application needs. You do **not** get a simulation you can run with
   `python`, and this project does not compile from source, so don't expect one. ROOT,
   Pythia8, uproot and the jet/PDF layer are fully usable from Python.
+  **Second `hep` note, on precision:** `TMath`'s special functions are not uniformly
+  double precision, and the split is inside one namespace. Measured against
+  `scipy.special` over x ∈ [0.1, 10] at 991 points — `Erf`, `Erfc` and `LnGamma` are
+  **bit-identical** at every point, while the Bessel functions are single-precision-grade
+  polynomial approximations: `BesselI0` 3.3e-08 and `BesselI1` 2.6e-08 relative,
+  `BesselJ0`/`J1` ~4.9e-09 absolute (their *relative* error reaches 6e-05 near J0's zero
+  at x≈2.405, where relative error is the wrong metric). Fine for histogram-scale work,
+  not for anything that needs the last few digits — use `scipy.special` there. Thanks to
+  [#34](https://github.com/playgroundlogic/aarchsci/issues/34) for spotting this.
+  `hep` is also by far the largest image in the catalog: 8.95 GB unpacked against
+  1.77 GB for `quantum` and 1.93 GB for `pic`, so pull time will dominate short jobs.
 
 - **`dft`, on NWChem's ARMCI network:** conda-forge ships two arm64 runtime variants and
   this image pins the two-sided one (`mpi_ts`). Measured on a container's default 64 MB
