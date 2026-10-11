@@ -640,11 +640,36 @@ the entire stack backwards by roughly two years:
 | libxc | 7.1.2 | 6.2.2 |
 | elpa | 2025.06.001 | 2021.11.002 |
 
-**Upstream fix:** add an `openmpi` variant for `linux-aarch64` to
-[`conda-forge/abinit-feedstock`](https://github.com/conda-forge/abinit-feedstock).
-That is an ordinary feedstock matrix change, which is why this is `stuck` (retry) and
-not `wontfix`. Recorded in [`farm/skip-list.tsv`](farm/skip-list.tsv) with a 90-day
-revisit.
+**Upstream fix — and this entry previously described it wrongly (corrected 2026-10-11).**
+It said "add an `openmpi` variant for `linux-aarch64` … an ordinary feedstock matrix
+change", which implies the variant exists on other platforms and only the arm64 leg is
+missing. **It doesn't.** Measured: `abinit 10.0.3` is mpich-only on **linux-64 too**
+(`h2b8cb88_2` → `mpich 4.3.2`, with `fftw`/`hdf5`/`libnetcdf`/`netcdf-fortran` all
+`mpi_mpich_*`). So the ask is to add an openmpi variant *at all*, across platforms — a
+larger change than a matrix flip, though an ordinary one in conda-forge terms since
+`cp2k`, `elpa` and `fftw` all carry both flavours.
+
+It has also **already been asked, twice, and the request is live**:
+[`abinit-feedstock#32`](https://github.com/conda-forge/abinit-feedstock/issues/32) (2021,
+open) with two attempts —
+[PR #21](https://github.com/conda-forge/abinit-feedstock/pull/21) (2020, closed: the
+openmpi build of `netcdf-fortran` was broken at the time) and
+[PR #33](https://github.com/conda-forge/abinit-feedstock/pull/33) (2021, **still open**,
+stalled in MPI-IO test timeouts). So the correct action here was never "file an issue" —
+it is to add a current downstream datapoint to the existing thread, which was done
+2026-10-11.
+
+**The 2020 blocker is gone**, and that is the useful thing we can contribute: all four of
+the MPI-flavoured dependencies now have current `mpi_openmpi_*` builds on linux-aarch64
+and they co-solve (68 packages, no conflict):
+
+```
+fftw            3.3.11  mpi_openmpi_h79548e3_0     libnetcdf       4.10.0  mpi_openmpi_h4966f38_4
+hdf5             2.2.0  mpi_openmpi_h57bd46d_1     netcdf-fortran   4.6.4  mpi_openmpi_h50cdedf_0
+```
+
+Still `stuck` (retry) rather than `wontfix`, because nothing technical blocks it now.
+Recorded in [`farm/skip-list.tsv`](farm/skip-list.tsv) with a 90-day revisit.
 
 ### `whitebox` — wontfix (assemble-gap, by design)
 

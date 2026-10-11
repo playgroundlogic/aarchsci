@@ -60,6 +60,21 @@ in the domain** (forced — there's no `.sci` TLD).
 - GitHub repo: **playgroundlogic/aarchsci**
 - Robot account (when created): `aarchsci+robot` (mirrors `aarchbio+robot`)
 
-## Open questions (DESIGN OQ1, OQ2, OQ4)
-Image granularity (broad vs fine), versioning scheme (date vs spec-hash),
-reconciler "changed" definition. (OQ3 naming is now settled above.)
+## Open questions: NONE — all four are settled (DESIGN.md has the reasoning)
+OQ2 versioning (four tags, immutable `<date>.<HHMMSS>` is the retention anchor), OQ3
+naming (above), OQ4 reconciler trigger (lock-hash change), and OQ1 granularity as of
+2026-10-11.
+
+**OQ1's rule is worth having here, because every "add package P to env Y" request is an
+OQ1 question.** Ask in order; the first test that answers it, answers it:
+1. **Artifact shape (D5)** — one tool or a stack? One tool is aarchbio's, whatever the subject.
+2. **Would co-tenancy cost either side a version?** conda-forge resolves an env as a whole,
+   so the strictest member sets everyone's floor. **A dry-run solve answers this in
+   seconds — run it before arguing.** It is what decided psi4→`dft`, su2→`cfd-fv`,
+   warpx→`pic` (inheriting su2's py311 cap) and cp2k-vs-qe.
+3. **Domain coherence, both directions** — would the existing env's users be puzzled to
+   find it, *and* would its seekers look there? A shared *format* is not a shared domain.
+
+Not tests: "the new env would be too thin" (size is not a cost — `cfd-fv` is 56 pkgs; and
+`pic` was predicted "essentially one package", measured 166) and "it's the same broad
+field" (`fem-cfd` and `cfd-fv` are both CFD and correctly separate).

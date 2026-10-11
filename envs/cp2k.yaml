@@ -27,7 +27,7 @@
 # back into `dft`. That is a qe-feedstock matter, not something to force here.
 #
 # CP2K SHIPS ITS OWN DATA, which is what makes full verification possible and separates it
-# from siesta and dftbplus: 98 basis-set and pseudopotential files under share/cp2k/data,
+# from siesta and dftbplus: 68 basis-set and pseudopotential files under share/cp2k/data,
 # plus 344 Quickstep regtest directories whose TEST_FILES.toml carries committed reference
 # energies AND committed tolerances. cp2k.smoke.py reproduces one of those references at
 # upstream's own tolerance — see that file.

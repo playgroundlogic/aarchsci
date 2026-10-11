@@ -127,9 +127,54 @@ wins on price/perf. (The pip-arm64-wheel gap is a CPU-stack problem anyway.)
 
 ## Open questions
 
-- **OQ1 — image granularity:** few broad domain images (easy to use, larger) vs
-  many fine-grained ones (composable, more to maintain)? Lean broad for v1
-  (`geospatial` is one broad image). Still open for the catalog as a whole.
+- **OQ1 — image granularity: SETTLED 2026-10-11, by practice rather than by argument.**
+  The original question was "few broad domain images vs many fine-grained ones", and it sat
+  open for 23 envs — during which it was *answered* repeatedly, because every "add package P
+  to env Y" request is an OQ1 question. #32 (pathology→geospatial), #33 (quantum→
+  optimization) and #35 (warpx→cfd-fv) were all decided in one week, and all three were
+  decided the same way, from the same three tests in the same order. We were applying a rule
+  we had never written down; this is that rule.
+
+  **Ask, in order. The first test that answers it, answers it.**
+
+  1. **Artifact shape (D5).** Does the user want one tool or a working stack? One tool is
+     aarchbio's shape, whatever the subject. Only stacks are in scope here. — Settles most
+     cross-project confusion before granularity is even relevant.
+
+  2. **Would co-tenancy cost either side a version?** This is the test that has done the
+     most work and the one nobody thinks to run. conda-forge resolves an env as a whole, so
+     the *strictest* member sets the floor for everyone. Measured instances: `psi4` would
+     have dragged `comp-chem` back 13 packages → went to `dft`. `su2` caps python at 3.11 →
+     got `cfd-fv` to itself. `warpx` would have **inherited** su2's cap and landed on a
+     py311 build three minors behind the one the request named → got `pic` (#35). `qe`'s
+     elpa pin is mutually exclusive with `cp2k`'s → two envs (#30).
+
+     Note the direction: this test *splits*. It is also objective — a dry-run solve answers
+     it in seconds, and it does not require anyone to have a view about domains. **Run it
+     before arguing about anything else.**
+
+  3. **Domain coherence, in both directions.** Would a user of the existing env be puzzled
+     to find this package, *and* would a user looking for this package think to look in an
+     env with that name? Failing either direction splits. A shared *format* is not a shared
+     domain — a whole-slide image is a tiled pyramidal TIFF, which is why #32 argued for
+     `geospatial`, and by that reasoning astronomy mosaics and electron microscopy would
+     land there too. Failing both directions is the strongest case for merging.
+
+  **Two arguments that are explicitly NOT tests**, because both were tried and neither
+  survives:
+  - *"A new env would be too thin."* Size is not a cost. `cfd-fv` is 56 packages,
+    `optimization` 61, and both are fine. `julia` was declined because conda-forge packages
+    **zero** Julia libraries — an availability problem that was twice misread as a size
+    objection (#31, then #32 citing #31). And the estimate is usually wrong anyway: `pic`
+    was predicted at "essentially one package" and measured 166.
+  - *"It's the same broad field."* Fields are not envs. `fem-cfd` and `cfd-fv` are both CFD
+    and are correctly separate — finite-element vs finite-volume, with different Python
+    caps.
+
+  **So: broad where a stack is genuinely one stack, split the moment co-tenancy costs a
+  version.** That is why the catalog looks the way it does — 56 to 367 packages, no upper
+  or lower bound imposed — and why the next request should be answered with a solve rather
+  than a discussion.
 - **OQ2 — versioning scheme: SETTLED, then amended twice (2026-09-04, 2026-09-07).**
   **Four** tags per build: `<date>.<HHMMSS>` (immutable — unique per build, never
   moves, the retention anchor), `<date>` (`2026.06.25` — human/reconciler-friendly),
@@ -237,6 +282,18 @@ wins on price/perf. (The pip-arm64-wheel gap is a CPU-stack problem anyway.)
 - Compiling packages from source (same as aarchbio: build from blessed conda-forge
   packages; gaps go upstream).
 - ~~Bioinformatics (that's aarchbio).~~ **Amended 2026-10-08 — see D5 below.**
+- **An amd64 leg. DECIDED 2026-10-11 — previously this was deferred in a code comment
+  rather than decided, which is why it is written down here now.** `builder/build-env.sh`
+  has said since v1 that "multi-arch merge is a later addition", and that dangling note was
+  doing the work of a decision for five months. The decision: **arm64-only, deliberately,
+  and not merely for cost.** The project's thesis is that the arm64 leg is the one that
+  doesn't assemble — `No matching distribution found for rasterio` on c7g is the founding
+  bug. An amd64 leg would ship images whose value is already covered by plain
+  `conda create` upstream, double every build and every daily reconciler run, and dilute
+  what "verified" means here from "we closed a real gap" to "we rebuilt what worked."
+  **The trigger that would reverse this:** a consumer needing *bit-comparable* x86/arm
+  results from one lock, which is a reproducibility use case the catalog does not currently
+  claim and would be an honest reason to revisit. Until someone asks for that, arm64-only.
 
 ## D5 — the boundary between the two projects is ARTIFACT SHAPE
 
