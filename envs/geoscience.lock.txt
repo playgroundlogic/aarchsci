@@ -1,9 +1,9 @@
 # geoscience — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geoscience.yaml   Built: 2026.10.10.135645   Builder: 4088b77
-# lock-hash: 28604f74a270   packages: 112
+# Source spec: envs/geoscience.yaml   Built: 2026.10.11.141659   Builder: f839008
+# lock-hash: 30beae7cd3f8   packages: 112
 # Regenerate with: ./builder/build-env.sh geoscience
 _openmp_mutex 4.5
-backports.zstd 1.7.0
+backports.zstd 1.8.0
 brotli 1.2.0
 brotli-bin 1.2.0
 brotli-python 1.2.0
@@ -78,7 +78,7 @@ matplotlib-base 3.11.2
 modflow6 6.8.1
 munkres 1.1.4
 ncurses 6.6
-numpy 2.5.3
+numpy 2.5.4
 obspy 1.5.1
 openjpeg 2.5.4
 openssl 3.6.5
