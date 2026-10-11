@@ -95,9 +95,39 @@ dependency *all* say "this is the Python build", and there is no Python module b
 of them. The rule above still works but needs the extra step: `depends` tells you whether
 an interpreter is capped, and only the **file list** tells you whether a Python API exists.
 `hep` pins `geant4=*=noqt_*` as a result (11.4.3, `pydeps []`, headless), which is newer
-and declares no interpreter coupling for an API that isn't there. Not a gap — nothing is
-missing from arm64 — but it is the reason `hep` cannot verify Geant4 beyond its version and
-its physics datasets.
+and declares no interpreter coupling for an API that isn't there. Not an *arm64* gap —
+nothing is missing from arm64, the same is true on linux-64 — but it is the reason `hep`
+cannot verify Geant4 beyond its version and its physics datasets.
+
+**Re-measured 2026-10-11, because #34 asked for the repin a second time** and the request
+deserved a demonstration rather than a restatement. Installed
+`geant4=11.4.2=py314h616aef8_0` itself and enumerated it:
+
+```
+total files 13295      top-level dirs: bin, include, lib, share
+site-packages files 0  "pybind" matches 0   .py files 32 (all share/Geant4/examples/*, C++ example helpers)
+bin/            geant4-config, geant4.sh, geant4.csh   (no exampleB*/exampleN* binaries)
+import Geant4 / geant4 / geant4_pybind / g4py  ->  ModuleNotFoundError, all four
+```
+
+**And the mechanism, which is the part worth remembering:** the package links
+`libboost_python314.so`, and depends on `libboost-python 1.90.0 py314hea2faff_3`. *That* is
+why the build string says `py314` and why `python_abi 3.14.* *_cp314` is pinned — an
+interpreter coupling through a **linked library**, not through a module. Boost.Python being
+linked means the C++ is capable of exposing bindings; the feedstock does not build or
+install `g4py`. No separate binding package exists either — `geant4-pybind`,
+`geant4_pybind`, `pygeant4`, `python-geant4` and `geant4-python` are all absent from
+conda-forge.
+
+The repin would also **double the dependency footprint for no capability**: solved alone,
+`11.4.2=py314h616aef8_0` is **142 packages** and pulls **`qt6-main`** (it is the Qt variant)
+against **71 packages** for `11.4.3 noqt_*` — a full Qt stack into a headless image that is
+already the largest in the catalog.
+
+**Where the fix belongs: `conda-forge/geant4-feedstock`**, which would need to build and
+install the `g4py` module. Until it does, no conda-forge env on any architecture can drive
+a Geant4 simulation from Python, and the only other route is compiling an example from the
+shipped source — which is from-source, and a DESIGN non-goal.
 
 **A third python-ABI collision, 2026-10-10, scoping `pic` (issue #35): an INHERITED cap.**
 The first two instances were a package whose own builds capped an env. This one is a
