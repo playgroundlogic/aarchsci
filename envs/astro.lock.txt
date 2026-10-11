@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.10.10.135646   Builder: 4088b77
-# lock-hash: ed5afa726bbe   packages: 364
+# Source spec: envs/astro.yaml   Built: 2026.10.11.141700   Builder: f839008
+# lock-hash: 0221d7b797f5   packages: 364
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -45,7 +45,7 @@ azure-storage-common-cpp 12.14.0
 azure-storage-files-datalake-cpp 12.16.0
 backports 1.0
 backports.tarfile 1.2.0
-backports.zstd 1.7.0
+backports.zstd 1.8.0
 beautifulsoup4 4.15.0
 bleach 6.4.0
 blosc 1.21.6
@@ -251,7 +251,7 @@ nest-asyncio2 1.7.3
 networkx 3.7
 nlohmann_json 3.12.0
 numcodecs 0.17.0
-numpy 2.5.3
+numpy 2.5.4
 openjpeg 2.5.4
 openssl 3.6.5
 orc 2.3.1
@@ -318,7 +318,7 @@ slicerator 1.1.0
 snappy 1.2.2
 snuggs 1.4.7
 sortedcontainers 2.4.0
-soupsieve 2.10
+soupsieve 3.0.1
 specutils 2.4.0
 spiceypy 8.2.0
 sqlite 3.54.0
