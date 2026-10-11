@@ -124,7 +124,9 @@ The repin would also **double the dependency footprint for no capability**: solv
 against **71 packages** for `11.4.3 noqt_*` — a full Qt stack into a headless image that is
 already the largest in the catalog.
 
-**Where the fix belongs: `conda-forge/geant4-feedstock`**, which would need to build and
+**Where the fix belongs — and it is now filed:**
+[`conda-forge/geant4-feedstock#111`](https://github.com/conda-forge/geant4-feedstock/issues/111)
+(2026-10-11), which would need to build and
 install the `g4py` module. Until it does, no conda-forge env on any architecture can drive
 a Geant4 simulation from Python, and the only other route is compiling an example from the
 shipped source — which is from-source, and a DESIGN non-goal.
@@ -187,6 +189,8 @@ Two things that fell out of building it are worth keeping:
   `elpa >=2025.6.1,<2025.6.2.0a0`, and *every* qe linux-aarch64 build pins an old elpa
   minor (7.5 `h8f6a5eb_0`, 7.4, 7.2 → 2021.11.x). So this is structural, not a bump away,
   and the two codes cannot share an env until conda-forge rebuilds qe against elpa 2026.
+  Filed as [`conda-forge/qe-feedstock#83`](https://github.com/conda-forge/qe-feedstock/issues/83)
+  (2026-10-11).
 - **cp2k ships its own data, which is why it gets full verification where `siesta` cannot.**
   68 basis-set and pseudopotential files under `share/cp2k/data`, plus 344 Quickstep
   regtest directories whose `TEST_FILES.toml` carries committed reference energies *and*

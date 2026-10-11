@@ -23,7 +23,9 @@
 # real SCF — a bad trade. Issue #30 pre-authorised this fallback: "If it turns out the elpa
 # bump is disruptive... a separate env would be a reasonable answer."
 #
-# Revisit if conda-forge rebuilds qe against elpa 2026, at which point the two could merge
+# Asked upstream as conda-forge/qe-feedstock#83 (2026-10-11): the pin looks like an
+# exact-minor pin rather than a compatibility floor, so a plain rebuild would likely clear
+# it. Revisit if conda-forge rebuilds qe against elpa 2026, at which point the two could merge
 # back into `dft`. That is a qe-feedstock matter, not something to force here.
 #
 # CP2K SHIPS ITS OWN DATA, which is what makes full verification possible and separates it
