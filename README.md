@@ -6,7 +6,7 @@ stack** — geospatial / earth-observation first. For Apple Silicon and AWS Grav
 Sister project to [aarch.bio](https://aarch.bio/), which rebuilds **bioconda tool
 packages**. aarch.science covers the **conda-forge** scientific stack.
 
-> **Status:** live. **23 verified, signed, public env images** on
+> **Status:** live. **26 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -18,7 +18,7 @@ Two questions decide it, and the first one usually settles it:
 
 | | aarch.bio | aarch.science |
 |---|---|---|
-| **unit** | one tool per image (~503) | a curated multi-package env (23) |
+| **unit** | one tool per image (~503) | a curated multi-package env (26) |
 | **example** | `samtools`, `bwa`, `bcftools` | `geospatial`, `dft`, `astro`, `single-cell` |
 | **source** | bioconda / BioContainers | conda-forge |
 | **you want it when** | "I need *this tool* in a pipeline step" | "I need a *working stack* I can import against" |
@@ -110,7 +110,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`geo-ml`](envs/geo-ml.yaml) | 367 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader |
 | [`climate`](envs/climate.yaml) | 262 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
 | [`pointcloud`](envs/pointcloud.yaml) | 234 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
-| [`comp-chem`](envs/comp-chem.yaml) | 207 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb, vina |
+| [`comp-chem`](envs/comp-chem.yaml) | 223 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb, vina |
 | [`dft`](envs/dft.yaml) | 236 | gpaw, siesta, psi4, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 245 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
 | [`viz`](envs/viz.yaml) | 244 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
@@ -128,6 +128,9 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`quantum`](envs/quantum.yaml) | 165 | Qiskit + Aer (CPU), qiskit-algorithms/optimization/machine-learning, openfermion, QuTiP — quantum circuit simulation |
 | [`hep`](envs/hep.yaml) | 352 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
 | [`pic`](envs/pic.yaml) | 166 | WarpX (electromagnetic particle-in-cell) + AMReX/pyAMReX, openPMD, yt — plasma physics, OpenMP-threaded |
+| [`structbio`](envs/structbio.yaml) | 121 | cctbx + gemmi (two independent symmetry implementations), biopython — crystallography |
+| [`popgen`](envs/popgen.yaml) | 246 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
+| [`tomography`](envs/tomography.yaml) | 88 | ASTRA (CPU) + TomoPy, scikit-image, tifffile — CT reconstruction |
 
 `dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes
 further than the others': the smoke tests run the same calculation serially and again under
@@ -141,7 +144,25 @@ in parallel the same way:
 docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python your_script.py
 ```
 
-Seven caveats worth knowing before you use them, all measured rather than assumed:
+Nine caveats worth knowing before you use them, all measured rather than assumed:
+
+- **`tomography`: ASTRA and TomoPy are verified to different depths, deliberately.** ASTRA
+  is the verified engine — projections conserve the object's mass to 9.5e-07 and FBP error
+  falls monotonically with the angle count. TomoPy is verified at **import plus its phantom
+  generator** only, for two measured reasons: its reconstruction conventions don't match
+  ASTRA's sinograms without scaling work that belongs in a recipe (best correlation 0.62,
+  magnitudes ~1e4 off), and its multiprocessing path died with `ConnectionResetError` from
+  a dead child — twice, including at `ncore=1` — while the machine was under load from a
+  concurrent build, then passed at 64/128/256 px when idle. Intermittent-under-load is the
+  worst property a build gate can have, so the gate doesn't rest on it. Use TomoPy's
+  pipeline by all means; just know ASTRA is the part this image proves.
+- **`popgen` ships without `stdpopsim`, and that is not an oversight.** Every release from
+  0.2.0 on requires `slim`, which has **no conda-forge package on any platform**, so an
+  unpinned spec silently resolves 2020-era **0.1.2** instead of failing. Shipping that
+  under a name implying the current model catalog would be advertising a capability rather
+  than providing one. `msprime`, `tskit`, `tszip`, `demes` and `scikit-allel` are all
+  current. Note also that `msprime` on bioconda is stuck at 0.4.0 with zero aarch64 files —
+  conda-forge is the right source, which a naive search gets wrong.
 
 - **`pic` has no MPI, and that is the package's choice rather than ours.** conda-forge's
   WarpX is `nompi` on *every* architecture and has been since 21.03, so this is not an

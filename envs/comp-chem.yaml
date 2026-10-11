@@ -81,3 +81,16 @@ dependencies:
   # Two patch releases of rdkit is a fair price for a docking engine; recorded here so
   # the next reader doesn't mistake it for unexplained staleness.
   - vina
+  # --- thermochemistry, kinetics and transport (issue #38) ---
+  # Cantera covers RATES, which nothing else in the catalog touches: equilibrium,
+  # reaction kinetics, transport properties, 1-D flames. The rest of this env is
+  # structure and energy (rdkit, openbabel, pyscf, xtb, openmm), so this is the
+  # complement rather than an overlap.
+  #
+  # Costs nothing: measured, the env goes 207 -> 223 packages with python, rdkit and
+  # everything else unchanged. Note the build that actually lands is `py313`, NOT the
+  # py314 one issue #38 highlighted — this env resolves python 3.13.16 (psi4's old
+  # py313 ceiling is why `psi4` lives in `dft` instead, see GAPS.md), and cantera 3.2.0
+  # has aarch64 builds for py310 through py314, so it fits whatever this env's python is
+  # rather than moving it.
+  - cantera

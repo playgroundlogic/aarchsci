@@ -35,6 +35,7 @@ HEADLINE = [
     "openmm", "MDAnalysis", "mdtraj", "parmed", "pdbfixer",
     "ase", "pyscf", "xtb",
     "vina",
+    "cantera",
 ]
 print("[smoke] 1. imports")
 for mod in HEADLINE:
@@ -180,6 +181,65 @@ def _vina():
     # function is bounded well inside this range for any physical pose.
     assert -50.0 < total < 0.0, f"vina total score implausible: {total}"
     print(f"       (vina total score: {total:.3f} kcal/mol)")
+
+
+# --- thermochemistry and kinetics (issue #38) -----------------------------------
+print("[smoke] 7. cantera: conservation identities, not bands")
+
+
+@check("cantera ships its mechanisms and obeys the ideal-gas law exactly")
+def _cantera_state():
+    import glob
+    import os
+    import cantera as ct
+    # The mechanisms ship IN the package — 23 YAML files including gri30 — so this needs
+    # no download, which is what made it acceptable here at all (the `whitebox` wontfix
+    # precedent).
+    bundled = glob.glob(os.path.join(ct.__path__[0], "data", "*.yaml"))
+    assert len(bundled) >= 10, f"only {len(bundled)} bundled mechanisms"
+    assert os.path.exists(os.path.join(ct.__path__[0], "data", "gri30.yaml")), \
+        "gri30.yaml is not bundled"
+    g = ct.Solution("gri30.yaml")
+    g.TPX = 1200.0, ct.one_atm, "CH4:1, O2:2, N2:7.52"
+    assert g.n_species == 53 and g.n_reactions == 325, \
+        f"gri30 is {g.n_species} species / {g.n_reactions} reactions, expected 53/325"
+    # Mass fractions sum to EXACTLY one — equality, not a tolerance.
+    assert sum(g.Y) - 1.0 == 0.0, f"sum(Y) - 1 = {sum(g.Y) - 1.0!r}, expected exactly 0"
+    # P = rho*R*T/M is the definition of the ideal-gas phase, so the only error allowed
+    # is round-off. Measured 1.4e-16.
+    rhs = g.density * ct.gas_constant * g.T / g.mean_molecular_weight
+    rel = abs(rhs - g.P) / g.P
+    assert rel < 1e-13, f"ideal-gas law closure {rel:.3e}, expected round-off"
+    print(f"       (cantera {ct.__version__}, {len(bundled)} bundled mechanisms; "
+          f"gri30 {g.n_species} species/{g.n_reactions} reactions; "
+          f"sum(Y)-1 = {sum(g.Y) - 1.0:.1f} exactly; PV=nRT closure {rel:.1e})")
+
+
+@check("constant-enthalpy equilibration conserves enthalpy and every element")
+def _cantera_equilibrate():
+    import cantera as ct
+    g = ct.Solution("gri30.yaml")
+    g.TPX = 1200.0, ct.one_atm, "CH4:1, O2:2, N2:7.52"
+    h0 = g.enthalpy_mass
+    el0 = {e: g.elemental_mass_fraction(e) for e in g.element_names}
+    # 'HP' holds enthalpy and pressure fixed while the composition relaxes to
+    # equilibrium, so h is an INVARIANT the solver must preserve and the elements are
+    # conserved by construction. Both are identities; neither is a band on an observed
+    # number. Burning methane also moves the state a long way (T 1200 -> ~2620 K), so a
+    # solver that silently did nothing would fail the temperature check below.
+    g.equilibrate("HP")
+    dh = abs(g.enthalpy_mass - h0) / abs(h0)
+    assert dh < 1e-9, f"enthalpy drifted {dh:.3e} under HP equilibration"
+    worst = 0.0
+    for e, v0 in el0.items():
+        worst = max(worst, abs(g.elemental_mass_fraction(e) - v0))
+    assert worst < 1e-10, f"element mass fraction drifted {worst:.3e}"
+    assert sum(g.Y) - 1.0 == 0.0, "mass fractions do not sum to exactly 1 after equilibrium"
+    # Adiabatic flame temperature for this mixture from 1200 K; a wide window, because
+    # the point is that combustion actually happened, not to pin the value.
+    assert 2000.0 < g.T < 3200.0, f"adiabatic flame temperature {g.T:.1f} K is implausible"
+    print(f"       (HP equilibrate: |dh/h| = {dh:.2e}, worst element drift {worst:.2e}, "
+          f"T_ad = {g.T:.1f} K)")
 
 
 # --- verdict --------------------------------------------------------------------

@@ -3,6 +3,135 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-11 (envs 24-26 — crystallography, population genetics, tomography; plus two additions)
+
+Seven issues (#36-#42) triaged by dry-run solve rather than by argument, which is OQ1's
+rule as settled earlier today. Five accepted, one declined, one recorded as a gap.
+
+### Added — `structbio` (issue #39)
+- **121 packages, lock `se0104a505be2`.** cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88,
+  python 3.14.8. Passed D3 on the first build.
+- **Its own env, not an addition to `md`.** `md` is trajectory production; this is
+  symmetry/coordinate/map work. cctbx-base is a 161 MB solve with its own boost stack, and
+  keeping it separate means a cctbx rebuild cannot perturb `md`'s shipped recipes.
+- **cctbx AND gemmi on purpose, not redundantly** — they are two *independent*
+  implementations of crystallographic symmetry, which is what makes a cross-implementation
+  check possible. Measured: a triclinic unit-cell volume is **bit-identical** across gemmi,
+  cctbx and the closed form (relative difference exactly 0.0); both agree with the
+  International Tables on space-group order for 10 groups; cubic d-spacings match
+  `a/sqrt(h²+k²+l²)` to 2.8e-16; and symmetry operations close under composition exactly —
+  `F m -3 m` gives 192 operators, **36864 products, 0 outside the group**.
+- **A lesson is baked into that table.** The first draft asserted order 3 for `R 3` from a
+  hand-typed value; *both* libraries independently returned 9, and they are right — `R 3`
+  defaults to hexagonal axes where the order is 9, and only `R 3 :R` is 3. Two independent
+  implementations disagreeing with your constant means re-check the constant. Both settings
+  are now asserted, so the test encodes the trap rather than tripping on it.
+- **Not in scope, recorded so nobody re-derives it:** `dxtbx` and `reciprocalspaceship` have
+  no aarch64 build at latest, so DIALS-style diffraction-*image* processing is out of reach
+  even with cctbx present.
+
+### Added — `popgen` (issue #40)
+- **246 packages, lock `s39c447dd4e42`.** msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim,
+  scikit-allel, python 3.14.8. Passed D3 on the first build.
+- **Mostly exact, because a tree sequence is a conservation structure:** dump-to-disk and
+  reload gives **byte-identical tables** and bit-identical diversity; tszip
+  compress/decompress likewise; segregating-site count equals site count exactly when each
+  site carries one mutation.
+- **The one statistical check is judged by its own standard error**, the discipline `bayes`
+  uses with Stan's MCSE. Coalescent theory gives E[pairwise diversity] = 4·N_e·μ exactly;
+  measured over 200 replicates, 3.815e-05 against a theoretical 4.000e-05 — **0.57 sigma**.
+- **`stdpopsim` is deliberately absent, correcting the request.** Every release from 0.2.0
+  on requires `slim`, which has **no conda-forge package on any platform**, so an unpinned
+  spec does not fail — it silently lands 2020-era **0.1.2**. Shipping that under a name
+  implying the current model catalog is the `dftbplus` mistake. Recorded in GAPS.md as a
+  solve-gap on `slim`; solve-gap count 15 → 16.
+- **The generalisable trap:** `stdpopsim` is **noarch**, which means no *build* constraint
+  and is widely read as "installs everywhere". It says nothing about whether the
+  *dependencies* resolve. That is the mirror image of the `py3NN` build-string trap — one
+  implied a constraint that didn't exist, this implies a freedom that doesn't either.
+
+### Added — `tomography` (issue #41)
+- **88 packages, lock `s9897b62718c6`.** astra-toolbox 2.5.0 (CPU), tomopy 1.15.3,
+  scikit-image, tifffile, python 3.14.8. Passed D3 on the first build.
+- **Both of the request's corrections confirmed.** astra-toolbox has non-CUDA aarch64
+  builds (30 files at 2.5.0 — 18 CUDA, 12 CPU, py310→py314, same count as linux-64), and
+  tomopy is not stale on aarch64 but **noarch** (0 files in *every* per-arch subdir
+  including linux-64), with its compiled core shipping separately as `libtomo`.
+- **One correction back:** the CPU builds are not selected "because the CUDA siblings sort
+  last by build string" — build-number sorting would *prefer* the CUDA ones (`libtomo`'s are
+  `_100.._102` against CPU `_0.._2`). They are excluded because CUDA builds require the
+  `__cuda` virtual package a GPU-less host doesn't provide; astra resolves to the CPU build
+  with **no pin at all**. The pin is kept because `__cuda` is a property of the *build host*,
+  so it makes the result deterministic wherever this is built — the same honest status as
+  `qiskit-aer=*=cpu_*`.
+- **A second correction, and this one is load-bearing:** the draft spec listed `tifffile`
+  unpinned, which silently costs tomopy's current release. tomopy 1.15.3 requires
+  `tifffile <2025.2.18`, so an unpinned tifffile lets the solver take the newest and drop
+  tomopy to **1.14.4**. The floor `tomopy >=1.15.3` is required, not cosmetic.
+- **Mass conservation is an identity, and the projector decides whether it is one.** Every
+  projection integral equals the object's mass; measured worst deviation **9.5e-07** with
+  `strip` (area-integrating) against **2.1e-03** with `line` (ray-sampling) — three orders
+  of magnitude, so the projector choice is the difference between an identity and a 0.2%
+  approximation.
+- **FBP convergence is asserted as a trend and it holds**, unlike #35's ladder: relative RMS
+  0.773 → 0.425 → 0.250 → 0.217 over 16/32/64/128 angles, monotone, plateauing near 0.21
+  which is FBP's floor for this phantom rather than a defect.
+- **TomoPy is verified at import plus its phantom generator** — the `siesta` precedent — for
+  two measured reasons. Its reconstruction conventions don't match ASTRA's sinograms without
+  calibration (best correlation 0.62, magnitudes ~1e4 off, and `center=None` producing
+  ~-2.5e16), and `tomopy.project` died twice with `ConnectionResetError` from a dead child
+  — including at `ncore=1` — while the machine was loaded by a concurrent build, then passed
+  at 64/128/256 px when idle. **Intermittent-under-load is the worst property a build gate
+  can have**, so the gate does not rest on it. `tomopy.shepp2d` is pure numpy and was
+  reliable throughout, so the phantom is tomopy's and the reconstruction is ASTRA's.
+
+### Added to existing envs
+- **`md` + `gemmi` (issue #36), lock `sf7ed8789d24e`, still 245 packages.** Declared, not
+  added: gemmi was already resolving transitively at 0.7.5 and the published image has
+  always carried it, so the resolved set is **unchanged** — verified. The point is that a
+  transitive member can be dropped by a re-solve with nothing announcing it, and a
+  downstream recipe asserts against gemmi's space-group tables. `md.smoke.py` now imports
+  it, so the guarantee is checked rather than assumed.
+- **`comp-chem` + `cantera` (issue #38), lock `s1243f25ebfec`, 207 → 223 packages.** Cantera
+  covers *rates* — equilibrium, kinetics, transport — which nothing else in the catalog
+  touches. Costs nothing: python, rdkit and everything else are unchanged. Small premise
+  slip in the request worth noting: this env resolves python **3.13.16**, not 3.14, so the
+  py314 build it highlighted isn't the one that lands — `cantera 3.2.0 py313hdaafa18_0` is.
+  Verified with conservation identities rather than bands: 23 mechanisms ship in the package
+  (so nothing is downloaded), mass fractions sum to **exactly** 1.0, `P = ρRT/M` closes to
+  1.4e-16, and constant-enthalpy equilibration of stoichiometric CH₄/air holds enthalpy to
+  5.05e-12 and every element to 3.30e-13 while moving the state from 1200 K to a 2621.9 K
+  adiabatic flame.
+
+### Declined — `dftbplus` (issue #37), for the second time and on the same grounds
+Everything the request asserts is true: `dftbplus 25.1` has a current aarch64 build in three
+MPI flavours, and being Fortran it carries no python cap. **None of that was ever the
+objection.** The objection is data, from issue #25, and nothing has changed — re-measured:
+
+```
+dftbplus 25.1 mpi_openmpi:  349 files, top-level dirs bin/include/lib only
+                            *.skf files: 0        test files: 0
+SK parameter packages on conda-forge: dftbplus-data, slako, 3ob, mio, dftb-sk,
+                            dftbplus-params, auorg, skprogs, sktools — all absent
+```
+
+So `dftb+` installs and runs and cannot compute, and users can't fix that from this image
+either, because SK sets are distributed under click-through terms and cannot be bundled the
+way `sssp` rescued `qe`. The request also claims "a committed test suite to assert against":
+**0 test files ship in the package** — the suite is in the GitHub repo. That is the third
+time this week the repository has been mistaken for the package, after #34's Geant4
+checksums and #35's `benchmarks_json`. Stays `stuck` with a 180-day revisit; the un-defer
+condition is an openly-licensed SK set packaged for conda-forge.
+
+### Recorded as a gap — `deepmd-kit` (issue #42)
+Filed by the requester as a tracked gap rather than a request, which was right. aarch64 is
+behind on two axes at once: newest is **3.1.3** (`cpu_py312h0e94a91_mpi_openmpi_0`,
+`python_abi 3.12.*`) against **3.2.0** on linux-64, and py312 is the ceiling. `md` resolves
+python 3.14.8, so adding it would drag every shipped `md` recipe back to py312 for a package
+that is itself not current — the `su2`/`warpx` inherited-cap shape (OQ1 test 2). Un-defers
+on a py313/py314 aarch64 build, or on a 3.2.0 build plus a dedicated ML-potentials env so
+the cap binds only what opts into it.
+
 ## 2026-10-10 (env 23 — particle-in-cell plasma physics)
 
 ### Added — `pic` (issue #35), as its own env rather than inside `cfd-fv`

@@ -1,5 +1,5 @@
 # md — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/md.yaml   Built: 2026.10.11.141659   Builder: f839008
+# Source spec: envs/md.yaml   Built: 2026.10.11.180717   Builder: f839008
 # lock-hash: f7ed8789d24e   packages: 245
 # Regenerate with: ./builder/build-env.sh md
 _openmp_mutex 4.5

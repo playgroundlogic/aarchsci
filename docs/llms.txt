@@ -77,7 +77,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     than asserting a tolerance band).
   - `pointcloud` (234 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
-  - `comp-chem` (207 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
+  - `comp-chem` (223 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, xtb-python, vina; cheminformatics + MD + quantum chemistry
     + docking).
   - `dft` (236 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
@@ -324,6 +324,59 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     scheme is not symplectic. One thing NOT asserted: a multi-level convergence ladder —
     the error floors near 3e-5 and wanders (3.59e-4, 8.25e-5, 3.25e-5, 7.08e-5 for n_cell
     128..1024), so only one refinement step is claimed.)
+  - `structbio` (121 pkgs — cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88; crystallography
+    and structural biology. ITS OWN ENV rather than an addition to `md` (issue #39): md is
+    trajectory production, this is symmetry/coordinate/map work, and cctbx-base is a 161 MB
+    solve with its own boost stack that should not be able to perturb md's shipped recipes.
+    All three headline packages have py314 aarch64 builds at the channel's current version,
+    so nothing caps python. BOTH cctbx AND gemmi are present on purpose, not redundantly:
+    they are two INDEPENDENT implementations of crystallographic symmetry, which is what
+    makes a cross-implementation check possible. Measured: unit-cell volume is BIT-IDENTICAL
+    across gemmi, cctbx and the closed form (relative difference exactly 0.0 on a triclinic
+    cell); both agree with the International Tables on space-group order for 10 groups;
+    cubic d-spacings match a/sqrt(h^2+k^2+l^2) to 2.8e-16; and symmetry operations close
+    under composition exactly — F m -3 m gives 192 operators, 36864 products, 0 outside the
+    group. A lesson is baked into that table: the first draft asserted order 3 for `R 3`
+    from a hand-typed value and BOTH libraries returned 9, because `R 3` defaults to
+    hexagonal axes where the order IS 9; only `R 3 :R` is 3. Two independent
+    implementations disagreeing with your constant means re-check the constant. NOT in
+    scope: dxtbx and reciprocalspaceship have no aarch64 build at latest, so DIALS-style
+    diffraction-image processing is out of reach even with cctbx present.)
+  - `popgen` (246 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
+    coalescent simulation and population genetics, a domain the catalog could not touch.
+    Both compiled headliners have py314 aarch64 builds at current versions. Verification is
+    unusually strong because a tree sequence is a CONSERVATION STRUCTURE: dump-to-disk and
+    reload gives byte-identical tables AND bit-identical diversity; tszip compress/
+    decompress likewise; segregating-site count equals the site count exactly when each
+    site carries one mutation. The one statistical check is judged by its OWN standard
+    error rather than a chosen band — E[pairwise diversity] = 4*N_e*mu under the neutral
+    coalescent, measured 3.815e-05 against a theoretical 4.000e-05 over 200 replicates,
+    0.57 sigma. STDPOPSIM IS DELIBERATELY ABSENT, correcting issue #40: every release from
+    0.2.0 on requires `slim`, which has NO conda-forge package on any platform, so an
+    unpinned spec silently lands 2020-era 0.1.2 rather than failing. noarch means no BUILD
+    constraint, which reads as "installs everywhere" and says nothing about whether the
+    dependencies resolve — the mirror image of the py3NN build-string trap. Also note
+    msprime on bioconda is 0.4.0 with zero aarch64 files; conda-forge is the right source.)
+  - `tomography` (88 pkgs — astra-toolbox 2.5.0 CPU build, tomopy 1.15.3, scikit-image,
+    tifffile; CT reconstruction. Issue #41's two corrections are both CONFIRMED: astra has
+    non-CUDA aarch64 builds (30 files at 2.5.0 — 18 CUDA, 12 CPU, py310 through py314, same
+    count as linux-64), and tomopy is not stale on aarch64 but NOARCH (0 files in every
+    per-arch subdir including linux-64), with its compiled core shipping as libtomo with
+    current non-CUDA aarch64 builds. ONE CORRECTION BACK: the CPU builds are not chosen
+    "because the CUDA siblings sort last" — build-number sorting would PREFER the CUDA ones
+    (libtomo's are _100.._102 against CPU _0.._2). They are excluded because CUDA builds
+    require the `__cuda` virtual package a GPU-less host does not provide, so astra resolves
+    to the CPU build with no pin at all; the pin is kept only to make that deterministic
+    regardless of the build host. A SECOND CORRECTION: the request's draft spec listed
+    tifffile unpinned, which silently costs tomopy's current release — tomopy 1.15.3 needs
+    tifffile <2025.2.18, so an unpinned tifffile drops tomopy to 1.14.4. The floor
+    `tomopy >=1.15.3` is load-bearing. Verified: every projection integral equals the
+    object's mass to 9.5e-07 (an identity, and the PROJECTOR decides whether it is one —
+    `strip` gives 9.5e-07 where `line` gives 2.1e-03), and FBP error falls monotonically
+    0.773 -> 0.425 -> 0.250 -> 0.217 over 16/32/64/128 angles, plateauing near 0.21 which is
+    FBP's floor for this phantom rather than a defect. tomopy is verified at import plus its
+    phantom generator only — the siesta precedent — because its reconstruction conventions
+    need calibration and its multiprocessing path failed intermittently under load.)
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
@@ -406,9 +459,9 @@ hence the `single-cell` env.
 
 ## Facts
 
-- 23 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+- 26 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
   comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k,
-  pathology, quantum, hep, pic) —
+  pathology, quantum, hep, pic, structbio, popgen, tomography) —
   native arm64, verified
   (assemble+import+functional) + signed + public.
 - `dft` (gpaw, siesta, psi4, nwchem, quantum-espresso, ase, libxc, ELPA, ScaLAPACK,

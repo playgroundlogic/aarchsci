@@ -1,0 +1,58 @@
+# aarch.science — tomography environment
+# Computed tomography / reconstruction (DESIGN D2): ASTRA as the verified reconstruction
+# engine, with TomoPy for phantoms and the pipeline layer.
+#
+# Issue #41's two corrections to the arm64 story are both CONFIRMED, and they are the
+# reason this env is possible at all:
+#
+#   1. astra-toolbox 2.5.0 has non-CUDA aarch64 builds. Measured: 30 files in that subdir,
+#      18 CUDA and 12 CPU, with CPU builds for py310 through py314 (four py314 builds).
+#      30 files on linux-64 too, so aarch64 is a first-class target here.
+#   2. tomopy is not stale on aarch64 — it is NOARCH. tomopy 1.15.3 is `pyhd8ed1ab_*` with
+#      0 files in EVERY per-arch subdir including linux-64, so the empty aarch64 listing
+#      says nothing. Its compiled core is a separate package and is fine:
+#      libtomo 1.15.3 ships `h1234567_{0,1,2}` (CPU) alongside `cuda12.9*` siblings.
+#
+# ONE CORRECTION BACK: the CPU builds are not selected "because the CUDA siblings sort last
+# by build string" — build number sorting would in fact PREFER the CUDA ones (libtomo's are
+# _100.._102 against the CPU _0.._2). They are excluded because CUDA builds require the
+# `__cuda` virtual package, which a GPU-less host does not provide. Measured: astra-toolbox
+# resolves to `py314hf3ba446_1` with no pin at all. So the pin below is belt-and-braces, not
+# load-bearing — the same honest status as `qiskit-aer=*=cpu_*` in `quantum`. It is kept
+# because `__cuda` is a property of the BUILD HOST, so the pin makes the result deterministic
+# wherever this is built rather than dependent on whether that machine has a GPU.
+#
+# THE tomopy FLOOR IS LOAD-BEARING AND WAS NOT IN THE REQUEST. Issue #41's draft listed
+# `tifffile` unpinned alongside tomopy, and measured that silently costs you tomopy's current
+# release: tomopy 1.15.3 requires `tifffile <2025.2.18`, so an unpinned tifffile lets the
+# solver take the newest one and drop tomopy to **1.14.4** instead. With the floor below the
+# env resolves tomopy 1.15.3 + tifffile 2025.1.10 and 88 packages.
+#
+# WHAT EACH PACKAGE IS VERIFIED TO DO, stated plainly because they differ:
+#   * astra is the verified engine — mass conservation to 9.5e-07 and a monotone FBP
+#     convergence ladder in the number of projection angles. See tomography.smoke.py.
+#   * tomopy is verified at IMPORT plus its phantom generator, which is the `siesta`
+#     precedent. Two measured reasons: its reconstruction conventions do not match ASTRA's
+#     sinograms without scaling work that belongs in a recipe rather than a build gate
+#     (best correlation reached was 0.62 with the wrong magnitude), and its multiprocessing
+#     path crashed twice with `ConnectionResetError` from a dead child while the machine was
+#     under load from a concurrent build, then passed at 64/128/256 px when idle. A gate
+#     that fails under load is worse than a narrower gate that holds. `tomopy.shepp2d` is
+#     pure numpy and was reliable throughout, so the phantom this env reconstructs is
+#     tomopy's — the two packages are used for what each is verified to do.
+name: tomography
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  # --- reconstruction engine (the verified core) ---
+  # CPU builds are tagged `py*`; the CUDA ones are tagged `cuda*`, so this prefix is an
+  # exact discriminator. See the note above on why it is deterministic rather than needed.
+  - astra-toolbox=*=py*
+  # --- phantoms + pipeline ---
+  # The floor is required, not cosmetic: without it tifffile pulls tomopy back to 1.14.4.
+  - tomopy >=1.15.3
+  - scikit-image
+  - tifffile

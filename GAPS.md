@@ -148,7 +148,7 @@ precedent.
 
 | Kind | Count | Notes |
 |------|------:|-------|
-| **solve-gap** | 15 | No `linux-aarch64` build at all. Engines/potentials: ~~`cp2k`~~ (**RESOLVED 2026-10-10 — see below**), `sisl`, `asap3`, `kimpy`, `openkim-models`, `quippy`, `chgnet`, `m3gnet`. Phonons/transport: `phono3py`, `alamode`, `dynaphopy`, `boltztrap2`, `kwant`. DMFT: `triqs`, `triqs_dft_tools`, `edrixs`. All surfaced while scoping `dft` and probing its neighborhood; **none blocks a shipping env** — they are candidates we probed and declined. `cp2k` was the highest-value target and is now shipping as its own env; `phono3py` is the cheapest of what remains. |
+| **solve-gap** | 16 | No `linux-aarch64` build at all. Engines/potentials: ~~`cp2k`~~ (**RESOLVED 2026-10-10 — see below**), `sisl`, `asap3`, `kimpy`, `openkim-models`, `quippy`, `chgnet`, `m3gnet`. Population genetics: `slim` (blocks current `stdpopsim`; see below). Phonons/transport: `phono3py`, `alamode`, `dynaphopy`, `boltztrap2`, `kwant`. DMFT: `triqs`, `triqs_dft_tools`, `edrixs`. All surfaced while scoping `dft` and probing its neighborhood; **none blocks a shipping env** — they are candidates we probed and declined. `cp2k` was the highest-value target and is now shipping as its own env; `phono3py` is the cheapest of what remains. |
 | **assemble-gap** | 1 | `whitebox` — solves, imports, but fetches an amd64 binary at runtime (wontfix); see below |
 | **MPI-flavor conflict** | 1 | `abinit` — has an arm64 build, solves standalone, but MPICH-only (stuck); see below |
 | **python-ABI collision** | 3 | `psi4` in `comp-chem` — no py313 arm64 build; relocated to `dft` (py314) instead of downgrading 13 packages. `su2` in `fem-cfd` — arm64 builds stop at py311, which would cap the whole env; declined, so su2 got `cfd-fv` to itself. `warpx` in `cfd-fv` (#35) — would have *inherited* su2's py311 cap, so it got `pic` instead. None is a gap in any shipping image; see below |
@@ -157,10 +157,11 @@ precedent.
 **The curated science head is near-complete on arm64.** This is still the real
 finding, and it's the inverse of the pip experience: the exact stack that fails
 `No matching distribution found for rasterio` on PyPI solves *and* assembles cleanly
-on conda-forge. Twenty-three envs ship verified (geospatial, earth-observation, geo-ml,
+on conda-forge. Twenty-six envs ship verified (geospatial, earth-observation, geo-ml,
 climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization,
-neuroimaging, single-cell, bayes, geoscience, cp2k, pathology, quantum, hep, pic), and
-every headline package in all twenty-three assembles and does real work natively.
+neuroimaging, single-cell, bayes, geoscience, cp2k, pathology, quantum, hep, pic, structbio,
+popgen, tomography), and every headline package in all twenty-six assembles and does real
+work natively.
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
 changed: every solve-gap listed above is a **candidate we probed and declined**, not a
@@ -674,6 +675,85 @@ hdf5             2.2.0  mpi_openmpi_h57bd46d_1     netcdf-fortran   4.6.4  mpi_o
 
 Still `stuck` (retry) rather than `wontfix`, because nothing technical blocks it now.
 Recorded in [`farm/skip-list.tsv`](farm/skip-list.tsv) with a 90-day revisit.
+
+### `slim` — solve-gap, and it silently costs `stdpopsim` four releases (2026-10-11, issue #40)
+
+**Env affected:** `popgen` (ships without `stdpopsim`).
+
+Issue #40 listed `stdpopsim 0.3.0` as a noarch freebie. It isn't installable from
+conda-forge at all, and the reason is one layer down: **every `stdpopsim` from 0.2.0 on
+requires `slim`, which has no conda-forge package on any platform.** Measured with
+python 3.12, 3.13 and 3.14 — identical outcome at each:
+
+```
+stdpopsim 0.3.0  ->  blocked: requires slim, "which does not exist (perhaps a missing channel)"
+stdpopsim 0.2.1  ->  blocked, same
+stdpopsim 0.2.0  ->  blocked, same
+stdpopsim 0.1.2  ->  INSTALLABLE (52 pkgs)  <- what an unpinned spec silently lands on
+```
+
+So an unpinned `stdpopsim` does not fail; it quietly gives you a 2020-era release under a
+name that implies the current catalog of demographic models. That is the `dftbplus`
+problem — advertising a capability rather than shipping one — so `popgen` omits it.
+
+**Why this was easy to miss, and the rule it generalises:** `stdpopsim` is **noarch**, and
+noarch means "no *build* constraint", which reads as "installs everywhere". It says nothing
+about whether the package's *dependencies* resolve. This is the mirror image of the
+`py3NN`-build-string trap recorded above: there, a build string implied a constraint that
+did not exist; here, the absence of one implied a freedom that does not exist either.
+**Neither the subdir listing nor the build string is a statement about installability — only
+a solve is.**
+
+**Upstream fix:** a conda-forge `slim` package (the SLiM forward simulator). Not filed —
+packaging a new C++ simulator is a larger piece of work than this project should volunteer
+someone else for, and `popgen` is useful without it.
+
+### `tomopy` — shipped, but verified only at import + phantom (2026-10-11, issue #41)
+
+**Env affected:** `tomography` (included, with a narrower verification than `astra`).
+
+Not a gap: `tomopy 1.15.3` is noarch, its compiled `libtomo` has current non-CUDA aarch64
+builds, and both install and import cleanly. Recorded here because the env's two headline
+packages are verified to **different depths**, and that asymmetry should be discoverable:
+
+1. **Its reconstruction conventions do not match ASTRA's sinograms** without scaling work
+   that belongs in a recipe rather than a build gate. Measured: feeding an ASTRA `strip`
+   sinogram to `tomopy.recon` gave correlation 0.59 and magnitudes ~1e4 off; driving
+   tomopy's own `project` → `recon` round trip reached correlation 0.62 at best across
+   `fbp`/`gridrec` and three centre values, with `center=None` producing values of
+   ~-2.5e16. Resolvable, but it is calibration, not packaging.
+2. **Its multiprocessing path failed twice under load.** `tomopy.project` at 128 px / 180
+   angles died with `ConnectionResetError: [Errno 104]` from a dead child — including with
+   `ncore=1` — while the machine was running a concurrent `md` build, then passed at 64,
+   128 and 256 px when idle. Intermittent under memory pressure is the worst property a
+   build gate can have, so the gate does not depend on it.
+
+`tomopy.shepp2d` is pure numpy and was reliable throughout, so the phantom `tomography`
+reconstructs is tomopy's while ASTRA does the verified reconstruction — each package used
+for what it is verified to do.
+
+### `deepmd-kit` — deferred, with an un-defer condition (2026-10-11, issue #42)
+
+**Env affected:** none. Would belong in `md`, and that is exactly the problem.
+
+Filed by the requester as a tracked gap rather than a request, which was the right call.
+aarch64 is behind on **two axes at once** — one minor version and two python versions:
+
+```
+linux-64        1528 files, 72 at the current 3.2.0
+linux-aarch64     48 files, 0 at 3.2.0; newest is 3.1.3 cpu_py312h0e94a91_mpi_openmpi_0
+                  python tags: py310, py311, py312 (max), and that build pins
+                  python_abi 3.12.* *_cp312
+```
+
+`md` resolves python 3.14.8, so adding it would drag the whole env to py312 — changing the
+image for every shipped `md` recipe and invalidating their verified digests — to gain a
+package that is itself not current. That is the `su2`/`warpx` inherited-cap shape (OQ1 test
+2), and the answer is the same: not into an existing env.
+
+**Un-defers if either:** conda-forge ships a py313/py314 aarch64 build, **or** a 3.2.0
+aarch64 build appears and an ML-potentials env is wanted, so the cap binds only what opts
+into it.
 
 ### `whitebox` — wontfix (assemble-gap, by design)
 

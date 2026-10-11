@@ -73,6 +73,9 @@ HEADLINE = [
     "numpy", "scipy",
     "mpi4py", "mpi4py.MPI",
     "lammps", "MDAnalysis", "mdtraj", "parmed",
+    # Declared explicitly in the spec rather than left transitive (issue #36); imported
+    # here so that guarantee is checked rather than asserted in a comment.
+    "gemmi",
 ]
 print("[smoke] 1. imports")
 for mod in HEADLINE:

@@ -65,3 +65,12 @@ dependencies:
   - mdanalysis
   - mdtraj
   - parmed
+  # Structural-biology I/O and crystallographic symmetry. DECLARED, NOT ADDED (issue #36):
+  # gemmi already resolved here transitively at 0.7.5 and the published image has always
+  # carried it, so this line changes nothing in the solve — verified, the resolved set is
+  # unchanged. It is here because a downstream recipe asserts against gemmi's space-group
+  # tables, and a transitive member can be dropped or moved by a re-solve with nothing
+  # announcing it. Declaring it makes that a build failure instead of a surprise, and
+  # md.smoke.py now imports it so the guarantee is checked rather than assumed.
+  # It caps nothing: gemmi has py311-py314 aarch64 builds at 0.7.5 and this env is py3.14.
+  - gemmi

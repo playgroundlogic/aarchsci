@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">23</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k, pathology, quantum, hep</div>
+                    <div class="stat-num green">26</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k, pathology, quantum, hep, structbio, popgen, tomography</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -153,7 +153,7 @@
                   <tr style="border-bottom:1px solid var(--border);">
                     <td style="padding:0.5rem 0.75rem;"><strong>unit</strong></td>
                     <td style="padding:0.5rem 0.75rem;">one tool per image (~503)</td>
-                    <td style="padding:0.5rem 0.75rem;">a curated multi-package env (23)</td>
+                    <td style="padding:0.5rem 0.75rem;">a curated multi-package env (26)</td>
                   </tr>
                   <tr style="border-bottom:1px solid var(--border);">
                     <td style="padding:0.5rem 0.75rem;"><strong>example</strong></td>
@@ -373,7 +373,7 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                 </div>
                 <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
                   <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-green);">comp-chem</span><br>
-                  <strong>207 packages</strong> — cheminformatics, molecular dynamics, quantum chemistry &amp; docking
+                  <strong>223 packages</strong> — cheminformatics, molecular dynamics, quantum chemistry &amp; docking
                 </p>
                 <div class="catalog">
                     <span class="chip">rdkit</span>
@@ -814,6 +814,78 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   adding an MPI stack would dress a single-node code as a cluster code. It is
                   still parallel: OpenMP across a Graviton's cores, with the thread count
                   asserted.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">structbio</span><br>
+                  <strong>121 packages</strong> &mdash; crystallography &amp; structural biology
+                </p>
+                <div class="catalog">
+                    <span class="chip">cctbx 2026.9</span>
+                    <span class="chip">gemmi 0.7.5</span>
+                    <span class="chip">biopython 1.88</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  cctbx and gemmi are both here <em>because</em> they are two independent
+                  implementations of crystallographic symmetry &mdash; which makes a
+                  cross-implementation check possible instead of a self-check. Measured: a
+                  triclinic unit-cell volume comes out <strong>bit-identical</strong> across
+                  gemmi, cctbx and the closed-form expression; both agree with the
+                  International Tables on space-group order for ten groups; and symmetry
+                  operations close under composition exactly &mdash;
+                  <code>F m -3 m</code> gives 192 operators, 36&nbsp;864 products,
+                  <strong>0</strong> outside the group. One lesson is baked into that table:
+                  our first draft asserted order 3 for <code>R 3</code> and both libraries
+                  independently said 9 &mdash; because <code>R 3</code> defaults to hexagonal
+                  axes, where 9 is right. When two independent implementations disagree with
+                  your constant, re-check the constant.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">popgen</span><br>
+                  <strong>246 packages</strong> &mdash; coalescent simulation / population genetics
+                </p>
+                <div class="catalog">
+                    <span class="chip">msprime 1.4.4</span>
+                    <span class="chip">tskit 1.0.3</span>
+                    <span class="chip">tszip / demes</span>
+                    <span class="chip">scikit-allel</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  A tree sequence is a <strong>conservation structure</strong>, so most of
+                  this verification is exact rather than statistical: writing one to disk and
+                  reading it back gives <strong>byte-identical tables</strong> and
+                  bit-identical diversity, <code>tszip</code> compression round-trips the
+                  same way, and the segregating-site count equals the site count exactly. The
+                  one statistical check is judged against its <em>own</em> standard error, not
+                  a band we chose: coalescent theory says
+                  E[diversity] = 4<em>N<sub>e</sub>μ</em> exactly, and 200 replicates give
+                  3.815×10<sup>&minus;5</sup> against a theoretical
+                  4.000×10<sup>&minus;5</sup> &mdash; <strong>0.57σ</strong>.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">tomography</span><br>
+                  <strong>88 packages</strong> &mdash; CT reconstruction
+                </p>
+                <div class="catalog">
+                    <span class="chip">ASTRA 2.5 (CPU)</span>
+                    <span class="chip">TomoPy 1.15</span>
+                    <span class="chip">scikit-image</span>
+                    <span class="chip">no GPU needed</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  A parallel-beam projection is a set of line integrals, so the integral of
+                  every projection <em>equals the object's mass</em> &mdash; an identity that
+                  needs no reference value. Measured to
+                  <strong>9.5×10<sup>&minus;7</sup></strong>, which is float32 round-off. The
+                  projector decides whether that is an identity at all: <code>strip</code>
+                  gives 9.5×10<sup>&minus;7</sup> where <code>line</code> gives
+                  2.1×10<sup>&minus;3</sup>. Reconstruction error then falls monotonically
+                  with the number of angles &mdash; 0.773 → 0.425 → 0.250 → 0.217 over
+                  16/32/64/128 &mdash; plateauing near 0.21, which is FBP's floor for this
+                  phantom rather than a defect. The phantom is generated, so the ground truth
+                  is exact and nothing is downloaded. <strong>ASTRA is the verified engine;
+                  TomoPy is verified at import plus its phantom generator</strong>, because
+                  its reconstruction needs calibration and its multiprocessing path proved
+                  flaky under load. We'd rather say which half is proven.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

@@ -1,0 +1,42 @@
+# aarch.science — structbio environment
+# Structural biology and crystallography (DESIGN D2): cctbx as the reference
+# implementation of crystallographic computing, gemmi as the fast modern I/O + symmetry
+# layer, biopython for the sequence/structure glue.
+#
+# Its own env rather than an addition to `md`, as issue #39 argued and OQ1's tests agree:
+# `md` is trajectory production (gromacs/lammps/ambertools) and this is symmetry,
+# coordinate and map work — different inputs, different outputs, no shared recipe. Keeping
+# them apart also means a cctbx-base rebuild (161 MB, its own boost/python stack) cannot
+# perturb the five shipped `md` recipes.
+#
+# Costs nothing in python terms: cctbx-base 2026.9, gemmi 0.7.5 and biopython 1.88 all have
+# py314 linux-aarch64 builds at the channel's current version, so the env resolves
+# python 3.14.8 and nothing here caps anything. Verified: 121 packages.
+#
+# EXPLICITLY NOT IN SCOPE, recorded so nobody re-derives it: `dxtbx` 3.30.0 and
+# `reciprocalspaceship` 1.0.8 have NO linux-aarch64 build at their latest versions, so
+# DIALS-style diffraction-IMAGE processing is out of reach even with cctbx present. This
+# env supports symmetry, coordinate and map work, not image integration.
+#
+# WHY BOTH cctbx AND gemmi, which is the point rather than redundancy: they are two
+# INDEPENDENT implementations of crystallographic symmetry, with separate space-group
+# tables and separate cell arithmetic. That makes a cross-implementation check available —
+# the strongest verification shape this catalog has (ROOT/uproot in `hep`, yt/openpmd-api
+# in `pic`, qutip/Qiskit in `quantum`). Measured: they agree on space-group order for every
+# group tested AND their unit-cell volumes are bit-identical to each other and to the
+# closed form. See structbio.smoke.py.
+name: structbio
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  # --- crystallography core ---
+  - cctbx-base
+  # gemmi is also DECLARED in `md` (issue #36), where it had been resolving transitively.
+  # Both declarations are intentional: a recipe asserts against it there, and it is a
+  # headline member here.
+  - gemmi
+  # --- sequence/structure glue ---
+  - biopython

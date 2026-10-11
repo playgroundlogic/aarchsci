@@ -1,0 +1,48 @@
+# aarch.science — popgen environment
+# Population genetics (DESIGN D2): msprime for coalescent simulation, tskit for the
+# tree-sequence core, plus the analysis and I/O layer.
+#
+# A domain the catalog could not touch at all. Verified native arm64: msprime 1.4.4 and
+# tskit 1.0.3 both have py314 linux-aarch64 builds at the channel's current version, so the
+# env resolves python 3.14.8 and nothing caps anything.
+#
+# Note on sourcing, because a naive search finds the wrong copy first (issue #40): msprime
+# is ALSO on bioconda, stuck at 0.4.0 with zero aarch64 files. conda-forge is the right
+# source. Under D5 this is ours regardless of channel because the artifact is an
+# environment, not a single-tool image.
+#
+# STDPOPSIM IS DELIBERATELY ABSENT, which is a correction to the request. Issue #40 listed
+# `stdpopsim 0.3.0` as a noarch freebie. Measured, every version from 0.2.0 on requires
+# `slim`, and `slim` IS NOT ON CONDA-FORGE AT ALL — so with this channel the solver silently
+# falls back to **0.1.2**, four releases and roughly five years behind:
+#
+#   stdpopsim 0.3.0 / 0.2.1 / 0.2.0  ->  blocked: requires slim, which does not exist
+#   stdpopsim 0.1.2                  ->  installable (what an unpinned spec would land)
+#
+# Shipping 0.1.2 under a name that implies the current catalog of demographic models is the
+# `dftbplus` mistake — advertising a capability rather than shipping one — so it is out, and
+# recorded in GAPS.md as a solve-gap on `slim` instead. noarch is why this is easy to miss:
+# it means no BUILD constraint, which reads as "works everywhere", and says nothing about
+# whether the dependencies resolve.
+#
+# The verification is unusually strong for a simulation env because coalescent theory gives
+# closed forms and tree sequences are conservation structures — exact round-trips plus a
+# theoretical expectation judged against its own standard error. See popgen.smoke.py.
+name: popgen
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  # --- coalescent simulation + the tree-sequence core ---
+  - msprime
+  - tskit
+  # --- analysis + I/O ---
+  # demes, tszip and pyslim are noarch, so they cost nothing here and are NOT arm64 gaps
+  # despite being absent from the linux-aarch64 subdir listing. tszip earns its place in
+  # the verification: compress -> decompress must return byte-identical tables.
+  - scikit-allel
+  - demes
+  - tszip
+  - pyslim

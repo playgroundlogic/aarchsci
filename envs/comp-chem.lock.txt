@@ -1,19 +1,10 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.10.11.141702   Builder: f839008
-# lock-hash: e03ee9775702   packages: 207
+# Source spec: envs/comp-chem.yaml   Built: 2026.10.11.181913   Builder: f839008
+# lock-hash: 1243f25ebfec   packages: 223
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
 ase 3.29.0
-aws-c-auth 1.0.0
-aws-c-cal 1.0.0
-aws-c-common 1.0.3
-aws-c-compression 1.0.0
-aws-c-http 1.0.0
-aws-c-io 1.0.0
-aws-c-s3 1.0.0
-aws-c-sdkutils 1.0.0
-aws-checksums 1.0.1
 blosc 1.21.6
 brotli 1.2.0
 brotli-bin 1.2.0
@@ -24,6 +15,7 @@ ca-certificates 2026.7.22
 cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
+cantera 3.2.0
 certifi 2026.7.22
 cffi 2.1.1
 cftime 1.6.5
@@ -37,7 +29,8 @@ cycler 0.12.1
 cyrus-sasl 2.1.28
 dftd4 4.2.0
 eigen-abi 3.4.0.100
-filelock 4.1.0
+filelock 4.1.1
+fmt 12.0.0
 font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
@@ -50,12 +43,13 @@ formulaic 1.2.2
 freetype 2.14.3
 freetype-py 2.3.0
 fribidi 1.0.17
+gmp 6.3.0
 graphite2 1.3.15
 griddataformats 1.2.0
 gsd 5.0.1
 h5py 3.16.0
 hdf4 4.2.15
-hdf5 2.2.0
+hdf5 1.14.6
 icu 78.3
 interface_meta 1.3.0
 joblib 1.6.0
@@ -68,15 +62,23 @@ ld_impl_linux-aarch64 2.46.1
 legacy-cgi 2.6.4
 lerc 4.2.0
 libaec 1.1.5
+libamd 3.3.3
 libblas 3.11.0
 libboost 1.86.0
 libboost-python 1.86.0
 libbrotlicommon 1.2.0
 libbrotlidec 1.2.0
 libbrotlienc 1.2.0
+libbtf 2.3.2
+libcamd 3.3.3
+libcantera 3.2.0
 libcblas 3.11.0
+libccolamd 3.3.4
+libcholmod 5.3.1
 libcint 6.1.3
+libcolamd 3.3.4
 libcurl 8.22.0
+libcxsparse 4.4.1
 libdeflate 1.25
 libedit 3.1.20260512
 libev 4.33
@@ -93,24 +95,32 @@ libgomp 16.2.0
 libharfbuzz 14.6.0
 libiconv 1.18
 libjpeg-turbo 3.2.0
+libklu 2.3.5
 liblapack 3.11.0
+libldl 3.3.2
 liblzma 5.8.3
 libmpdec 4.0.0
 libnetcdf 4.10.1
 libnghttp2 1.68.1
 libntlm 1.4
 libopenblas 0.3.34
+libparu 1.0.0
 libpng 1.6.59
 libpq 18.6
 libpsl 0.23.1
 libpython 3.13.16
 libraqm 0.11.0
+librbio 4.3.4
 librdkit 2026.03.1
+libspex 3.2.3
+libspqr 4.3.4
 libsqlite 3.54.0
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
+libsuitesparseconfig 7.10.1
 libtiff 4.7.2
+libumfpack 6.3.5
 libuuid 2.42.4
 libwebp-base 1.6.0
 libxc-c 7.1.2
@@ -126,7 +136,9 @@ mctc-lib 0.5.2
 mda-xdrlib 0.2.0
 mdanalysis 2.10.0
 mdtraj 1.11.2
+metis 5.1.0
 mmtf-python 1.1.3
+mpfr 4.2.2
 mrcfile 1.5.4
 msgpack-python 1.2.3
 multicharge 0.5.0
@@ -174,7 +186,8 @@ rdkit 2026.03.1
 readline 8.3
 reportlab 5.0.1
 rlpycairo 0.4.0
-s2n 1.7.7
+ruamel.yaml 0.19.1
+ruamel.yaml.clib 0.2.15
 scikit-learn 1.9.1
 scipy 1.18.1
 seaborn 0.13.2
@@ -185,6 +198,8 @@ six 1.17.0
 snappy 1.2.2
 sqlalchemy 2.1.4
 statsmodels 0.15.0
+suitesparse 7.10.1
+sundials 7.5.0
 tblite 0.6.0
 threadpoolctl 3.7.0
 tidynamics 1.1.2
@@ -206,6 +221,7 @@ xorg-libxext 1.3.7
 xorg-libxrender 0.9.12
 xtb 6.7.1
 xtb-python 22.1
+yaml-cpp 0.8.0
 zlib 1.3.2
 zlib-ng 2.3.3
 zstd 1.5.7
