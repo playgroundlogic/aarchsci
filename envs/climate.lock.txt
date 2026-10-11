@@ -1,6 +1,6 @@
 # climate — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/climate.yaml   Built: 2026.10.10.135644   Builder: 4088b77
-# lock-hash: 8c7f1e0cc15d   packages: 262
+# Source spec: envs/climate.yaml   Built: 2026.10.11.141700   Builder: f839008
+# lock-hash: b9bf647e0f09   packages: 262
 # Regenerate with: ./builder/build-env.sh climate
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -23,7 +23,7 @@ azure-identity-cpp 1.13.3
 azure-storage-blobs-cpp 12.18.0
 azure-storage-common-cpp 12.14.0
 azure-storage-files-datalake-cpp 12.16.0
-backports.zstd 1.7.0
+backports.zstd 1.8.0
 blosc 1.21.6
 bokeh 3.10.0
 bottleneck 1.6.0
@@ -186,7 +186,7 @@ netcdf4 1.7.4
 nlohmann_json 3.12.0
 numba 0.68.0
 numcodecs 0.17.0
-numpy 2.5.3
+numpy 2.5.4
 openjpeg 2.5.4
 openssl 3.6.5
 orc 2.3.1
