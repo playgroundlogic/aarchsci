@@ -9,7 +9,7 @@ Seven issues (#36-#42) triaged by dry-run solve rather than by argument, which i
 rule as settled earlier today. Five accepted, one declined, one recorded as a gap.
 
 ### Added — `structbio` (issue #39)
-- **121 packages, lock `se0104a505be2`.** cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88,
+- **121 packages, lock `se0104a505be2`**, digest `sha256:0011efff998b…77d4c`. cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88,
   python 3.14.8. Passed D3 on the first build.
 - **Its own env, not an addition to `md`.** `md` is trajectory production; this is
   symmetry/coordinate/map work. cctbx-base is a 161 MB solve with its own boost stack, and
@@ -31,7 +31,7 @@ rule as settled earlier today. Five accepted, one declined, one recorded as a ga
   even with cctbx present.
 
 ### Added — `popgen` (issue #40)
-- **246 packages, lock `s39c447dd4e42`.** msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim,
+- **246 packages, lock `s39c447dd4e42`**, digest `sha256:6f585a84c9b2…f90f`. msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim,
   scikit-allel, python 3.14.8. Passed D3 on the first build.
 - **Mostly exact, because a tree sequence is a conservation structure:** dump-to-disk and
   reload gives **byte-identical tables** and bit-identical diversity; tszip
@@ -51,7 +51,7 @@ rule as settled earlier today. Five accepted, one declined, one recorded as a ga
   implied a constraint that didn't exist, this implies a freedom that doesn't either.
 
 ### Added — `tomography` (issue #41)
-- **88 packages, lock `s9897b62718c6`.** astra-toolbox 2.5.0 (CPU), tomopy 1.15.3,
+- **88 packages, lock `s9897b62718c6`**, digest `sha256:97ad57a2e01d…d2b29`. astra-toolbox 2.5.0 (CPU), tomopy 1.15.3,
   scikit-image, tifffile, python 3.14.8. Passed D3 on the first build.
 - **Both of the request's corrections confirmed.** astra-toolbox has non-CUDA aarch64
   builds (30 files at 2.5.0 — 18 CUDA, 12 CPU, py310→py314, same count as linux-64), and
@@ -86,7 +86,7 @@ rule as settled earlier today. Five accepted, one declined, one recorded as a ga
   reliable throughout, so the phantom is tomopy's and the reconstruction is ASTRA's.
 
 ### Added to existing envs
-- **`md` + `gemmi` (issue #36), lock `sf7ed8789d24e`, still 245 packages.** Declared, not
+- **`md` + `gemmi` (issue #36), lock `s92a210cb806c`, still 245 packages.** Declared, not
   added: gemmi was already resolving transitively at 0.7.5 and the published image has
   always carried it, so the resolved set is **unchanged** — verified. The point is that a
   transitive member can be dropped by a re-solve with nothing announcing it, and a
