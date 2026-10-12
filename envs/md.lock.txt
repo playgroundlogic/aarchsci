@@ -1,6 +1,6 @@
 # md — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/md.yaml   Built: 2026.10.11.182333   Builder: cc62f40
-# lock-hash: 92a210cb806c   packages: 245
+# Source spec: envs/md.yaml   Built: 2026.10.12.165744   Builder: 16593d7
+# lock-hash: 86753a0da0a3   packages: 245
 # Regenerate with: ./builder/build-env.sh md
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -194,8 +194,8 @@ plumed 2.9.2
 psutil 7.2.2
 pthread-stubs 0.4
 py-cpuinfo 9.0.0
-pydantic 2.14.0
-pydantic-core 2.50.0
+pydantic 2.14.1
+pydantic-core 2.50.1
 pyedr 0.8.0
 pygments 2.21.0
 pyparsing 3.3.2
