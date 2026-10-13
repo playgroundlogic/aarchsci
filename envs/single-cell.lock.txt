@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.10.12.165744   Builder: 16593d7
-# lock-hash: 7007fa09a40d   packages: 346
+# Source spec: envs/single-cell.yaml   Built: 2026.10.13.151607   Builder: 652f896
+# lock-hash: 849465a607b6   packages: 346
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -325,7 +325,7 @@ six 1.17.0
 statsmodels 0.15.0
 sysroot_linux-aarch64 2.39
 tbb 2023.1.0
-texttable 1.7.0
+texttable 1.7.1
 threadpoolctl 3.7.0
 tk 8.6.13
 tktable 2.10
