@@ -1,6 +1,6 @@
 # pic — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pic.yaml   Built: 2026.10.13.151606   Builder: 652f896
-# lock-hash: cfbc182e9968   packages: 166
+# Source spec: envs/pic.yaml   Built: 2026.10.14.130304   Builder: 94fa542
+# lock-hash: 68b5a73affb1   packages: 166
 # Regenerate with: ./builder/build-env.sh pic
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -106,7 +106,7 @@ libzlib 1.3.2
 lz4-c 1.10.0
 matplotlib-base 3.11.2
 matplotlib-inline 0.2.2
-more-itertools 11.1.0
+more-itertools 11.2.0
 mpc 1.4.0
 mpfr 4.2.2
 mpmath 1.4.1
