@@ -1,6 +1,6 @@
 # pathology — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pathology.yaml   Built: 2026.10.13.151605   Builder: 652f896
-# lock-hash: 73a4ec25d56b   packages: 208
+# Source spec: envs/pathology.yaml   Built: 2026.10.15.125002   Builder: 29e757d
+# lock-hash: 7cdc8e99d60c   packages: 208
 # Regenerate with: ./builder/build-env.sh pathology
 _openmp_mutex 4.5
 aom 3.14.1
@@ -49,7 +49,7 @@ font-ttf-ubuntu 0.83
 fontconfig 2.18.3
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
-fonttools 4.66.1
+fonttools 4.67.0
 freetype 2.14.3
 fribidi 1.0.17
 fsspec 2026.9.0
@@ -85,7 +85,7 @@ libbrotlidec 1.2.0
 libbrotlienc 1.2.0
 libcblas 3.11.0
 libcrc32c 1.1.2
-libcurl 8.22.0
+libcurl 8.23.0
 libdav1d7 1.5.4
 libdeflate 1.25
 libdicom 1.3.0
