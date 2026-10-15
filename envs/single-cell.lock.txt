@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.10.13.151607   Builder: 652f896
-# lock-hash: 849465a607b6   packages: 346
+# Source spec: envs/single-cell.yaml   Built: 2026.10.15.125003   Builder: 29e757d
+# lock-hash: 91147868a82e   packages: 349
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -31,7 +31,7 @@ cairo 1.18.6
 certifi 2026.7.22
 cloudpickle 3.1.2
 contourpy 1.4.0
-curl 8.22.0
+curl 8.23.0
 cycler 0.12.1
 donfig 0.8.1.post1
 fast-array-utils 1.5.1
@@ -42,7 +42,7 @@ font-ttf-ubuntu 0.83
 fontconfig 2.18.3
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
-fonttools 4.66.1
+fonttools 4.67.0
 formulaic 1.2.2
 freetype 2.14.3
 fribidi 1.0.17
@@ -78,7 +78,7 @@ libbrotlidec 1.2.0
 libbrotlienc 1.2.0
 libcblas 3.11.0
 libcrc32c 1.1.2
-libcurl 8.22.0
+libcurl 8.23.0
 libdeflate 1.25
 libedit 3.1.20260512
 libev 4.33
@@ -94,6 +94,7 @@ libgfortran5 16.2.0
 libglib 2.90.1
 libgomp 16.2.0
 libharfbuzz 14.6.0
+libharfbuzz-devel 14.6.0
 libhwloc 2.15.0
 libiconv 1.18
 libjpeg-turbo 3.2.0
@@ -103,6 +104,8 @@ liblzma 5.8.3
 libmpdec 4.0.0
 libnghttp2 1.68.1
 libopenblas 0.3.34
+libpango 1.58.2
+libpango-devel 1.58.2
 libpng 1.6.59
 libpsl 0.23.1
 libpython 3.14.8
@@ -149,7 +152,7 @@ pixman 0.46.4
 pthread-stubs 0.4
 pydantic 2.14.1
 pydantic-core 2.50.1
-pydantic-settings 2.15.0
+pydantic-settings 2.16.0
 pynndescent 0.6.0
 pyparsing 3.3.3
 python 3.14.8
@@ -315,7 +318,7 @@ scanpy 1.12.4
 scikit-learn 1.9.1
 scikit-misc 0.5.3
 scipy 1.18.1
-scverse-misc 0.1.6
+scverse-misc 0.1.7
 seaborn 0.13.2
 seaborn-base 0.13.2
 sed 4.10
@@ -335,7 +338,7 @@ typing-inspection 0.4.4
 typing_extensions 4.16.0
 tzdata 2026c
 umap-learn 0.5.12
-wrapt 2.5.0
+wrapt 2.5.1
 xorg-libice 1.1.2
 xorg-libsm 1.2.6
 xorg-libx11 1.8.13
