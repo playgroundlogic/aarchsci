@@ -66,3 +66,12 @@ dependencies:
   # the objective is a real check — and the issue correctly noted `coin-or-cbc` was absent
   # from `geo-ml` despite an earlier survey claiming otherwise.
   - coin-or-cbc
+  # --- SMT solving (issue #44) ---
+  # Z3 is a different kind of solver from the three above: it decides SATISFIABILITY of
+  # logical formulas rather than optimising a linear objective. That makes it a natural
+  # neighbour here (constraint solving) and gives this env its most exact checks available
+  # -- an SMT verdict is a logical fact, not a number with a tolerance. Costs nothing:
+  # measured, the env goes to 63 packages with python 3.14.8 and numpy unchanged, because
+  # z3-solver 5.1.0.0 `h2c195cf_1` declares an unpinned `python >=3.11` (abi3-style) rather
+  # than a python_abi constraint.
+  - z3-solver

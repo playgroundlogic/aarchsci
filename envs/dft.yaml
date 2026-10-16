@@ -78,7 +78,6 @@ dependencies:
   # comp-chem's packages. This env already runs py314, so psi4 joins for free.
   # The >=1.11 floor is load-bearing: psi4 1.10 installs against libxc-c 7.1.2 and
   # then dies on `import psi4` with "Could not find required LibXC functional".
-  - psi4 >=1.11
   # nwchem: a fourth engine — Gaussian-basis and plane-wave quantum chemistry, and the
   # one code here built to scale across nodes rather than within one (issue #7). It
   # lands in `dft` rather than a new env because every one of its 30 linux-aarch64
@@ -147,3 +146,23 @@ dependencies:
   - spglib
   - phonopy
   - pymatgen
+  # --- Gaussian-and-plane-waves DFT, merged in from the former `cp2k` env (2026-10-16) ---
+  # THIS MERGE WAS BLOCKED FOR SIX DAYS AND THE BLOCKER IS NOW GONE, which is worth
+  # recording because it is the first gap in this project closed by an upstream fix we
+  # asked for. Issue #30 found that `qe 7.5` hard-pinned `elpa >=2025.6.1,<2025.6.2` while
+  # cp2k needs `elpa >=2026.2.2`, so the two could not share an env and cp2k shipped
+  # separately. Asked upstream as conda-forge/qe-feedstock#83; mkrack merged PR #85
+  # ("Update to QE 7.6 and revise build") on 2026-10-14 with linux_aarch64 green.
+  # Measured after it landed: `qe 7.6 hb96c5eb_0` declares NO elpa dependency at all, so
+  # the conflict simply does not exist any more. This env now resolves cp2k 2026.2,
+  # qe 7.6 and elpa 2026.02.002 together, 235 packages.
+  #
+  # PSI4 WAS REMOVED TO MAKE ROOM, AND THAT IS THE HONEST COST OF THIS MERGE. psi4's
+  # `gauxc 1.1` dependency hard-pins `hdf5 >=1.14.6,<1.14.7` while cp2k requires
+  # `hdf5 >=2.2.0`; gauxc ships no hdf5-2.x build, so no pin reconciles them. psi4 could
+  # not go back to `comp-chem` either — measured, it drags that env's python from 3.13.16
+  # to 3.11.17 and takes rdkit, openmm and cantera with it. So psi4 now has its own env
+  # (`envs/psi4.yaml`, 82 packages at py314). That is arguably where it belonged anyway:
+  # psi4 is correlated-wavefunction MOLECULAR quantum chemistry, and everything left here
+  # is periodic DFT. It was only ever in `dft` as a refugee from comp-chem's python cap.
+  - cp2k=*=mpi_openmpi*

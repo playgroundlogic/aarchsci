@@ -151,17 +151,18 @@ precedent.
 | **solve-gap** | 16 | No `linux-aarch64` build at all. Engines/potentials: ~~`cp2k`~~ (**RESOLVED 2026-10-10 — see below**), `sisl`, `asap3`, `kimpy`, `openkim-models`, `quippy`, `chgnet`, `m3gnet`. Population genetics: `slim` (blocks current `stdpopsim`; see below). Phonons/transport: `phono3py`, `alamode`, `dynaphopy`, `boltztrap2`, `kwant`. DMFT: `triqs`, `triqs_dft_tools`, `edrixs`. All surfaced while scoping `dft` and probing its neighborhood; **none blocks a shipping env** — they are candidates we probed and declined. `cp2k` was the highest-value target and is now shipping as its own env; `phono3py` is the cheapest of what remains. |
 | **assemble-gap** | 1 | `whitebox` — solves, imports, but fetches an amd64 binary at runtime (wontfix); see below |
 | **MPI-flavor conflict** | 1 | `abinit` — has an arm64 build, solves standalone, but MPICH-only (stuck); see below |
-| **python-ABI collision** | 3 | `psi4` in `comp-chem` — no py313 arm64 build; relocated to `dft` (py314) instead of downgrading 13 packages. `su2` in `fem-cfd` — arm64 builds stop at py311, which would cap the whole env; declined, so su2 got `cfd-fv` to itself. `warpx` in `cfd-fv` (#35) — would have *inherited* su2's py311 cap, so it got `pic` instead. None is a gap in any shipping image; see below |
+| **python-ABI collision** | 3 | `psi4` in `comp-chem` — had no py313 arm64 build; relocated to `dft`, then to its own env in 2026-10 (it now HAS a py313 build, yet still drags comp-chem to py311 — re-measured, see below). `su2` in `fem-cfd` — arm64 builds stop at py311, which would cap the whole env; declined, so su2 got `cfd-fv` to itself. `warpx` in `cfd-fv` (#35) — would have *inherited* su2's py311 cap, so it got `pic` instead. None is a gap in any shipping image; see below |
 | **solve-gap (R/CRAN layer)** | 729 | Counted separately because it is a *coverage* measurement, not a list of probed candidates: 729 of the 3891 `r-*` packages installable on linux-64 have no arm64 build. 18.7%, and the `r` env ships anyway. See "The R layer" below |
 
 **The curated science head is near-complete on arm64.** This is still the real
 finding, and it's the inverse of the pip experience: the exact stack that fails
 `No matching distribution found for rasterio` on PyPI solves *and* assembles cleanly
-on conda-forge. Twenty-six envs ship verified (geospatial, earth-observation, geo-ml,
+on conda-forge. Twenty-seven envs ship verified (geospatial, earth-observation, geo-ml,
 climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization,
 neuroimaging, single-cell, bayes, geoscience, cp2k, pathology, quantum, hep, pic, structbio,
-popgen, tomography), and every headline package in all twenty-six assembles and does real
-work natively.
+popgen, tomography, psi4), and every headline package in all twenty-seven assembles and does
+real work natively. (`cp2k` is deprecated as of 2026-10-16 — its contents moved into `dft` —
+and is counted while it still publishes as a transition alias.)
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
 changed: every solve-gap listed above is a **candidate we probed and declined**, not a
@@ -192,6 +193,22 @@ Two things that fell out of building it are worth keeping:
   and the two codes cannot share an env until conda-forge rebuilds qe against elpa 2026.
   Filed as [`conda-forge/qe-feedstock#83`](https://github.com/conda-forge/qe-feedstock/issues/83)
   (2026-10-11).
+
+  **RESOLVED UPSTREAM 2026-10-14, and this is the first gap in this file closed by a fix we
+  asked for.** mkrack replied on #83 pointing at
+  [`qe-feedstock#85`](https://github.com/conda-forge/qe-feedstock/pull/85) ("Update to QE
+  7.6 and revise build"), merged with `linux_aarch64` green, and noted that an
+  [`elpa-feedstock` OpenMPI build for osx_arm64](https://github.com/conda-forge/elpa-feedstock/pull/45)
+  had been added so that all qe variants now build against ELPA 2026.02.002. Verified on
+  the channel: **`qe 7.6 hb96c5eb_0` declares no `elpa` dependency at all**, so the
+  conflict does not merely move — it ceases to exist. Three days from asking to fixed.
+
+  Consequence: `dft` absorbed cp2k on 2026-10-16 and now resolves cp2k 2026.2, qe 7.6 and
+  elpa 2026.02.002 together at 235 packages. The `cp2k` env is deprecated and kept
+  publishing as a transition alias.
+
+  **The merge cost psi4 its seat, via a second and unrelated pin — see the hdf5 entry
+  below.**
 - **cp2k ships its own data, which is why it gets full verification where `siesta` cannot.**
   68 basis-set and pseudopotential files under `share/cp2k/data`, plus 344 Quickstep
   regtest directories whose `TEST_FILES.toml` carries committed reference energies *and*
@@ -675,6 +692,34 @@ hdf5             2.2.0  mpi_openmpi_h57bd46d_1     netcdf-fortran   4.6.4  mpi_o
 
 Still `stuck` (retry) rather than `wontfix`, because nothing technical blocks it now.
 Recorded in [`farm/skip-list.tsv`](farm/skip-list.tsv) with a 90-day revisit.
+
+### `psi4` vs `cp2k` — a dependency-pin conflict with no arm64 component (2026-10-16)
+
+**Env affected:** none, by design — `psi4` now has its own env. Recorded because it is the
+reason `dft` could absorb cp2k but not keep psi4.
+
+Nothing here is missing from arm64. Two packages simply cannot co-exist:
+
+```
+psi4 1.11   ->  gauxc 1.1 nompi_*  ->  hdf5 >=1.14.6,<1.14.7.0a0
+cp2k 2026.2 mpi_openmpi_*          ->  hdf5 >=2.2.0,<3.0a0
+```
+
+`gauxc` ships no hdf5-2.x build on any platform, so the ranges are disjoint and no pin
+reconciles them — the solver reports it as an hdf5/mpich/libhwloc cascade, which takes some
+reading to trace back to gauxc. Same **shape** as the `abinit` MPI-flavour conflict recorded
+above (one env, one allowed version of a shared native library), with hdf5 in place of the
+`mpi` metapackage.
+
+**And psi4 could not simply go back to `comp-chem`**, which is where it was first requested.
+Its original blocker there *has* cleared — psi4 1.11 now has a py313 aarch64 build
+(`py313hd20022e_3`) where in 2026-09 it had none. But measured inside that env it resolves
+**python 3.11.17**, two minors below comp-chem's 3.13.16, dragging rdkit, openmm and cantera
+with it. So the first reason evaporated and a second one replaced it, which is worth
+recording on its own: **a cap clearing upstream does not mean the co-tenancy test now passes
+— re-run the solve.**
+
+Standalone, psi4 resolves py314 cleanly at 82 packages, which is where it ships.
 
 ### `slim` — solve-gap, and it silently costs `stdpopsim` four releases (2026-10-11, issue #40)
 

@@ -3,6 +3,84 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-16 (the first upstream fix lands; dft absorbs cp2k; psi4 gets its own env)
+
+### Upstream: `qe-feedstock#83` was answered and fixed in three days
+The elpa blocker recorded since issue #30 is **gone**. mkrack replied on the issue pointing
+at [`qe-feedstock#85`](https://github.com/conda-forge/qe-feedstock/pull/85) ("Update to QE
+7.6 and revise build"), merged 2026-10-14 with `linux_aarch64` green, and added an
+[`elpa-feedstock` OpenMPI build](https://github.com/conda-forge/elpa-feedstock/pull/45) so
+every qe variant builds against ELPA 2026.02.002.
+
+Verified on the channel: **`qe 7.6 hb96c5eb_0` declares no `elpa` dependency at all** — the
+conflict doesn't move, it ceases to exist. This is the first gap in GAPS.md closed by a fix
+this project asked for, and the turnaround was three days. Filing the measurement rather
+than just recording the gap is what made that possible.
+
+### Changed — `dft` absorbs cp2k; `cp2k` deprecated
+- **`dft` now resolves cp2k 2026.2, qe 7.6 and elpa 2026.02.002 together, 235 packages.**
+  Users get Gaussian-and-plane-waves and plane-wave DFT in one image for the first time.
+  cp2k's full verification came across intact — it still reproduces **upstream's own
+  regtest reference at upstream's own tolerance**, with both the energy and the bound read
+  out of cp2k's committed `TEST_FILES.toml` at run time via stdlib `tomllib`, serially and
+  on 2 MPI ranks.
+- **`cp2k` is deprecated and still publishing**, as a transition alias, so nobody tracking
+  `quay.io/aarchsci/cp2k:latest` breaks on a tag that silently stops updating. The spec
+  header says so and points at `dft`; it will be removed after a transition period.
+
+### Changed — `psi4` moved to its own env, 82 packages
+This is the honest cost of the merge, and it is stated in both specs rather than buried.
+- **Why it had to leave `dft`:** `psi4 1.11 → gauxc 1.1 → hdf5 >=1.14.6,<1.14.7` against
+  cp2k's `hdf5 >=2.2.0`. gauxc ships no hdf5-2.x build on any platform, so the ranges are
+  disjoint and no pin reconciles them. Same shape as the `abinit` MPI-flavour conflict, with
+  hdf5 in place of the `mpi` metapackage.
+- **Why it could not go back to `comp-chem`, where it was first requested.** Its original
+  blocker there *has* cleared — psi4 1.11 now has a py313 aarch64 build
+  (`py313hd20022e_3`) where in 2026-09 it had none. But measured inside that env it resolves
+  **python 3.11.17**, two minors below comp-chem's 3.13.16, dragging rdkit, openmm and
+  cantera with it. **A cap clearing upstream does not mean the co-tenancy test now passes —
+  re-run the solve.**
+- **And this is arguably where it belonged all along**, which two relocations obscured:
+  psi4 is correlated-wavefunction *molecular* quantum chemistry; everything left in `dft` is
+  periodic solid-state DFT. It was only ever in `dft` as a refugee from a python cap.
+- Verified with textbook values plus two identities, which is unusual here and deliberate:
+  quantum chemistry is one of the few domains with published numbers at the needed
+  precision. RHF/STO-3G on H2 at 0.74 Å; MP2/cc-pVDZ asserted to lie **below** HF (the
+  variational principle — an inequality no bug satisfies by accident); and the SCF energy
+  invariant under a rigid 5 Å translation to 1e-8 Hartree, which catches coordinate-handling
+  bugs a single-geometry check cannot.
+
+### Added to existing envs — the free adds from #43 and #44
+Each was checked with a dry-run solve first, per OQ1's rule, and none moved a pin.
+- **`optimization` + `z3-solver`, 61 → 63 packages.** Z3 decides *satisfiability*, so its
+  verdicts are the most exact checks in the catalog — `unsat` is a proof, not a measurement.
+  Verified: `x² = 4 ∧ x > 0` → sat with x = 2; negated modus ponens → **unsat**; three
+  pigeons in two distinct holes → **unsat**. z3-solver 5.1.0.0 declares an unpinned
+  `python >=3.11` rather than a `python_abi` constraint, so it caps nothing.
+- **`single-cell` + `squidpy` + `scvelo`, 346 → 533 packages.** Spatial omics and RNA
+  velocity, both noarch on top of the scanpy/anndata stack already present; python 3.14.8
+  and numpy 2.5.4 unchanged. Matched the request's predicted 533 exactly.
+- **`neuroimaging` + `mne-base`, `polars`, `pyarrow`, `numpydoc`, 229 → 294 packages.**
+  `mne-base` not `mne`, as the request asked: the metapackage pulls jupyter, ipywidgets,
+  ipympl, Qt and ffmpeg, none of which a headless batch image needs. Verified with an exact
+  identity and no staged data — a synthetic 10 Hz sine's PSD peak lands at **exactly
+  10.0 Hz** (2000 samples at 1000 Hz gives 0.5 Hz bins, so 10 Hz is a bin centre), with the
+  flat channel asserted silent.
+
+### Corrected — the three nilearn test dependencies are necessary but **not sufficient**
+Issue #43 asked for `polars`, `pyarrow` and `numpydoc` so nilearn's 135 shipped test modules
+become collectable. They're in, and they help — but measured with all three present,
+`import nilearn._utils.estimator_checks` **still fails**, on `pytest`:
+
+```
+ModuleNotFoundError: No module named 'pytest'
+```
+
+The request anticipated this ("the rest of that group is pytest and pure-Python pytest
+plugins, which I can stage myself"), so the plan is unaffected — but the claim that these
+three unblock the suite isn't quite right, and the spec now says exactly what they buy. A
+test runner stays out of a runtime env by design.
+
 ## 2026-10-11 (envs 24-26 — crystallography, population genetics, tomography; plus two additions)
 
 Seven issues (#36-#42) triaged by dry-run solve rather than by argument, which is OQ1's

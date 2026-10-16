@@ -1,0 +1,38 @@
+# aarch.science — psi4 environment
+# Correlated-wavefunction molecular quantum chemistry: Hartree-Fock, DFT, MP2, coupled
+# cluster on molecules, through Psi4's own integral and SCF stack.
+#
+# WHY THIS EXISTS AS ITS OWN ENV, which is a story about two python caps and one hdf5 pin.
+# psi4 has never had a home of its own; it has been a refugee twice.
+#
+#   1. Requested for `comp-chem` (2026-08). Declined: psi4 had no py313 arm64 build, and
+#      taking it would have dragged that env back 13 packages. Relocated to `dft`, which
+#      was py314 — recorded in GAPS.md as the first python-ABI collision.
+#   2. Removed from `dft` (2026-10-16), because `dft` absorbed cp2k once
+#      conda-forge/qe-feedstock#85 removed qe's elpa pin. psi4's `gauxc 1.1` dependency
+#      hard-pins `hdf5 >=1.14.6,<1.14.7` while cp2k requires `hdf5 >=2.2.0`, and gauxc
+#      ships no hdf5-2.x build, so no pin reconciles them. Structural, not a bump away.
+#   3. Could it go back to `comp-chem` now that psi4 1.11 HAS a py313 build
+#      (`py313hd20022e_3`)? Measured: no. Inside that env it resolves python 3.11.17 —
+#      two minors down from comp-chem's 3.13.16 — taking rdkit, openmm and cantera with
+#      it. Standalone it resolves py314 cleanly. So the OQ1 co-tenancy test says separate.
+#
+# And on reflection this is where it belonged all along, which the two relocations
+# obscured: psi4 is MOLECULAR correlated-wavefunction quantum chemistry, while everything
+# in `dft` is periodic solid-state DFT (gpaw, siesta, qe, cp2k, nwchem). Sharing an env
+# with them was always an accident of python versions rather than a domain judgement.
+#
+# Deliberately small — 82 packages. Size is not a cost (DESIGN OQ1): `cfd-fv` is 56 and
+# `tomography` is 88. What matters is that nothing else has to pay psi4's constraints.
+name: psi4
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  - scipy
+  # The `>=1.11` floor is load-bearing and predates this env. psi4 1.10 installs cleanly
+  # against libxc-c 7.1.2 and then dies during `import psi4` while building its functional
+  # table — "Fatal Error: Could not find required LibXC functional". Carried over from
+  # dft.yaml, where it was first diagnosed.
+  - psi4 >=1.11

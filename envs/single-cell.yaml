@@ -71,3 +71,9 @@ dependencies:
   # --- the R half ---
   - r-base
   - r-seurat >=5
+  # --- spatial omics + RNA velocity (issue #44) ---
+  # Both noarch and both sit on top of the scanpy/anndata stack already here, so they add
+  # capability without adding a solve constraint. Measured: the env goes to 533 packages
+  # with python 3.14.8 and numpy 2.5.4 unchanged.
+  - squidpy
+  - scvelo

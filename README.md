@@ -6,7 +6,7 @@ stack** — geospatial / earth-observation first. For Apple Silicon and AWS Grav
 Sister project to [aarch.bio](https://aarch.bio/), which rebuilds **bioconda tool
 packages**. aarch.science covers the **conda-forge** scientific stack.
 
-> **Status:** live. **26 verified, signed, public env images** on
+> **Status:** live. **27 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -18,7 +18,7 @@ Two questions decide it, and the first one usually settles it:
 
 | | aarch.bio | aarch.science |
 |---|---|---|
-| **unit** | one tool per image (~503) | a curated multi-package env (26) |
+| **unit** | one tool per image (~503) | a curated multi-package env (27) |
 | **example** | `samtools`, `bwa`, `bcftools` | `geospatial`, `dft`, `astro`, `single-cell` |
 | **source** | bioconda / BioContainers | conda-forge |
 | **you want it when** | "I need *this tool* in a pipeline step" | "I need a *working stack* I can import against" |
@@ -108,29 +108,30 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`geospatial`](envs/geospatial.yaml) | 110 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
 | [`earth-observation`](envs/earth-observation.yaml) | 246 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr |
 | [`geo-ml`](envs/geo-ml.yaml) | 367 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader |
-| [`climate`](envs/climate.yaml) | 265 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
+| [`climate`](envs/climate.yaml) | 262 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
 | [`pointcloud`](envs/pointcloud.yaml) | 234 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
 | [`comp-chem`](envs/comp-chem.yaml) | 223 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb, vina |
-| [`dft`](envs/dft.yaml) | 236 | gpaw, siesta, psi4, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
+| [`dft`](envs/dft.yaml) | 235 | gpaw, siesta, **cp2k**, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 245 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
-| [`viz`](envs/viz.yaml) | 247 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
-| [`r`](envs/r.yaml) | 330 | R 4.5 + tidyverse, data.table, arrow, sf, terra, glmnet, randomForest, caret, knitr/rmarkdown + pandoc, Rcpp |
+| [`viz`](envs/viz.yaml) | 244 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
+| [`r`](envs/r.yaml) | 328 | R 4.5 + tidyverse, data.table, arrow, sf, terra, glmnet, randomForest, caret, knitr/rmarkdown + pandoc, Rcpp |
 | [`astro`](envs/astro.yaml) | 364 | astropy, photutils, sunpy, healpy, yt, regions, reproject, specutils, astroquery, rebound |
 | [`fem-cfd`](envs/fem-cfd.yaml) | 131 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), CalculiX, OpenMPI, mpi4py, HDF5/ADIOS2 |
 | [`cfd-fv`](envs/cfd-fv.yaml) | 56 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
-| [`optimization`](envs/optimization.yaml) | 61 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
-| [`neuroimaging`](envs/neuroimaging.yaml) | 231 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
-| [`single-cell`](envs/single-cell.yaml) | 349 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
+| [`optimization`](envs/optimization.yaml) | 63 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
+| [`neuroimaging`](envs/neuroimaging.yaml) | 294 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
+| [`single-cell`](envs/single-cell.yaml) | 533 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
 | [`bayes`](envs/bayes.yaml) | 125 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
 | [`geoscience`](envs/geoscience.yaml) | 112 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
-| [`cp2k`](envs/cp2k.yaml) | 111 | CP2K 2026.2 (Gaussian + plane-wave DFT, ab-initio MD), OpenMPI — MPI-parallel |
+| [`cp2k`](envs/cp2k.yaml) | 111 | **deprecated** — CP2K now ships inside [`dft`](envs/dft.yaml); kept as a transition alias |
 | [`pathology`](envs/pathology.yaml) | 208 | OpenSlide + openslide-python, tifffile/imagecodecs, scikit-image, zarr, dask — whole-slide imaging |
 | [`quantum`](envs/quantum.yaml) | 165 | Qiskit + Aer (CPU), qiskit-algorithms/optimization/machine-learning, openfermion, QuTiP — quantum circuit simulation |
-| [`hep`](envs/hep.yaml) | 354 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
+| [`hep`](envs/hep.yaml) | 352 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
 | [`pic`](envs/pic.yaml) | 166 | WarpX (electromagnetic particle-in-cell) + AMReX/pyAMReX, openPMD, yt — plasma physics, OpenMP-threaded |
 | [`structbio`](envs/structbio.yaml) | 121 | cctbx + gemmi (two independent symmetry implementations), biopython — crystallography |
 | [`popgen`](envs/popgen.yaml) | 246 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
 | [`tomography`](envs/tomography.yaml) | 88 | ASTRA (CPU) + TomoPy, scikit-image, tifffile — CT reconstruction |
+| [`psi4`](envs/psi4.yaml) | 82 | Psi4 — correlated-wavefunction molecular quantum chemistry (HF, DFT, MP2, CC) |
 
 `dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes
 further than the others': the smoke tests run the same calculation serially and again under

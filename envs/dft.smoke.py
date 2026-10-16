@@ -6,7 +6,7 @@
 # extension, libxc/libvdwxc (exchange-correlation), and the parallel layer —
 # OpenMPI + ELPA + ScaLAPACK + FFTW — all of which can solve and import yet fail to
 # actually compute. So we drive real SCF calculations, not just imports — three
-# independent ones, through gpaw, psi4 and nwchem, which share no integral or SCF code.
+# independent ones, through gpaw, nwchem, qe and cp2k, which share no integral or SCF code.
 #
 # This env is the first in the catalog whose headline capability is PARALLEL, so D3
 # here also runs the same DFT calculation under `mpiexec -n 2` and asserts the answer
@@ -23,6 +23,7 @@
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import tempfile
@@ -41,6 +42,13 @@ SI_KPTS = (2, 2, 2)
 # Set in the child process to select the parallel leg. Without this the child would
 # re-run the whole serial suite and recurse.
 CHILD = os.environ.get("AARCHSCI_MPI_CHILD") == "1"
+
+# cp2k's regtest to reproduce, merged in with the env on 2026-10-16. `Ar.inp` is a single
+# argon atom in the GPW regtest set: the smallest input that still exercises the full
+# Quickstep path (grids, XC, SCF) and whose committed reference is quoted to 3e-13.
+REGTEST_DIR = "QS/regtest-gpw-1"
+REGTEST_INPUT = "Ar.inp"
+CP2K = {}
 
 
 def check(name):
@@ -96,11 +104,6 @@ HEADLINE = [
     "ase", "gpaw", "_gpaw",
     "mpi4py", "mpi4py.MPI",
     "spglib", "phonopy", "pymatgen",
-    # `import psi4` is a genuine check, not a formality: psi4 1.10 installs cleanly
-    # against libxc-c 7.1.2 and then dies right here, during import, building its
-    # functional table — "Fatal Error: Could not find required LibXC functional".
-    # This line is what the `psi4 >=1.11` floor in dft.yaml protects.
-    "psi4",
 ]
 
 # Packages whose conda BUILD STRING carries meaning this repo's lock file cannot record.
@@ -121,6 +124,10 @@ BUILD_STRING_MUST_CONTAIN = {
     # the version, and the binary does not print it. `_pr` cannot run on one rank at
     # all, so shipping it would break the serial/parallel comparison below.
     "nwchem": "mpi_ts",
+    # cp2k arrived with the 2026-10-16 merge. conda-forge ships it on aarch64 in BOTH
+    # flavours and the MPICH one sorts higher by build number, so an unpinned solve takes
+    # the wrong side; the spec pins it and this asserts the pin held.
+    "cp2k": "mpi_openmpi",
 }
 print("[smoke] 1. imports")
 for mod in HEADLINE:
@@ -257,25 +264,6 @@ def _si():
     assert -20.0 < e < -5.0, f"bulk Si LDA energy unphysical: {e}"
     SERIAL_SI["energy"] = e
     print(f"       (Si bulk PW({PW_CUTOFF})/LDA, kpts={SI_KPTS} = {e:.4f} eV)")
-
-
-@check("psi4 Hartree-Fock on H2 (independent ab-initio kernel)")
-def _psi4():
-    import psi4
-    scratch = Path(tempfile.mkdtemp())
-    # psi4 writes an output file and scratch files relative to cwd by default; the
-    # image runs as an unprivileged user, so point both at a temp dir.
-    os.environ.setdefault("PSI_SCRATCH", str(scratch))
-    psi4.core.set_output_file(str(scratch / "psi4.out"), False)
-    psi4.set_memory("500 MB")
-    psi4.geometry("0 1\nH 0.0 0.0 0.0\nH 0.0 0.0 0.74\nunits angstrom\n")
-    e = psi4.energy("scf/sto-3g")
-    # H2 at 0.74 A in a minimal basis: the textbook RHF/STO-3G total energy is
-    # -1.1167 Hartree. This is a tight, well-known number, so unlike the gpaw checks
-    # it can be asserted narrowly — psi4 computes it through an entirely separate
-    # native integral/SCF stack from gpaw's, which is what makes it worth having here.
-    assert -1.15 < e < -1.09, f"H2 RHF/STO-3G energy off: {e} Hartree"
-    print(f"       (H2 RHF/STO-3G = {e:.6f} Hartree)")
 
 
 # --- 4. structure / symmetry / phonons --------------------------------------------
@@ -438,7 +426,7 @@ print("[smoke] 6. nwchem (real SCF, serial + 2-rank)")
 
 # H2O at its experimental geometry. RHF/STO-3G on this geometry is -74.963023 Hartree —
 # a small, fast, completely determined number that comes out of an integral/SCF stack
-# with nothing in common with gpaw's or psi4's.
+# with nothing in common with gpaw's.
 NWCHEM_INPUT = """echo
 start h2o
 memory total 400 mb
@@ -730,6 +718,149 @@ def _qe_parallel():
         f"2-rank energy {par:.8f} Ry disagrees with serial {serial:.8f} Ry "
         f"(delta {delta:.2e})")
     print(f"       (nproc=2, serial {serial:.8f} vs 2-rank {par:.8f} Ry, delta {delta:.1e})")
+
+
+
+# --- 7. cp2k: reproduce UPSTREAM'S OWN reference at UPSTREAM'S OWN tolerance -------
+# Merged in from the former `cp2k` env on 2026-10-16, when conda-forge/qe-feedstock#85
+# removed qe's elpa pin and let the two codes share an env. The checks are unchanged from
+# that env's suite: this is still the strongest verification in the catalog that we did
+# not invent, because both the reference energy AND the tolerance are read out of cp2k's
+# own committed TOML at run time rather than copied into this file.
+print("[smoke] 7. cp2k (Gaussian + plane waves)")
+
+
+def _cp2k_tests_root():
+    """Locate cp2k's shipped regtest tree.
+
+    conda puts package tests under etc/conda/test-files/<pkg>/<n>/, not under share/, so
+    this is globbed rather than hardcoded — the `<n>` is a conda implementation detail.
+    """
+    base = Path(sys.prefix) / "etc" / "conda" / "test-files" / "cp2k"
+    for cand in sorted(base.glob("*/tests")):
+        if cand.is_dir():
+            return cand
+    return None
+
+
+def _elf_machine(path):
+    """e_machine from an ELF header, or None if not an ELF. 183 == EM_AARCH64."""
+    with open(path, "rb") as fh:
+        head = fh.read(20)
+    if head[:4] != b"\x7fELF":
+        return None
+    return struct.unpack("<H" if head[5] == 1 else ">H", head[18:20])[0]
+
+
+def _cp2k_mpi_env():
+    env = dict(os.environ)
+    env["OMPI_ALLOW_RUN_AS_ROOT"] = "1"
+    env["OMPI_ALLOW_RUN_AS_ROOT_CONFIRM"] = "1"
+    env["OMPI_MCA_rmaps_base_oversubscribe"] = "yes"
+    env["OMPI_MCA_osc"] = "^ucx"       # no RDMA in a container; silences a noisy error
+    env["OMP_NUM_THREADS"] = "1"       # cp2k is an OpenMP build; keep ranks from fighting
+    return env
+
+
+def _run_regtest(ranks):
+    """Run REGTEST_INPUT on `ranks` ranks in a scratch copy; return the total energy."""
+    root = CP2K["tests_root"]
+    src = root / REGTEST_DIR
+    d = Path(tempfile.mkdtemp())
+    # Copy the whole regtest directory: inputs reference sibling files, and cp2k writes
+    # restart/wfn files next to them, so the shipped tree must stay read-only.
+    for item in src.iterdir():
+        if item.is_file():
+            shutil.copy2(item, d / item.name)
+    exe = shutil.which("cp2k")
+    argv = ([shutil.which("mpiexec"), "-n", str(ranks), "--oversubscribe", exe]
+            if ranks > 1 else [exe])
+    proc = subprocess.run(argv + ["-i", REGTEST_INPUT, "-o", "out.txt"],
+                          cwd=str(d), capture_output=True, text=True, timeout=1800,
+                          env=_cp2k_mpi_env())
+    out_file = d / "out.txt"
+    out = out_file.read_text() if out_file.is_file() else (proc.stdout + proc.stderr)
+    assert proc.returncode == 0, \
+        f"cp2k on {ranks} rank(s) exited {proc.returncode}:\n{out[-1500:]}"
+    assert "SCF run converged" in out, \
+        f"SCF did not converge on {ranks} rank(s):\n{out[-1500:]}"
+    m = re.findall(r"ENERGY\|\s+Total FORCE_EVAL.*?(-?\d+\.\d+)", out)
+    assert m, f"no total energy in cp2k output on {ranks} rank(s):\n{out[-1500:]}"
+    return float(m[-1])
+
+
+@check("cp2k is an aarch64 binary and CP2K_DATA_DIR is wired to its shipped data")
+def _cp2k_binary():
+    exe = shutil.which("cp2k")
+    assert exe, "cp2k not on PATH"
+    mach = _elf_machine(exe)
+    if mach is not None:
+        assert mach == 183, f"cp2k ELF e_machine {mach}, expected 183 (EM_AARCH64)"
+    out = subprocess.run([exe, "--version"], capture_output=True, text=True,
+                         timeout=300).stdout
+    assert "2026" in out, f"unexpected cp2k version banner:\n{out[:400]}"
+    # conda-forge's cp2k ships its basis sets and pseudopotentials but sets no
+    # CP2K_DATA_DIR, so builder/Dockerfile exports it from activate.d. That makes this
+    # env one of the four needing `apptainer run` rather than `exec`, and asserting the
+    # variable here is what stops a regression shipping silently.
+    data = os.environ.get("CP2K_DATA_DIR")
+    assert data and Path(data).is_dir(), (
+        f"CP2K_DATA_DIR is {data!r} — activation did not run; use `run`, not `exec`")
+    n_data = sum(1 for _ in Path(data).iterdir())
+    assert n_data > 20, f"only {n_data} files under CP2K_DATA_DIR"
+    CP2K["version"] = out.strip().splitlines()[0] if out.strip() else "?"
+    print(f"       (aarch64 cp2k, CP2K_DATA_DIR wired with {n_data} basis/potential files)")
+
+
+@check("cp2k ships regtests with committed reference energies and tolerances")
+def _cp2k_refs():
+    root = _cp2k_tests_root()
+    assert root, "cp2k's regtest tree is not installed under etc/conda/test-files"
+    toml_path = root / REGTEST_DIR / "TEST_FILES.toml"
+    assert toml_path.is_file(), f"no TEST_FILES.toml at {toml_path}"
+    # tomllib is stdlib from 3.11; this env is py3.14. Parsed properly rather than
+    # regexed, so a format change upstream fails loudly instead of silently matching.
+    import tomllib
+    with open(toml_path, "rb") as fh:
+        spec = tomllib.load(fh)
+    assert REGTEST_INPUT in spec, f"{REGTEST_INPUT} not listed in {toml_path}"
+    entry = spec[REGTEST_INPUT][0]
+    ref, tol = float(entry["ref"]), float(entry["tol"])
+    assert entry.get("matcher") == "E_total", \
+        f"{REGTEST_INPUT} matcher is {entry.get('matcher')!r}, expected E_total"
+    CP2K.update(tests_root=root, ref=ref, tol=tol)
+    n_qs = len(list((root / "QS").glob("regtest*"))) if (root / "QS").is_dir() else 0
+    print(f"       ({n_qs} QS regtest dirs; {REGTEST_INPUT} ref={ref!r} tol={tol:g} "
+          "— both read from upstream's TOML)")
+
+
+@check("cp2k reproduces its own regtest reference within upstream's tolerance")
+def _cp2k_serial():
+    assert "ref" in CP2K, "the reference check did not run"
+    e = _run_regtest(1)
+    dev = abs(e - CP2K["ref"])
+    assert dev <= CP2K["tol"], (
+        f"cp2k serial energy {e!r} deviates {dev:.3e} from upstream's reference "
+        f"{CP2K['ref']!r}, tolerance {CP2K['tol']!r}")
+    CP2K["serial"] = e
+    print(f"       (serial {e!r}, deviation {dev:.2e} against tolerance {CP2K['tol']!r})")
+
+
+@check("cp2k on 2 ranks reproduces the reference and agrees with the serial run")
+def _cp2k_parallel():
+    assert "serial" in CP2K, "the serial cp2k run did not complete"
+    assert shutil.which("mpiexec"), "mpiexec missing — the MPI build is not usable"
+    e = _run_regtest(2)
+    dev = abs(e - CP2K["ref"])
+    assert dev <= CP2K["tol"], (
+        f"cp2k 2-rank energy {e!r} deviates {dev:.3e} from the reference, "
+        f"tolerance {CP2K['tol']!r}")
+    # Same code, same input, different rank count: the decomposition must not change the
+    # answer beyond summation-order noise.
+    delta = abs(e - CP2K["serial"])
+    assert delta <= max(CP2K["tol"], 1e-10), (
+        f"2-rank energy {e!r} disagrees with serial {CP2K['serial']!r} (delta {delta:.2e})")
+    print(f"       (2 ranks {e!r}, deviation {dev:.2e}; serial/parallel delta {delta:.2e})")
 
 
 # --- verdict ----------------------------------------------------------------------

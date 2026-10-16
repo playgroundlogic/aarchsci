@@ -67,7 +67,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
   - `geo-ml` (367 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (265 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+  - `climate` (262 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
     regridding, plus ocean thermodynamics. cdo and nco are the netCDF/GRIB command-line
     operators — the CLI complement to the Python stack; both are serial/OpenMP with no
@@ -80,7 +80,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
   - `comp-chem` (223 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, xtb-python, vina; cheminformatics + MD + quantum chemistry
     + docking).
-  - `dft` (236 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
+  - `dft` (235 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
     libvdwxc, elpa, scalapack, fftw, openmpi, mpi4py, spglib, phonopy, pymatgen; plane-wave/
     LCAO density-functional theory plus Gaussian-basis quantum chemistry, MPI-parallel. Run
     in parallel with
@@ -98,13 +98,13 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     is `gmx_mpi`, not `gmx`, and conda-forge builds it `ARM_NEON_ASIMD`, so it uses NEON
     and leaves SVE/SVE2 idle on Graviton 3+. `pmemd` is not included — paid Amber
     licence only).
-  - `r` (330 pkgs — R 4.5.3 + tidyverse, data.table, arrow, sf, terra, glmnet,
+  - `r` (328 pkgs — R 4.5.3 + tidyverse, data.table, arrow, sf, terra, glmnet,
     randomForest, caret, knitr/rmarkdown with pandoc, ragg, Rcpp; the catalog's first
     non-Python env, so its verification is `Rscript /opt/aarchsci/smoke.R`. Pinned to
     the R 4.5 line on purpose: r-base reaches 4.6.1 on arm64 but ZERO of conda-forge's
     3162 linux-aarch64 `r-*` packages have an r46 build, and `r-base=4.6.1 r-tidyverse`
     does not solve at all).
-  - `viz` (247 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
+  - `viz` (244 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
     rendering goes via GLX against Xvfb, which ships in the image).
@@ -150,7 +150,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     finite-volume scheme holds uniform flow to machine zero even on skewed cells; a broken
     one does not. Note: conda-forge's su2 ships no meshes/tutorial cases and no pysu2
     binding, so the smoke test generates its own mesh and drives SU2_CFD as a binary).
-  - `optimization` (61 pkgs — HiGHS + highspy, SCIP + PySCIPOpt, CBC, scipy; linear and
+  - `optimization` (63 pkgs — HiGHS + highspy, SCIP + PySCIPOpt, CBC, scipy; linear and
     mixed-integer programming. Its own env rather than part of geo-ml because optimization
     is a cross-cutting METHOD, not a domain. Verification uses exact identities rather than
     tolerances: the LP optimum is a textbook value (36 exactly), the primal-dual gap must be
@@ -158,7 +158,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     same problem. Note `scip` is pinned <10.1: pyscipopt 6.2.1 links libscip.so.10.0 while
     declaring `scip >=10.0.0,<11.0a0`, so an unpinned solve installs scip 10.1.0 and
     `import pyscipopt` then fails — an upstream soname/metadata bug, caught by D3.)
-  - `neuroimaging` (231 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
+  - `neuroimaging` (294 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
     volume-based fMRI, diffusion MRI and structural MRI. In scope for this project rather
     than the bioinformatics sister project because none of these packages are on bioconda at
     all — they are conda-forge only. Verified with no staged or downloaded data: a NIfTI
@@ -168,7 +168,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     `ants` has no linux-aarch64 build at all and FSL/FreeSurfer/MRtrix3 are not on
     conda-forge, so registration-heavy and surface-based pipelines are out of reach;
     `templateflow` is excluded because it downloads atlases at runtime.)
-  - `single-cell` (349 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
+  - `single-cell` (533 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
     python 3.14, AND r-seurat 5.5 on R 4.5, in one image; single-cell transcriptomics in
     both ecosystems. Here because it is an ENVIRONMENT (DESIGN D5: the split with the
     sister project is artifact shape, not subject) — aarch.bio also ships a single-tool
@@ -259,7 +259,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the support exactly and that both sampled distributions match the EXACT statevector
     probabilities within their own sampling error, sqrt(p(1−p)/N) — worst deviation
     1.67 sigma at 20000 shots.)
-  - `hep` (354 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
+  - `hep` (352 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
     datasets, hepmc3, fastjet, lhapdf, yoda, uproot, awkward; high-energy physics. ITS OWN
     env — nothing existing is close, and ROOT alone is a large self-contained framework.
     GEANT4 IS PINNED `noqt_*`, WHICH INVERTS WHAT ISSUE #34 ASKED FOR, and the reason is
@@ -377,6 +377,24 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     FBP's floor for this phantom rather than a defect. tomopy is verified at import plus its
     phantom generator only — the siesta precedent — because its reconstruction conventions
     need calibration and its multiprocessing path failed intermittently under load.)
+  - `psi4` (82 pkgs — psi4 1.11, numpy, scipy; correlated-wavefunction MOLECULAR quantum
+    chemistry: HF, DFT, MP2, coupled cluster. ITS OWN ENV as of 2026-10-16 after being a
+    refugee twice. Requested for `comp-chem` in 2026-08 and declined (no py313 aarch64
+    build then, would have dragged that env back 13 packages), so it went to `dft` which was
+    py314. Removed from `dft` when that env absorbed cp2k, because psi4's `gauxc 1.1`
+    hard-pins `hdf5 >=1.14.6,<1.14.7` while cp2k needs `hdf5 >=2.2.0` and gauxc ships no
+    hdf5-2.x build anywhere — disjoint ranges, no pin reconciles them. Could it return to
+    `comp-chem` now that psi4 1.11 HAS a py313 build? Measured: no — inside that env it
+    resolves python 3.11.17, two minors below comp-chem's 3.13.16, dragging rdkit, openmm
+    and cantera down. A CAP CLEARING UPSTREAM DOES NOT MEAN THE CO-TENANCY TEST NOW PASSES;
+    re-run the solve. And this is arguably where psi4 belonged all along: everything in
+    `dft` is periodic solid-state DFT, psi4 is molecular. Verified with textbook values
+    rather than identities, which is rare here and deliberate — quantum chemistry is one of
+    the few domains with published numbers at the needed precision: RHF/STO-3G on H2 at
+    0.74 A; MP2/cc-pVDZ asserted to lie BELOW HF by the variational principle, an inequality
+    no bug satisfies by accident; and the SCF energy invariant under a rigid 5 A translation
+    to 1e-8 Hartree. The `psi4 >=1.11` floor is load-bearing: 1.10 installs cleanly against
+    libxc-c 7.1.2 and then dies during `import psi4` building its functional table.)
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
@@ -459,9 +477,9 @@ hence the `single-cell` env.
 
 ## Facts
 
-- 26 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+- 27 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
   comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k,
-  pathology, quantum, hep, pic, structbio, popgen, tomography) —
+  pathology, quantum, hep, pic, structbio, popgen, tomography, psi4) —
   native arm64, verified
   (assemble+import+functional) + signed + public.
 - `dft` (gpaw, siesta, psi4, nwchem, quantum-espresso, ase, libxc, ELPA, ScaLAPACK,

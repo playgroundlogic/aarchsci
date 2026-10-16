@@ -54,3 +54,26 @@ dependencies:
   - nibabel
   - nilearn
   - nipype
+  # --- MEG/EEG, the electrophysiology half of this domain (issue #43) ---
+  # `mne-base`, NOT the `mne` metapackage: the latter pulls jupyter, ipywidgets, ipympl,
+  # mne-qt-browser (Qt) and imageio-ffmpeg, none of which a headless batch image needs to
+  # read, filter, epoch or source-localise. noarch, so it installs by construction and
+  # moves no pin.
+  - mne-base
+  # --- nilearn's shipped test suite needs these to be collectable (issue #43) ---
+  # nilearn 0.14.1 ships 135 test modules, and its shared helper
+  # `nilearn/_utils/estimator_checks.py` imports polars and numpydoc unconditionally, so
+  # without them the masker/GLM/decoding/connectome test modules cannot even be imported.
+  #
+  # HONEST SCOPE, because the request implied these three were sufficient and measured
+  # they are not: the same helper also imports `pytest`, which is deliberately NOT added
+  # here (a test runner is not part of a runtime env). So these three remove two of the
+  # three blockers; whoever runs nilearn's suite still has to supply pytest from outside,
+  # which the requester already planned to do. Verified: with polars/pyarrow/numpydoc
+  # present, `import nilearn._utils.estimator_checks` fails on pytest alone.
+  #
+  # None of the three caps this env: polars 2.0.0 is noarch over an aarch64
+  # polars-runtime, numpydoc is noarch, and pyarrow 25.0.0 has py314 aarch64 builds.
+  - polars
+  - pyarrow
+  - numpydoc

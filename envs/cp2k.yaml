@@ -1,3 +1,16 @@
+# DEPRECATED 2026-10-16 — cp2k now ships inside `dft`, and this env is a transition alias.
+#
+# This env existed for one reason: `qe 7.5` hard-pinned `elpa >=2025.6.1,<2025.6.2` while
+# cp2k needs `elpa >=2026.2.2`, so cp2k could not share an env with the rest of the DFT
+# stack (issue #30). That blocker is gone. Asked upstream as conda-forge/qe-feedstock#83;
+# mkrack merged PR #85 on 2026-10-14, and `qe 7.6 hb96c5eb_0` declares no elpa dependency
+# at all. `dft` now resolves cp2k 2026.2, qe 7.6 and elpa 2026.02.002 together.
+#
+# It is kept building and publishing for now so that anyone tracking
+# `quay.io/aarchsci/cp2k:latest` does not break on a tag that stops updating. New work
+# should use `dft`, which has cp2k plus gpaw, siesta, qe and nwchem in one image. This
+# spec will be removed after a transition period; the `dft` image is the successor.
+#
 # aarch.science — cp2k environment
 # CP2K: Gaussian-and-plane-waves DFT, ab-initio molecular dynamics, and the mixed
 # QM/MM and linear-scaling machinery around them (DESIGN D2). MPI-parallel.

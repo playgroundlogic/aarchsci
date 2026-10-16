@@ -77,7 +77,14 @@ HEADLINE = [
     "nibabel",
     "dipy", "dipy.reconst.dti", "dipy.sims.voxel", "dipy.core.gradients",
     "nilearn", "nilearn.image",
+    # The four nilearn namespaces whose TEST modules were uncollectable before polars and
+    # numpydoc were added (issue #43). The runtime modules import either way; these are
+    # here so a regression in the namespace itself is caught too.
+    "nilearn.maskers", "nilearn.glm", "nilearn.decoding", "nilearn.connectome",
     "nipype",
+    # MEG/EEG (issue #43), and nilearn's test-suite dependencies.
+    "mne",
+    "polars", "pyarrow", "numpydoc",
 ]
 print("[smoke] 1. imports")
 for mod in HEADLINE:
@@ -239,6 +246,61 @@ def _nilearn_mask():
     assert np.allclose(np.sort(X, axis=None), np.sort(expect, axis=None), atol=1e-6), \
         "masked values do not match the source voxels"
     print(f"       (masker: {X.shape[0]} timepoints x {X.shape[1]} in-mask voxels)")
+
+
+# --- MEG/EEG, with an exact frequency identity (issue #43) -------------------------
+print("[smoke] 7. mne: a known sine lands in a known PSD bin")
+
+
+@check("MNE recovers the exact frequency of a synthetic sine")
+def _mne():
+    import mne
+    import numpy as np
+    mne.set_log_level("ERROR")
+    # NOTHING IS DOWNLOADED. MNE's sample datasets are fetched via pooch at runtime, which
+    # is the pattern that made `whitebox` a wontfix, so this builds its own signal — the
+    # same choice as the generated slide in `pathology` and the generated phantom in
+    # `tomography`. A pure sine has an exactly known frequency, so the expected answer is
+    # arithmetic rather than a reference value.
+    sfreq, n, f0 = 1000.0, 2000, 10.0
+    t = np.arange(n) / sfreq
+    info = mne.create_info(["EEG1", "EEG2", "EEG3"], sfreq, ch_types="eeg")
+    data = np.vstack([np.sin(2 * np.pi * f0 * t),
+                      np.sin(2 * np.pi * f0 * t + np.pi / 2),
+                      np.zeros(n)])
+    raw = mne.io.RawArray(data, info)
+    assert raw.n_times == n, f"RawArray has {raw.n_times} samples, expected {n}"
+    assert raw.info["sfreq"] == sfreq, "sampling frequency was not preserved"
+    psd = raw.compute_psd(fmin=1, fmax=40, verbose="ERROR")
+    freqs = psd.freqs
+    power = psd.get_data()
+    peak = float(freqs[int(np.argmax(power[0]))])
+    # 2000 samples at 1000 Hz gives 0.5 Hz bins, so 10 Hz falls exactly on a bin centre
+    # and the peak is an equality rather than a nearby value. Measured: exactly 10.0.
+    assert peak == f0, f"PSD peak at {peak} Hz, expected exactly {f0}"
+    # The flat channel must carry essentially no power -- catches a channel mix-up.
+    assert power[2].max() < power[0].max() * 1e-6, "the zero channel is not silent"
+    print(f"       (mne {mne.__version__}: {raw.n_times} samples at {sfreq:.0f} Hz, "
+          f"PSD peak exactly {peak} Hz, flat channel silent)")
+
+
+@check("nilearn's test-suite dependencies are importable")
+def _nilearn_testdeps():
+    import numpydoc
+    import polars
+    import pyarrow
+    # These exist so nilearn's 135 shipped test modules can be collected (issue #43).
+    # Stated honestly: they remove two of the three blockers. The shared helper
+    # `nilearn/_utils/estimator_checks.py` also imports pytest, which is NOT in this env
+    # by design -- a test runner is not part of a runtime image -- so collecting the suite
+    # still needs pytest supplied from outside.
+    from numpydoc.docscrape import NumpyDocString
+    assert NumpyDocString is not None
+    df = polars.DataFrame({"a": [1, 2, 3]})
+    assert df.shape == (3, 1), f"polars DataFrame shape {df.shape}"
+    assert pyarrow.array([1, 2, 3]).to_pylist() == [1, 2, 3], "pyarrow round trip failed"
+    print(f"       (polars {polars.__version__}, pyarrow {pyarrow.__version__}, "
+          f"numpydoc {numpydoc.__version__}; pytest intentionally absent)")
 
 
 # --- verdict ----------------------------------------------------------------------

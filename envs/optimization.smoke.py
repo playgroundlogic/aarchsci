@@ -55,7 +55,7 @@ def check(name):
 
 
 # --- 1. imports -------------------------------------------------------------------
-HEADLINE = ["numpy", "scipy", "pandas", "highspy", "pyscipopt"]
+HEADLINE = ["numpy", "scipy", "pandas", "highspy", "pyscipopt", "z3"]
 print("[smoke] 1. imports")
 for mod in HEADLINE:
     @check(f"import {mod}")
@@ -195,6 +195,39 @@ def _scipy_lp():
     obj = -res.fun
     assert abs(obj - LP_OBJ_EXACT) < 1e-9, f"linprog objective {obj!r}, expected {LP_OBJ_EXACT}"
     print(f"       (linprog objective={obj:.6f}, x={np.round(res.x, 6).tolist()})")
+
+
+# --- SMT: logical facts, not tolerances (issue #44) ---------------------------------
+print("[smoke] 6. z3: satisfiability verdicts are exact")
+
+
+@check("z3 decides sat/unsat correctly on three problems with known answers")
+def _z3():
+    import z3
+    # An SMT verdict is the most exact check available anywhere in this catalog: `unsat`
+    # is a proof that no assignment exists, not a measurement. No tolerance can apply.
+    x = z3.Int("x")
+    s = z3.Solver()
+    s.add(x * x == 4, x > 0)
+    assert s.check() == z3.sat, "x^2 == 4 with x > 0 should be satisfiable"
+    assert s.model()[x].as_long() == 2, f"expected x = 2, got {s.model()[x]}"
+
+    # Modus ponens is a tautology, so its NEGATION must be unsatisfiable. If this ever
+    # returns sat, the solver is broken in a way no numeric check would reveal.
+    p, q = z3.Bools("p q")
+    s2 = z3.Solver()
+    s2.add(z3.Not(z3.Implies(z3.And(p, z3.Implies(p, q)), q)))
+    assert s2.check() == z3.unsat, "negated modus ponens must be unsat"
+
+    # Pigeonhole: three pigeons cannot occupy two holes distinctly.
+    s3 = z3.Solver()
+    holes = [z3.Int(f"h{i}") for i in range(3)]
+    for h in holes:
+        s3.add(h >= 0, h <= 1)
+    s3.add(z3.Distinct(holes))
+    assert s3.check() == z3.unsat, "3 pigeons in 2 distinct holes must be unsat"
+    print(f"       (z3 {z3.get_version_string()}: x^2=4,x>0 -> sat with x=2; "
+          "negated modus ponens -> unsat; 3-in-2 pigeonhole -> unsat)")
 
 
 # --- verdict ----------------------------------------------------------------------

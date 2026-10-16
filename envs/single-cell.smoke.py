@@ -82,6 +82,8 @@ HEADLINE = [
     # missing them loads data fine and then dies at the clustering step.
     "leidenalg", "igraph",
     "umap",
+    # Spatial omics and RNA velocity (issue #44), both noarch on top of this stack.
+    "squidpy", "scvelo",
 ]
 print("[smoke] 1. imports (Python half)")
 for mod in HEADLINE:
