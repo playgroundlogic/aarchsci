@@ -676,10 +676,19 @@ It has also **already been asked, twice, and the request is live**:
 open) with two attempts —
 [PR #21](https://github.com/conda-forge/abinit-feedstock/pull/21) (2020, closed: the
 openmpi build of `netcdf-fortran` was broken at the time) and
-[PR #33](https://github.com/conda-forge/abinit-feedstock/pull/33) (2021, **still open**,
-stalled in MPI-IO test timeouts). So the correct action here was never "file an issue" —
-it is to add a current downstream datapoint to the existing thread, which was done
-2026-10-11.
+[PR #33](https://github.com/conda-forge/abinit-feedstock/pull/33) (2021, still open but
+**last touched 2022-03-12 — over four years dormant**, stalled in MPI-IO test timeouts). So
+the correct action here was never "file an issue" — it is to add a current downstream
+datapoint to the existing thread, which was done 2026-10-11.
+
+**Tier re-examined 2026-10-16.** "Still open" overstated how live that PR is, and the
+dormancy matters for whether `stuck` is honest: a four-year-idle PR plus an issue open since
+2021 is weak evidence that anyone intends to land an openmpi variant. It stays `stuck`
+rather than `wontfix` on two grounds — nothing *technical* blocks it any more (the
+`netcdf-fortran` openmpi breakage that closed PR #21 has cleared, measured above), and
+`abinit` costs this catalog nothing today because `gpaw`, `siesta`, `qe` and `cp2k` all
+cover the ground. But if the 90-day revisit comes round again with no movement, `wontfix`
+with the reason recorded is the more honest label than an indefinite `stuck`.
 
 **The 2020 blocker is gone**, and that is the useful thing we can contribute: all four of
 the MPI-flavoured dependencies now have current `mpi_openmpi_*` builds on linux-aarch64
