@@ -104,7 +104,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the R 4.5 line on purpose: r-base reaches 4.6.1 on arm64 but ZERO of conda-forge's
     3162 linux-aarch64 `r-*` packages have an r46 build, and `r-base=4.6.1 r-tidyverse`
     does not solve at all).
-  - `viz` (244 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
+  - `viz` (247 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
     rendering goes via GLX against Xvfb, which ships in the image).
@@ -158,7 +158,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     same problem. Note `scip` is pinned <10.1: pyscipopt 6.2.1 links libscip.so.10.0 while
     declaring `scip >=10.0.0,<11.0a0`, so an unpinned solve installs scip 10.1.0 and
     `import pyscipopt` then fails — an upstream soname/metadata bug, caught by D3.)
-  - `neuroimaging` (229 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
+  - `neuroimaging` (231 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
     volume-based fMRI, diffusion MRI and structural MRI. In scope for this project rather
     than the bioinformatics sister project because none of these packages are on bioconda at
     all — they are conda-forge only. Verified with no staged or downloaded data: a NIfTI

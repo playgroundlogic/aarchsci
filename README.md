@@ -113,13 +113,13 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`comp-chem`](envs/comp-chem.yaml) | 223 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb, vina |
 | [`dft`](envs/dft.yaml) | 236 | gpaw, siesta, psi4, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 245 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
-| [`viz`](envs/viz.yaml) | 244 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
+| [`viz`](envs/viz.yaml) | 247 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
 | [`r`](envs/r.yaml) | 330 | R 4.5 + tidyverse, data.table, arrow, sf, terra, glmnet, randomForest, caret, knitr/rmarkdown + pandoc, Rcpp |
 | [`astro`](envs/astro.yaml) | 364 | astropy, photutils, sunpy, healpy, yt, regions, reproject, specutils, astroquery, rebound |
 | [`fem-cfd`](envs/fem-cfd.yaml) | 131 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), CalculiX, OpenMPI, mpi4py, HDF5/ADIOS2 |
 | [`cfd-fv`](envs/cfd-fv.yaml) | 56 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
 | [`optimization`](envs/optimization.yaml) | 61 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
-| [`neuroimaging`](envs/neuroimaging.yaml) | 229 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
+| [`neuroimaging`](envs/neuroimaging.yaml) | 231 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
 | [`single-cell`](envs/single-cell.yaml) | 349 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
 | [`bayes`](envs/bayes.yaml) | 125 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
 | [`geoscience`](envs/geoscience.yaml) | 112 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
