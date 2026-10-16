@@ -6,7 +6,7 @@ stack** — geospatial / earth-observation first. For Apple Silicon and AWS Grav
 Sister project to [aarch.bio](https://aarch.bio/), which rebuilds **bioconda tool
 packages**. aarch.science covers the **conda-forge** scientific stack.
 
-> **Status:** live. **27 verified, signed, public env images** on
+> **Status:** live. **29 verified, signed, public env images** on
 > [`quay.io/aarchsci`](https://quay.io/organization/aarchsci), a daily reconciler,
 > and a site at **[aarch.science](https://aarch.science/)**.
 
@@ -18,7 +18,7 @@ Two questions decide it, and the first one usually settles it:
 
 | | aarch.bio | aarch.science |
 |---|---|---|
-| **unit** | one tool per image (~503) | a curated multi-package env (27) |
+| **unit** | one tool per image (~503) | a curated multi-package env (29) |
 | **example** | `samtools`, `bwa`, `bcftools` | `geospatial`, `dft`, `astro`, `single-cell` |
 | **source** | bioconda / BioContainers | conda-forge |
 | **you want it when** | "I need *this tool* in a pipeline step" | "I need a *working stack* I can import against" |
@@ -132,6 +132,8 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`popgen`](envs/popgen.yaml) | 246 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
 | [`tomography`](envs/tomography.yaml) | 88 | ASTRA (CPU) + TomoPy, scikit-image, tifffile — CT reconstruction |
 | [`psi4`](envs/psi4.yaml) | 82 | Psi4 — correlated-wavefunction molecular quantum chemistry (HF, DFT, MP2, CC) |
+| [`nlp`](envs/nlp.yaml) | 91 | spaCy + the packaged `en_core_web_sm` pipeline — NLP, no model download |
+| [`gw`](envs/gw.yaml) | 215 | Bilby, LALSuite, PyCBC — gravitational-wave parameter estimation (python 3.13) |
 
 `dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes
 further than the others': the smoke tests run the same calculation serially and again under
@@ -145,7 +147,25 @@ in parallel the same way:
 docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python your_script.py
 ```
 
-Nine caveats worth knowing before you use them, all measured rather than assumed:
+Ten caveats worth knowing before you use them, all measured rather than assumed:
+
+- **`gw` is on python 3.13, and `pycbc` is floored at 2.10 — both deliberate.** PyCBC has
+  no py314 build on *any* platform (2.10.0 is py311–py313 on linux-64 too), so this is a
+  python cap rather than an arm64 gap, and containing it in its own env is why `astro`
+  stays on 3.14. The floor is the sharper point: **pycbc 2.8.2 cannot import its own
+  waveform module** against current astropy — `pycbc.cosmology` does
+  `from astropy.cosmology.core import CosmologyError`, and that module is gone in astropy
+  8.0.1. A bare `import pycbc` succeeds while `pycbc.waveform`, `.filter` and
+  `.conversions` are all dead, which is why the smoke test imports the submodules
+  individually. Taking 2.10 costs one lalsuite minor (7.25 rather than 7.26) in exchange
+  for a working PyCBC.
+- **`nlp` ships the model, so it needs no network.** spaCy's documented install path is
+  `python -m spacy download en_core_web_sm`, a runtime fetch; conda-forge packages the
+  pipeline instead. Worth knowing what the small model lacks: it ships **no word vectors**
+  (`nlp.vocab.vectors.shape` is `(0, 0)`), and `token.has_vector` returns True anyway
+  because it falls back to context-sensitive tok2vec output. Similarity scores from this
+  image are therefore not static-embedding similarities. A `md`/`lg` model would be a
+  separate, larger addition.
 
 - **`tomography`: ASTRA and TomoPy are verified to different depths, deliberately.** ASTRA
   is the verified engine — projections conserve the object's mass to 9.5e-07 and FBP error

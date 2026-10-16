@@ -3,6 +3,103 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-16 (envs 28-29 — NLP and gravitational waves; `radio` declined)
+
+Closing out issue #44's three queued envs. Two built, one cannot be built, and the one that
+could not is the more useful finding.
+
+### Added — `nlp` (issue #44)
+- **91 packages, lock `s60b4d70cf1b7`.** spacy 3.8.16 + spacy-model-en_core_web_sm,
+  python 3.14.8. Passed D3 on the first build.
+- **The model is a package, not a download**, and that is the only reason this env is
+  viable. spaCy's documented path is `python -m spacy download en_core_web_sm`, a runtime
+  fetch from GitHub — the pattern that made `whitebox` a wontfix and `casatools`
+  unbuildable. conda-forge packages the pipeline as noarch, so it is present at build time.
+- **Verified with identities rather than model outputs**, which is a deliberate choice for a
+  statistical pipeline: tagger and NER predictions can change with a model version without
+  anything being broken, so asserting them narrowly would make the gate fail on upstream
+  retraining rather than on a packaging fault. What cannot change:
+  - **tokenization is lossless** — `doc.text == input` and `"".join(t.text_with_ws)` too,
+    with `Dr.` and `Jan.` surviving as single tokens rather than splitting on the period
+  - the **StringStore round-trips** string → 64-bit hash → string exactly
+  - **`Doc.to_bytes`/`from_bytes` preserves tokens *and* tags** exactly
+- **One limitation asserted so it cannot surprise anyone:** `en_core_web_sm` ships **no word
+  vectors** (`vocab.vectors.shape == (0, 0)`), while `token.has_vector` returns True anyway
+  via tok2vec fallback. Similarity scores from this image are therefore not
+  static-embedding similarities. The smoke test asserts the absence, so if a future model
+  does ship vectors the check fails loudly and the docs get updated.
+
+### Added — `gw` (issue #44), and it inverts the recommendation we made two days ago
+- **215 packages, lock `sab3a5857bd21`.** bilby 2.8.2, lalsuite 7.25 / python-lal 7.6.1,
+  pycbc 2.10.0, on **python 3.13.16**. Passed D3 on the first build. (The request predicted
+  237 packages; that was for the unpinned set — the pinned one resolves to 215.)
+- **Python 3.13 deliberately.** pycbc has no py314 build on *any* platform (2.10.0 is
+  py311–py313 on linux-64 too), so this is a python cap rather than an arm64 gap, and
+  containing it in its own env is what keeps `astro` on 3.14 — OQ1's second test again.
+- **We recommended the wrong pin set on #44, and running it is what revealed that.** The
+  issue offered a real trade-off: unpinned gives lalsuite 7.26 with pycbc 2.8.2, while
+  `pycbc=2.10.0` gives the newer pycbc with lalsuite 7.25. We took the unpinned set on the
+  reasoning that Bilby works with either and the newer lalsuite was preferable. Measured in
+  a container:
+
+```
+pycbc 2.8.2 -> import pycbc.waveform
+  File ".../pycbc/cosmology.py", line 37, in <module>
+  from astropy.cosmology.core import CosmologyError
+ModuleNotFoundError: No module named 'astropy.cosmology.core'
+```
+
+  `astropy.cosmology.core` is gone in astropy 8.0.1, which is what solves here, so pycbc
+  2.8.2's waveform, filter and conversion layers are all unreachable — **a bare
+  `import pycbc` succeeds while everything useful underneath it is dead.** pycbc 2.10.0
+  works against the same astropy. So the floor is `pycbc >=2.10`, the cost is one lalsuite
+  minor, and the smoke test imports the submodules individually rather than trusting the
+  top-level package. Textbook D3: both sets *solved* cleanly and only running one told us
+  which was usable.
+- Verified with identities in descending exactness:
+  - **LAL's own constants are mutually consistent** — `MTSUN_SI == MSUN_SI*G_SI/C_SI**3`,
+    exactly equal. A closed-form relation among the library's own published numbers, needing
+    no external reference.
+  - **chirp mass is bit-identical** to `(m1·m2)^(3/5)/(m1+m2)^(1/5)`, with the
+    component-mass round trip closing to 2e-16.
+  - a uniform prior's **rescale/cdf round trip is exact** (max error 0.0), density exactly
+    1/70 inside the support and exactly 0 outside.
+  - the **matched filter is normalised and discriminating**: self-match and a 2.5× scaled
+    copy both 1 to round-off, while a (20,20) template against (36,29) gives 0.3396.
+    Asserted as a tolerance rather than an equality on purpose — the self-match measures
+    **1.0000000000000002**, one ulp *above* one, so `m <= 1.0` would fail on correct
+    behaviour.
+
+### Declined — `radio` / `casatools` (issue #44): the cleanest assemble-gap yet
+`casatools` **cannot be imported at all**, which is worse than `whitebox` — that at least
+imported and only failed when invoked. `import casatools` runs
+`casaconfig.do_auto_updates`, which tries to fetch CASA's measures and ephemeris tables
+over the network at import time:
+
+```
+AutoUpdatesNotAllowed: data_update: path must exist as a directory and it must be
+  owned by the user, path = /home/mambauser/.casa/data
+```
+
+Creating that directory and disabling both updaters in `~/.casa/config.py` does not rescue
+it — the import then fails on the data itself: `ImportError: measures data is not
+available`. And no conda-forge package provides that data: `casadata`, `casa-data`,
+`casatools-data`, `casacore-data`, `measures-data` and `casa-measures` are all absent, and
+casatools depends on `casaconfig` — the downloader — rather than on any data package.
+
+Issue #44 anticipated the data requirement but framed it as a *recipe* concern. Measured, it
+is an **import** blocker, so the env is not viable rather than merely its recipes. Recorded
+in GAPS.md (assemble-gap count 1 → 2) and in `farm/skip-list.tsv` as `stuck` with a 180-day
+revisit, since a packaged measures snapshot is plausible — `geant4-data-*`, `sssp` and
+`gpaw-data` are all precedents in this catalog, though the IERS tables' update cadence is
+exactly why CASA auto-downloads, so a snapshot would be a compromise.
+
+**Incidental finding that also settles the request's option (a):** casatools and its
+dependencies (`casacore`, `casacpp`) are all `mpi_openmpi_*` builds, so adding casatools to
+`astro` would have introduced an MPI implementation into an env that has none and therefore
+carries no MPI flavour lock. That is a structural change to that env's contract, not the
+patch-level python move the request weighed.
+
 ## 2026-10-16 (the first upstream fix lands; dft absorbs cp2k; psi4 gets its own env)
 
 ### Upstream: `qe-feedstock#83` was answered and fixed in three days

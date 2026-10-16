@@ -111,8 +111,8 @@
             <!-- Stats -->
             <div class="stats">
                 <div class="stat">
-                    <div class="stat-num green">27</div>
-                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k, pathology, quantum, hep, structbio, popgen, tomography, psi4</div>
+                    <div class="stat-num green">29</div>
+                    <div class="stat-label">verified env images — geospatial, earth-observation, geo-ml, climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k, pathology, quantum, hep, structbio, popgen, tomography, psi4, nlp, gw</div>
                 </div>
                 <div class="stat">
                     <div class="stat-num rose">1.87×</div>
@@ -153,7 +153,7 @@
                   <tr style="border-bottom:1px solid var(--border);">
                     <td style="padding:0.5rem 0.75rem;"><strong>unit</strong></td>
                     <td style="padding:0.5rem 0.75rem;">one tool per image (~503)</td>
-                    <td style="padding:0.5rem 0.75rem;">a curated multi-package env (27)</td>
+                    <td style="padding:0.5rem 0.75rem;">a curated multi-package env (29)</td>
                   </tr>
                   <tr style="border-bottom:1px solid var(--border);">
                     <td style="padding:0.5rem 0.75rem;"><strong>example</strong></td>
@@ -908,6 +908,52 @@ docker run --rm <span class="k">quay.io/aarchsci</span>/geospatial:latest python
                   it is to 10<sup>&minus;8</sup> Hartree. Psi4 earned its own image the hard
                   way &mdash; it was displaced from two other envs by version constraints
                   that had nothing to do with arm64.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">nlp</span><br>
+                  <strong>91 packages</strong> &mdash; natural-language processing
+                </p>
+                <div class="catalog">
+                    <span class="chip">spaCy 3.8</span>
+                    <span class="chip">en_core_web_sm</span>
+                    <span class="chip">no model download</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  spaCy's documented way to get a pipeline is
+                  <code>python -m spacy download</code> &mdash; a runtime fetch. conda-forge
+                  packages the model instead, so this image needs no network, which is the
+                  only reason the env exists at all. Verified against
+                  <strong>identities rather than predictions</strong>, because a tagger's
+                  output can change with a model version without anything being broken:
+                  tokenization is <strong>lossless</strong> (the document reconstructs its
+                  input byte for byte, with <code>Dr.</code> and <code>Jan.</code> surviving
+                  as single tokens), the string store round-trips string&nbsp;→&nbsp;hash&nbsp;→&nbsp;string
+                  exactly, and <code>Doc.to_bytes</code> preserves tokens <em>and</em> tags.
+                  One documented limitation, asserted so it can't surprise you: the small
+                  model ships <strong>no word vectors</strong>.
+                </p>
+                <p class="section-header" style="margin-top:2.5rem;margin-bottom:0.75rem;">
+                  <span style="font-size:2.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--accent-teal);">gw</span><br>
+                  <strong>215 packages</strong> &mdash; gravitational-wave astronomy
+                </p>
+                <div class="catalog">
+                    <span class="chip">Bilby 2.8</span>
+                    <span class="chip">LALSuite 7.25</span>
+                    <span class="chip">PyCBC 2.10</span>
+                    <span class="chip">python 3.13</span>
+                </div>
+                <p class="footer-note" style="margin-top:0.75rem;">
+                  A textbook case for why this project runs the code instead of trusting the
+                  solve. Two pin combinations both resolve cleanly; only one works.
+                  <strong>PyCBC 2.8.2 cannot import its own waveform module</strong> &mdash;
+                  it reaches for <code>astropy.cosmology.core</code>, removed in current
+                  astropy &mdash; so a bare <code>import pycbc</code> succeeds while
+                  everything useful underneath it is dead. We had recommended that set
+                  before measuring; the image ships 2.10 instead, at the cost of one LALSuite
+                  minor. Verified by identities: LAL's own constants are mutually consistent
+                  (<em>M</em><sub>⊙</sub> in seconds equals <em>M</em><sub>⊙</sub><em>G</em>/<em>c</em>³
+                  <strong>exactly</strong>), chirp mass is bit-identical to the closed form,
+                  and the matched filter is both normalised and discriminating.
                 </p>
                 <p class="footer-note">
                   <a href="https://quay.io/organization/aarchsci" style="color:var(--accent-teal)">Browse the registry →</a>

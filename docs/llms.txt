@@ -395,6 +395,40 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     no bug satisfies by accident; and the SCF energy invariant under a rigid 5 A translation
     to 1e-8 Hartree. The `psi4 >=1.11` floor is load-bearing: 1.10 installs cleanly against
     libxc-c 7.1.2 and then dies during `import psi4` building its functional table.)
+  - `nlp` (91 pkgs — spacy 3.8.16 + spacy-model-en_core_web_sm, numpy; natural-language
+    processing. ITS OWN ENV: nothing in the catalog is adjacent (issue #44). THE MODEL IS A
+    PACKAGE, NOT A DOWNLOAD, which is what makes this env viable — spaCy's documented path
+    is `python -m spacy download en_core_web_sm`, a runtime fetch from GitHub, and
+    conda-forge packages the pipeline as noarch instead. Verified with IDENTITIES rather
+    than model outputs, because tagger/NER predictions can change with a model version
+    without anything being broken: tokenization is LOSSLESS (doc.text == input exactly, and
+    the token concatenation too, with `Dr.` and `Jan.` surviving as single tokens), the
+    StringStore round-trips string -> 64-bit hash -> string exactly, and Doc.to_bytes/
+    from_bytes preserves tokens AND tags exactly. The model's own predictions are checked
+    loosely on unambiguous cases by design. Note en_core_web_sm ships NO word vectors —
+    vocab.vectors.shape is (0,0) and has_vector is True anyway via tok2vec fallback — so
+    similarity scores here are not static-embedding similarities; the smoke test asserts
+    the absence so it is discoverable.)
+  - `gw` (215 pkgs — bilby 2.8.2, lalsuite 7.25 / python-lal 7.6.1, pycbc 2.10.0,
+    numpy/scipy/matplotlib on PYTHON 3.13; gravitational-wave parameter estimation. ITS OWN
+    ENV and on 3.13 deliberately: pycbc has no py314 build on ANY platform (2.10.0 is
+    py311-py313 on linux-64 too), so it is a python cap rather than an arm64 gap, and
+    containing it keeps `astro` on 3.14. THE pycbc FLOOR INVERTS WHAT WE FIRST RECOMMENDED
+    on issue #44: the unpinned set gives lalsuite 7.26 with pycbc 2.8.2, and measured in a
+    container pycbc 2.8.2 CANNOT IMPORT its own waveform module —
+    `from astropy.cosmology.core import CosmologyError` against astropy 8.0.1, where that
+    module no longer exists. A bare `import pycbc` succeeds while waveform/filter/
+    conversions are all dead, so the smoke test imports the submodules individually. pycbc
+    2.10.0 works against the same astropy; the cost is one lalsuite minor. Textbook D3: the
+    env solved cleanly either way and only running it showed which half was usable.
+    Verified with identities in descending exactness: LAL's own constants are mutually
+    consistent (MTSUN_SI == MSUN_SI*G_SI/C_SI^3, exactly equal); chirp mass is BIT-IDENTICAL
+    to the closed form (m1*m2)^(3/5)/(m1+m2)^(1/5) with the component-mass round trip
+    closing to 2e-16; a uniform prior's rescale/cdf round trip is exact (max error 0.0);
+    and the matched filter is normalised AND discriminating — self-match and a 2.5x scaled
+    copy both 1 to round-off, a (20,20) template at 0.3396. Note the self-match measures
+    1.0000000000000002, one ulp ABOVE one, so that check is a tolerance and `m <= 1.0`
+    would fail.)
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
@@ -477,9 +511,9 @@ hence the `single-cell` env.
 
 ## Facts
 
-- 27 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
+- 29 env images (geospatial, earth-observation, geo-ml, climate, pointcloud,
   comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization, neuroimaging, single-cell, bayes, geoscience, cp2k,
-  pathology, quantum, hep, pic, structbio, popgen, tomography, psi4) —
+  pathology, quantum, hep, pic, structbio, popgen, tomography, psi4, nlp, gw) —
   native arm64, verified
   (assemble+import+functional) + signed + public.
 - `dft` (gpaw, siesta, psi4, nwchem, quantum-espresso, ase, libxc, ELPA, ScaLAPACK,

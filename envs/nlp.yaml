@@ -1,0 +1,30 @@
+# aarch.science — nlp environment
+# Natural-language processing (DESIGN D2): spaCy plus its small English pipeline.
+#
+# Its own env because nothing in the catalog is adjacent (issue #44). The nearest thing is
+# `single-cell`'s scikit-learn, which is a dependency rather than a domain. Verified native
+# arm64: spacy 3.8.16 has py310-py314 linux-aarch64 builds at the channel's current
+# version, matching linux-64, so the env resolves python 3.14.8 and nothing caps anything.
+#
+# THE MODEL IS A PACKAGE, NOT A DOWNLOAD, and that is what makes this env viable at all.
+# spaCy's normal install path is `python -m spacy download en_core_web_sm`, a runtime fetch
+# from GitHub — the pattern that made `whitebox` a wontfix here and that made `casatools`
+# unbuildable (see GAPS.md). conda-forge packages the pipeline as a noarch package instead,
+# so the model is present at build time and the image needs no network.
+#
+# WHAT THE SMALL MODEL DOES NOT HAVE, stated so nobody builds on it: `en_core_web_sm` ships
+# NO word vectors. `nlp.vocab.vectors.shape` is `(0, 0)`, and `token.has_vector` returns
+# True anyway because it falls back to context-sensitive tok2vec output. So similarity
+# scores from this env are not static-embedding similarities, and nlp.smoke.py deliberately
+# asserts nothing about them. A `md`/`lg` model would be a separate, larger addition.
+name: nlp
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.11
+  - numpy
+  # --- the NLP pipeline ---
+  - spacy
+  # noarch, and the reason this env needs no runtime download. Pinned by name rather than
+  # version: the model package tracks spacy's minor line, so the solver should pair them.
+  - spacy-model-en_core_web_sm

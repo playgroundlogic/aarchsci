@@ -149,7 +149,7 @@ precedent.
 | Kind | Count | Notes |
 |------|------:|-------|
 | **solve-gap** | 16 | No `linux-aarch64` build at all. Engines/potentials: ~~`cp2k`~~ (**RESOLVED 2026-10-10 — see below**), `sisl`, `asap3`, `kimpy`, `openkim-models`, `quippy`, `chgnet`, `m3gnet`. Population genetics: `slim` (blocks current `stdpopsim`; see below). Phonons/transport: `phono3py`, `alamode`, `dynaphopy`, `boltztrap2`, `kwant`. DMFT: `triqs`, `triqs_dft_tools`, `edrixs`. All surfaced while scoping `dft` and probing its neighborhood; **none blocks a shipping env** — they are candidates we probed and declined. `cp2k` was the highest-value target and is now shipping as its own env; `phono3py` is the cheapest of what remains. |
-| **assemble-gap** | 1 | `whitebox` — solves, imports, but fetches an amd64 binary at runtime (wontfix); see below |
+| **assemble-gap** | 2 | `whitebox` — solves, imports, but fetches an amd64 binary at runtime (wontfix). `casatools` — solves and installs but cannot even be IMPORTED without downloading CASA's measures tables, which no conda-forge package provides (stuck); blocks the proposed `radio` env. Both below |
 | **MPI-flavor conflict** | 1 | `abinit` — has an arm64 build, solves standalone, but MPICH-only (stuck); see below |
 | **python-ABI collision** | 3 | `psi4` in `comp-chem` — had no py313 arm64 build; relocated to `dft`, then to its own env in 2026-10 (it now HAS a py313 build, yet still drags comp-chem to py311 — re-measured, see below). `su2` in `fem-cfd` — arm64 builds stop at py311, which would cap the whole env; declined, so su2 got `cfd-fv` to itself. `warpx` in `cfd-fv` (#35) — would have *inherited* su2's py311 cap, so it got `pic` instead. None is a gap in any shipping image; see below |
 | **solve-gap (R/CRAN layer)** | 729 | Counted separately because it is a *coverage* measurement, not a list of probed candidates: 729 of the 3891 `r-*` packages installable on linux-64 have no arm64 build. 18.7%, and the `r` env ships anyway. See "The R layer" below |
@@ -157,11 +157,11 @@ precedent.
 **The curated science head is near-complete on arm64.** This is still the real
 finding, and it's the inverse of the pip experience: the exact stack that fails
 `No matching distribution found for rasterio` on PyPI solves *and* assembles cleanly
-on conda-forge. Twenty-seven envs ship verified (geospatial, earth-observation, geo-ml,
+on conda-forge. Twenty-nine envs ship verified (geospatial, earth-observation, geo-ml,
 climate, pointcloud, comp-chem, dft, md, viz, r, astro, fem-cfd, cfd-fv, optimization,
 neuroimaging, single-cell, bayes, geoscience, cp2k, pathology, quantum, hep, pic, structbio,
-popgen, tomography, psi4), and every headline package in all twenty-seven assembles and does
-real work natively. (`cp2k` is deprecated as of 2026-10-16 — its contents moved into `dft` —
+popgen, tomography, psi4, nlp, gw), and every headline package in all twenty-nine assembles
+and does real work natively. (`cp2k` is deprecated as of 2026-10-16 — its contents moved into `dft` —
 and is counted while it still publishes as a transition alias.)
 
 The gap count moved off zero in 2026-08, and it's worth being precise about what
@@ -692,6 +692,56 @@ hdf5             2.2.0  mpi_openmpi_h57bd46d_1     netcdf-fortran   4.6.4  mpi_o
 
 Still `stuck` (retry) rather than `wontfix`, because nothing technical blocks it now.
 Recorded in [`farm/skip-list.tsv`](farm/skip-list.tsv) with a 90-day revisit.
+
+### `casatools` — assemble-gap, stuck (2026-10-16, issue #44)
+
+**Env affected:** the proposed `radio` env, which is **not built** as a result.
+
+This is the cleanest assemble-gap in the file, and it is worse than `whitebox`: casatools
+cannot be **imported at all**. `import casatools` runs `casaconfig.do_auto_updates`, which
+tries to fetch CASA's measures and ephemeris tables over the network at import time:
+
+```
+casaconfig.private.CasaconfigErrors.AutoUpdatesNotAllowed:
+  data_update: path must exist as a directory and it must be owned by the user,
+  path = /home/mambauser/.casa/data
+```
+
+Creating that directory and disabling both auto-updaters in `~/.casa/config.py`
+(`measures_auto_update = False`, `data_auto_update = False`) does not rescue it — the
+import then fails on the data itself:
+
+```
+ImportError: measures data is not available, visit
+  https://casadocs.readthedocs.io/en/stable/notebooks/external-data.html
+```
+
+So the package solves, installs, and has no usable entry point without a runtime download.
+`whitebox` at least imported and only failed when invoked.
+
+**And the data is not packaged anywhere on conda-forge.** Checked individually:
+`casadata`, `casa-data`, `casatools-data`, `casacore-data`, `measures-data` and
+`casa-measures` are all absent. casatools' own 237 installed files contain no measures
+tables, and it depends on `casaconfig` — the downloader — rather than on any data package.
+
+Issue #44 anticipated the data requirement but framed it as a *recipe* concern ("that data
+would have to be staged and pinned separately"). Measured, it is an **import** blocker, so
+the env itself is not viable, not merely its recipes.
+
+**Incidental finding worth keeping:** casatools and its dependencies (`casacore`,
+`casacpp`) are all `mpi_openmpi_*` builds. Adding casatools to `astro` — the request's
+option (a) — would therefore have introduced an MPI implementation into an env that has
+none and so carries no MPI flavour lock, which is a structural change to that env's
+contract rather than the patch-level python move the request weighed.
+
+**Upstream fix:** a conda-forge package carrying a snapshot of the measures data, so
+`casaconfig` can be pointed at it instead of the network. There is precedent for shipping
+bulky scientific data this way — `geant4-data-*`, `sssp` and `gpaw-data` are all in this
+catalog's envs — though the IERS tables' update cadence is what makes CASA auto-download in
+the first place, so a snapshot is a compromise rather than a clean answer. Recorded as
+`stuck` rather than `wontfix` on that basis. Not filed upstream: packaging a
+continuously-updated dataset is a judgement call for the feedstock maintainers rather than
+something to request from outside.
 
 ### `psi4` vs `cp2k` — a dependency-pin conflict with no arm64 component (2026-10-16)
 

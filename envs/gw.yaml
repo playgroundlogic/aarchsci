@@ -1,0 +1,47 @@
+# aarch.science — gw environment
+# Gravitational-wave astronomy (DESIGN D2): Bilby for Bayesian parameter estimation,
+# LALSuite as the reference waveform and signal-processing library, PyCBC for matched
+# filtering and search tooling.
+#
+# ITS OWN ENV, NOT AN ADDITION TO `astro`, and issue #44 established why before asking:
+# `astro` + bilby + lalsuite solves only by moving that env from python 3.14.8 to 3.13.16,
+# and `pycbc` has no py314 build on ANY platform (2.10.0 is py311-py313 on linux-64 too).
+# So this is a python cap rather than an arm64 gap, and containing it in its own env is the
+# OQ1 test-2 answer — the same reasoning that gave `cfd-fv`, `pic` and `psi4` their own
+# images. This env therefore sits on python 3.13 deliberately.
+#
+# THE pycbc FLOOR IS LOAD-BEARING AND IT INVERTS WHAT WE FIRST RECOMMENDED. Issue #44 laid
+# out a genuine trade-off: unpinned you get lalsuite 7.26 with pycbc 2.8.2, while
+# `pycbc=2.10.0` gets the newer pycbc with lalsuite 7.25. We initially took the unpinned set
+# on the grounds that Bilby works with either and the newer lalsuite was preferable.
+# Measured in a built container, that set DOES NOT WORK:
+#
+#   pycbc 2.8.2  ->  import pycbc.waveform
+#                    File ".../pycbc/cosmology.py", line 37
+#                    from astropy.cosmology.core import CosmologyError
+#                    ModuleNotFoundError: No module named 'astropy.cosmology.core'
+#
+# `astropy.cosmology.core` was removed in modern astropy, and the astropy that solves here
+# is 8.0.1, so pycbc 2.8.2's waveform, filter and conversion layers are all unreachable —
+# it imports as a bare package and dies on first real use. pycbc 2.10.0 fixed the import
+# and works against the same astropy 8.0.1. This is a textbook D3 case: the env SOLVED
+# cleanly either way, and only running it told us which half was usable.
+#
+# The cost is explicit: taking pycbc 2.10.0 means lalsuite 7.25 / python-lal 7.6.1 rather
+# than 7.26 / 7.7.0. One lalsuite minor, in exchange for a PyCBC that functions.
+name: gw
+channels:
+  - conda-forge
+dependencies:
+  # 3.13 on purpose — pycbc has no py314 build anywhere. See the note above.
+  - python >=3.11,<3.14
+  - numpy
+  - scipy
+  - matplotlib-base
+  # --- parameter estimation ---
+  - bilby
+  # --- the reference waveform + signal-processing library ---
+  - lalsuite
+  # --- matched filtering. The floor is required, not cosmetic: 2.8.2 cannot import its
+  # own waveform module against current astropy. See the note above.
+  - pycbc >=2.10
