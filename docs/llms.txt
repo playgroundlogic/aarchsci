@@ -67,7 +67,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
   - `geo-ml` (367 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (262 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+  - `climate` (265 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
     regridding, plus ocean thermodynamics. cdo and nco are the netCDF/GRIB command-line
     operators — the CLI complement to the Python stack; both are serial/OpenMP with no
@@ -98,13 +98,13 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     is `gmx_mpi`, not `gmx`, and conda-forge builds it `ARM_NEON_ASIMD`, so it uses NEON
     and leaves SVE/SVE2 idle on Graviton 3+. `pmemd` is not included — paid Amber
     licence only).
-  - `r` (328 pkgs — R 4.5.3 + tidyverse, data.table, arrow, sf, terra, glmnet,
+  - `r` (330 pkgs — R 4.5.3 + tidyverse, data.table, arrow, sf, terra, glmnet,
     randomForest, caret, knitr/rmarkdown with pandoc, ragg, Rcpp; the catalog's first
     non-Python env, so its verification is `Rscript /opt/aarchsci/smoke.R`. Pinned to
     the R 4.5 line on purpose: r-base reaches 4.6.1 on arm64 but ZERO of conda-forge's
     3162 linux-aarch64 `r-*` packages have an r46 build, and `r-base=4.6.1 r-tidyverse`
     does not solve at all).
-  - `viz` (244 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
+  - `viz` (247 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
     rendering goes via GLX against Xvfb, which ships in the image).
@@ -259,7 +259,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the support exactly and that both sampled distributions match the EXACT statevector
     probabilities within their own sampling error, sqrt(p(1−p)/N) — worst deviation
     1.67 sigma at 20000 shots.)
-  - `hep` (352 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
+  - `hep` (354 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
     datasets, hepmc3, fastjet, lhapdf, yoda, uproot, awkward; high-energy physics. ITS OWN
     env — nothing existing is close, and ROOT alone is a large self-contained framework.
     GEANT4 IS PINNED `noqt_*`, WHICH INVERTS WHAT ISSUE #34 ASKED FOR, and the reason is
