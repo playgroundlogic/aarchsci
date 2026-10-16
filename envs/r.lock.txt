@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.10.15.125004   Builder: 29e757d
-# lock-hash: d521d31a77b0   packages: 330
+# Source spec: envs/r.yaml   Built: 2026.10.16.123938   Builder: 7d720e7
+# lock-hash: e23b8fc37d59   packages: 330
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -196,7 +196,7 @@ r-forcats 1.0.1
 r-foreach 1.5.2
 r-foreign 0.8_91
 r-fs 2.1.0
-r-future 1.76.0
+r-future 1.80.0
 r-future.apply 1.20.2
 r-gargle 1.6.1
 r-generics 0.1.4
