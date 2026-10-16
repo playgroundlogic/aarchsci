@@ -1,6 +1,6 @@
 # neuroimaging — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/neuroimaging.yaml   Built: 2026.10.12.165744   Builder: 16593d7
-# lock-hash: 9aaf6c6d7f91   packages: 229
+# Source spec: envs/neuroimaging.yaml   Built: 2026.10.16.123941   Builder: 7d720e7
+# lock-hash: 10984b3e54da   packages: 231
 # Regenerate with: ./builder/build-env.sh neuroimaging
 _openmp_mutex 4.5
 acres 0.5.0
@@ -43,7 +43,7 @@ deepdiff 9.1.0
 dipy 1.12.1
 epoxy 1.5.10
 etelemetry 0.3.1
-filelock 4.1.1
+filelock 4.2.0
 font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
@@ -51,7 +51,7 @@ font-ttf-ubuntu 0.83
 fontconfig 2.18.3
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
-fonttools 4.66.1
+fonttools 4.67.0
 freetype 2.14.3
 fribidi 1.0.17
 gdk-pixbuf 2.44.8
@@ -90,7 +90,7 @@ libbrotlidec 1.2.0
 libbrotlienc 1.2.0
 libcblas 3.11.0
 libcups 2.3.3
-libcurl 8.22.0
+libcurl 8.23.0
 libdeflate 1.25
 libdrm 2.4.129
 libedit 3.1.20260512
@@ -126,6 +126,8 @@ libmpdec 4.0.0
 libnghttp2 1.68.1
 libopenblas 0.3.34
 libopengl 1.7.0
+libpango 1.58.2
+libpango-devel 1.58.2
 libpciaccess 0.19
 libpng 1.6.59
 libpsl 0.23.1
