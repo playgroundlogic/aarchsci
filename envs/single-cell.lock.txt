@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.10.16.162151   Builder: 16593d7
-# lock-hash: 957f8c9c38e0   packages: 533
+# Source spec: envs/single-cell.yaml   Built: 2026.10.17.114911   Builder: 1b09136
+# lock-hash: 4290a6d9fc0d   packages: 530
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -170,7 +170,6 @@ libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
 libgrpc 1.82.1
 libharfbuzz 14.6.0
-libharfbuzz-devel 14.6.0
 libhwloc 2.15.0
 libhwy 1.4.0
 libiconv 1.18
@@ -187,7 +186,6 @@ libopenblas 0.3.34
 libopentelemetry-cpp 1.27.0
 libopentelemetry-cpp-headers 1.27.0
 libpango 1.58.2
-libpango-devel 1.58.2
 libparquet 25.0.0
 libpng 1.6.59
 libprotobuf 7.35.1
@@ -198,7 +196,7 @@ libre2-11 2025.11.05
 librttopo 1.1.0
 libsanitizer 16.2.0
 libspatialite 5.1.0
-libsqlite 3.54.0
+libsqlite 3.54.1
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-devel_linux-aarch64 16.2.0
@@ -251,7 +249,7 @@ nomkl 1.0
 numba 0.68.0
 numcodecs 0.17.0
 numpy 2.5.4
-numpy_groupies 0.13.2
+numpy_groupies 0.14.1
 ome-zarr 0.17.0
 omnipath 1.0.12
 onednn 3.13.4
@@ -262,7 +260,6 @@ orc 2.3.1
 packaging 26.3
 pandas 3.0.6
 pandoc 3.12.1
-pango 1.58.2
 param 2.4.2
 partd 1.4.2
 pathlib-abc 0.5.2
@@ -340,7 +337,7 @@ r-fnn 1.1.4.1
 r-fontawesome 0.5.3
 r-fs 2.1.0
 r-future 1.80.0
-r-future.apply 1.20.2
+r-future.apply 1.21.0
 r-generics 0.1.4
 r-ggplot2 4.0.3
 r-ggrepel 0.9.8
@@ -483,7 +480,7 @@ sortedcontainers 2.4.0
 spatial-image 1.2.3
 spatialdata 0.8.0
 spatialdata-plot 0.4.2
-sqlite 3.54.0
+sqlite 3.54.1
 squidpy 1.8.2
 statsmodels 0.15.0
 svt-av1 4.2.0
