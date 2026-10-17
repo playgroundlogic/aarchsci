@@ -65,7 +65,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     scikit-image, numpy, scipy).
   - `earth-observation` (246 pkgs — geospatial base + xarray, dask, rioxarray,
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
-  - `geo-ml` (367 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
+  - `geo-ml` (361 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
   - `climate` (265 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
@@ -168,7 +168,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     `ants` has no linux-aarch64 build at all and FSL/FreeSurfer/MRtrix3 are not on
     conda-forge, so registration-heavy and surface-based pipelines are out of reach;
     `templateflow` is excluded because it downloads atlases at runtime.)
-  - `single-cell` (533 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
+  - `single-cell` (530 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
     python 3.14, AND r-seurat 5.5 on R 4.5, in one image; single-cell transcriptomics in
     both ecosystems. Here because it is an ENVIRONMENT (DESIGN D5: the split with the
     sister project is artifact shape, not subject) — aarch.bio also ships a single-tool

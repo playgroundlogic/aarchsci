@@ -107,7 +107,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 |-----|-----:|--------------|
 | [`geospatial`](envs/geospatial.yaml) | 110 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
 | [`earth-observation`](envs/earth-observation.yaml) | 246 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr |
-| [`geo-ml`](envs/geo-ml.yaml) | 367 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader |
+| [`geo-ml`](envs/geo-ml.yaml) | 361 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader |
 | [`climate`](envs/climate.yaml) | 265 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
 | [`pointcloud`](envs/pointcloud.yaml) | 234 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
 | [`comp-chem`](envs/comp-chem.yaml) | 223 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb, vina |
@@ -120,7 +120,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`cfd-fv`](envs/cfd-fv.yaml) | 56 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
 | [`optimization`](envs/optimization.yaml) | 63 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
 | [`neuroimaging`](envs/neuroimaging.yaml) | 294 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
-| [`single-cell`](envs/single-cell.yaml) | 533 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
+| [`single-cell`](envs/single-cell.yaml) | 530 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
 | [`bayes`](envs/bayes.yaml) | 125 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
 | [`geoscience`](envs/geoscience.yaml) | 112 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
 | [`cp2k`](envs/cp2k.yaml) | 111 | **deprecated** — CP2K now ships inside [`dft`](envs/dft.yaml); kept as a transition alias |
