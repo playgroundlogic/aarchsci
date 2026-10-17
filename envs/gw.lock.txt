@@ -1,6 +1,6 @@
 # gw — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/gw.yaml   Built: 2026.10.16.181854   Builder: 8ec726b
-# lock-hash: ab3a5857bd21   packages: 215
+# Source spec: envs/gw.yaml   Built: 2026.10.17.114915   Builder: 1b09136
+# lock-hash: b3632d357a8b   packages: 215
 # Regenerate with: ./builder/build-env.sh gw
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -9,7 +9,7 @@ arviz-base 1.3.1
 arviz-plots 1.3.2
 arviz-stats 1.3.3
 arviz-stats-core 1.3.3
-astropy-base 8.0.1
+astropy-base 8.0.2
 astropy-iers-data 0.2026.10.12.1.3.27
 attrs 26.1.0
 backports.zstd 1.8.0
