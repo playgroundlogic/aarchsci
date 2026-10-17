@@ -1,6 +1,6 @@
 # optimization — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/optimization.yaml   Built: 2026.10.16.161950   Builder: 16593d7
-# lock-hash: f8c54d155671   packages: 63
+# Source spec: envs/optimization.yaml   Built: 2026.10.17.115133   Builder: 1b09136
+# lock-hash: a77099009dbe   packages: 63
 # Regenerate with: ./builder/build-env.sh optimization
 _openmp_mutex 4.5
 ampl-asl 1.0.0
@@ -35,7 +35,7 @@ libopenblas 0.3.34
 libpython 3.14.8
 libscotch 7.0.11
 libspral 2025.09.18
-libsqlite 3.54.0
+libsqlite 3.54.1
 libstdcxx 16.2.0
 libuuid 2.42.4
 libxml2 2.15.4
