@@ -1,6 +1,6 @@
 # popgen — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/popgen.yaml   Built: 2026.10.15.125002   Builder: 29e757d
-# lock-hash: 73c778fbc9f0   packages: 246
+# Source spec: envs/popgen.yaml   Built: 2026.10.17.114911   Builder: 1b09136
+# lock-hash: 101e34439afc   packages: 246
 # Regenerate with: ./builder/build-env.sh popgen
 _openmp_mutex 4.5
 apricot-select 0.6.1
@@ -129,7 +129,7 @@ libpsl 0.23.1
 libpython 3.14.8
 libraqm 0.11.0
 libre2-11 2025.11.05
-libsqlite 3.54.0
+libsqlite 3.54.1
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
