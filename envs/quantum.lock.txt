@@ -1,6 +1,6 @@
 # quantum — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/quantum.yaml   Built: 2026.10.15.125006   Builder: 29e757d
-# lock-hash: 88c148cf62fe   packages: 165
+# Source spec: envs/quantum.yaml   Built: 2026.10.17.115149   Builder: 1b09136
+# lock-hash: 5eb328400f2a   packages: 165
 # Regenerate with: ./builder/build-env.sh quantum
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -94,7 +94,7 @@ libpng 1.6.59
 libpsl 0.23.1
 libpython 3.14.8
 libraqm 0.11.0
-libsqlite 3.54.0
+libsqlite 3.54.1
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
@@ -135,7 +135,7 @@ python-tzdata 2026.5
 python_abi 3.14
 pytz 2026.5
 qhull 2020.2
-qiskit 2.5.2
+qiskit 2.6.0
 qiskit-aer 0.17.2
 qiskit-algorithms 0.4.0
 qiskit-machine-learning 0.9.1
