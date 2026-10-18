@@ -1,6 +1,6 @@
 # psi4 — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/psi4.yaml   Built: 2026.10.16.162706   Builder: 16593d7
-# lock-hash: c0741f71b702   packages: 82
+# Source spec: envs/psi4.yaml   Built: 2026.10.18.121517   Builder: 5c3957b
+# lock-hash: 934360bdfdef   packages: 82
 # Regenerate with: ./builder/build-env.sh psi4
 _openmp_mutex 4.5
 annotated-types 0.8.0
@@ -40,7 +40,7 @@ libnghttp2 1.68.1
 libopenblas 0.3.34
 libpcm 1.2.3
 libpython 3.14.8
-libsqlite 3.54.0
+libsqlite 3.54.1
 libssh2 1.11.1
 libstdcxx 16.2.0
 libuuid 2.42.4
@@ -72,7 +72,7 @@ python-dotenv 1.2.4
 python_abi 3.14
 pyyaml 6.0.3
 qcelemental 0.51.3
-qcengine 0.51.0
+qcengine 0.52.0
 qcmanybody 0.8.0
 readline 8.3
 scipy 1.18.1
