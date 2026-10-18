@@ -2,7 +2,7 @@
 # Computational chemistry: cheminformatics + molecular dynamics + quantum chemistry
 # (DESIGN D2). rdkit for cheminformatics; openmm for MD; pyscf for quantum chemistry;
 # ase for atomistic simulation; mdanalysis/mdtraj for trajectory analysis; openbabel
-# + pdbfixer + parmed for structure prep; xtb-python for semi-empirical QM. All
+# + pdbfixer + parmed for structure prep. (xtb was REMOVED 2026-10-18 — see below.) All
 # CPU-bound — a strong Graviton price/perf case (D4: GPU out, this is the CPU stack).
 # All 13 candidates probe-verified to solve native arm64 on conda-forge.
 # Versions left to the channel's current; the reconciler pins + rebuilds on change.
@@ -26,7 +26,27 @@ dependencies:
   # --- quantum / atomistic ---
   - ase
   - pyscf
-  - xtb-python
+  # xtb / xtb-python REMOVED 2026-10-18 (issue #46): conda-forge's linux-aarch64 xtb
+  # computes WRONG ANALYTIC GRADIENTS while its energies are exactly right. Water from
+  # xtb's own test_gfn2.f90: energy -5.070451354837 Eh (upstream pin -5.070451355118),
+  # gradient norm 0.134752 against upstream's pinned 0.006457420125 — 21x too large, with
+  # the oxygen z-component of the opposite sign. Confirmed on aarch64 with NO x86
+  # reference: finite differences of arm64's own (correct) energies give 0.006457530.
+  #
+  # It cannot be pinned around. All seven aarch64 builds — 6.6.1 hcad76a7_0 and every
+  # 6.7.1 build (h0fb133d_0/_1/_2, ha9b52fb_3, hfc05e43_4, gfortran_hcd2ce30_5) — return a
+  # bit-identical 0.134752018160, so it is not a 6.7.1 regression. The feedstock
+  # cross-compiles aarch64 and never runs the upstream unit tests there, which is how it
+  # shipped. Tracked as conda-forge/xtb-feedstock#50.
+  #
+  # Why REMOVED rather than kept with a caveat, unlike `siesta` in `dft`: siesta fails
+  # LOUDLY (it cannot run without pseudopotentials). xtb fails SILENTLY — plausible
+  # energies, wrong forces — and geometry optimisation and MD are its main uses. Silent
+  # wrong answers are exactly what D3 exists to keep out of a published image.
+  #
+  # Note the wrong gradient still sums to zero (6.9e-18), so a translational-invariance
+  # check would NOT catch this. When it is re-added, the gate must compare against a
+  # reference or a finite difference. Re-add when a fixed aarch64 build exists.
   # --- CPU-only enforcement: BOTH lines are load-bearing (D4) ---
   # Graviton has no NVIDIA GPU, so any CUDA package here is dead weight. conda-forge's
   # mechanism for that is the `__cuda` virtual package: a CUDA build should declare it,
@@ -62,7 +82,7 @@ dependencies:
   # psi4 was requested here (issue #2) but lives in `dft` instead. It is not a
   # packaging gap — psi4 1.11 is fine on arm64 — it is a python-version collision
   # measured in this env: psi4 1.11 has linux-aarch64 builds for py310/311/312/314
-  # but NOT py313, and `xtb-python` has no py314 build, so the only python where
+  # but NOT py313, and `xtb-python` (removed 2026-10-18) had no py314 build, so the only python where
   # both fit is 3.11. Forcing that here downgrades 13 packages (python 3.13->3.11,
   # numpy 2.5->2.4, scipy 1.18->1.17, hdf5 2.2->1.14, rdkit, pyscf, libboost).
   # `dft` already runs py314, so psi4 joins there for free. See envs/dft.yaml.
@@ -84,7 +104,7 @@ dependencies:
   # --- thermochemistry, kinetics and transport (issue #38) ---
   # Cantera covers RATES, which nothing else in the catalog touches: equilibrium,
   # reaction kinetics, transport properties, 1-D flames. The rest of this env is
-  # structure and energy (rdkit, openbabel, pyscf, xtb, openmm), so this is the
+  # structure and energy (rdkit, openbabel, pyscf, openmm), so this is the
   # complement rather than an overlap.
   #
   # Costs nothing: measured, the env goes 207 -> 223 packages with python, rdkit and

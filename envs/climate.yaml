@@ -54,3 +54,11 @@ dependencies:
   # staged input and no network — the same standard as nwchem's basis sets and sssp's
   # pseudopotentials, rather than asserting a plausible-looking band.
   - gsw
+  # --- dask-native groupby reductions (issue #47) ---
+  # flox is xarray's groupby-reduction engine for dask; xarray uses it automatically when
+  # installed. Measured by the requester on Graviton4 (a year of hourly ERA5 2 m
+  # temperature, 36.4 GB decoded): without flox, `X.groupby("time.hour") - clim` was
+  # OOM-killed twice on a 64 GiB r8g.2xlarge. Pure Python over numpy/dask/numpy_groupies,
+  # all noarch, so it moves nothing: measured 265 -> 267 packages, python and numpy
+  # unchanged. (The request cited "flox 9.11"; the channel's version is 0.11.2.)
+  - flox

@@ -3,6 +3,87 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-10-18 (xtb removed for wrong forces; a tz regression of ours fixed; flox, scipy-tests)
+
+Three issues from a user running upstream's own tests and reference geometries against our
+images (#45, #46, #47). Two of them found defects we had shipped. Both are written up in
+full because the way they slipped through is the useful part.
+
+### Removed — `xtb` from `comp-chem`: it returns wrong forces on aarch64 (issue #46)
+**The most serious defect this project has shipped.** conda-forge's linux-aarch64 xtb
+computes wrong analytic gradients while its energies are exactly right. Reproduced
+independently on water from xtb's own `test/unit/test_gfn2.f90`:
+
+```
+                       total energy (Eh)    gradient norm      O dE/dz
+upstream test pin      -5.070451355118      0.006457420125
+aarch64 (all builds)   -5.070451354837      0.134752018160     +0.08282968
+aarch64 finite diff.                        0.006457530        -0.00507169
+```
+
+- **Confirmed with no x86 reference.** Since the aarch64 energy is right, a central finite
+  difference of aarch64's *own* energies gives the true gradient — and it reproduces
+  upstream's pinned `gnorm` to ~1e-7. So the energy surface is correct and only the
+  analytic gradient path is wrong.
+- **No pin avoids it.** All seven aarch64 builds — 6.6.1 and all six 6.7.1 builds — return a
+  bit-identical `0.134752018160`. Not a 6.7.1 regression. The feedstock cross-compiles
+  aarch64 and never runs `test_gfn2` there, which is how it shipped upstream.
+- **Why it shipped here:** our D3 check asserted only that an H₂ energy was negative. An
+  energy-only check cannot see a gradient bug, and the defective build passed it.
+- **Why an invariant would not have caught it either:** the wrong gradient respects C2v
+  symmetry *and* sums to zero over atoms (6.9e-18). Invariants prove a result is
+  self-consistent, not that it is right. Only a reference value or a finite difference
+  catches this, and that is what the gate must use when xtb comes back.
+- **Removed rather than caveated**, unlike `siesta` in `dft`: siesta fails *loudly* (it
+  cannot run without pseudopotentials), while xtb fails *silently* with plausible energies,
+  and optimisation and MD are its main uses. A clean subtraction: 223 → 210 packages,
+  python 3.13.16 and every other member unchanged.
+- **Every `comp-chem` image before 2026-10-18 contains the defective build**, and digest or
+  `<date>.<HHMMSS>` pins keep it by design. The README says so prominently. Energy-only use
+  was unaffected; optimisation, frequencies and MD with it should be re-run.
+- Our three extra datapoints (all builds affected; the aarch64-only finite-difference
+  confirmation; the invariant blind spot) went to
+  [conda-forge/xtb-feedstock#50](https://github.com/conda-forge/xtb-feedstock/issues/50).
+  GAPS.md gets a new category, **wrong results**, for a package that installs, imports, runs
+  and is wrong.
+
+### Fixed — legacy time zones, a regression we introduced (issue #45)
+From **2026-10-08 to 2026-10-18**, every env with pyarrow failed on legacy zone names:
+
+```
+pa.array([0], pa.timestamp("s", tz="US/Pacific"))
+-> ArrowInvalid: Cannot locate or parse timezone 'US/Pacific'
+```
+
+Cause, measured: the Debian 12 base had `/usr/share/zoneinfo/US`; Debian 13 moved those
+backward-compatible links into a separate `tzdata-legacy` package, and the base moved to
+Debian 13 on 2026-10-08 to give lammps GLIBC_2.38. pyarrow reads `/usr/share/zoneinfo`, not
+conda's tzdata, and pointing `TZDIR` at conda's copy does not help. So that base bump — fixing
+one env — quietly broke eight: astro, climate, geo-ml, earth-observation, pathology,
+neuroimaging, popgen and single-cell.
+
+Fix: `tzdata-legacy` in `builder/Dockerfile` (3.9 MB), followed by `test -e
+/usr/share/zoneinfo/US/Pacific` so that a future base dropping the links fails the **build**
+rather than shipping. All eight affected envs are republished. Lesson for base bumps: the
+glibc question was checked thoroughly, and the distro's *other* packaging changes were not.
+
+### Added — `flox` to `climate` (issue #47)
+265 → 267 packages, nothing moves. xarray's dask groupby engine; the requester measured
+`X.groupby("time.hour") - clim` OOM-killed twice on a 64 GiB Graviton4 box without it.
+Verified as a cross-implementation check: flox and xarray's native groupby are independent
+engines, and they agree to 2.8e-16 on a dask-backed climatology, both matching a plain numpy
+reshape-mean, with the anomaly's per-group mean ~1e-16. (The request said "flox 9.11"; the
+version is 0.11.2.)
+
+### Added — `scipy-tests` to `geo-ml` (issue #45)
+conda-forge ships SciPy's tests as a separate output, so `scipy.test()` in any image without
+it finds zero test files. Unlike nilearn's test dependencies (#43), `scipy-tests` brings
+pytest and hypothesis with it, so the suite really runs. On aarch64 the full "fast" suite is
+**76,421 passed, 0 failed** in 4 minutes; D3 now runs the `linalg` and `special` subsets on
+every build (~19,400 tests, ~24 s). `linalg` was chosen because it is SciPy's own test
+coverage of the BLAS/LAPACK layer, the native code most likely to go wrong on a new
+architecture. Upstream's suite at upstream's tolerances beats any check we could write.
+
 ## 2026-10-16 (envs 28-29 — NLP and gravitational waves; `radio` declined)
 
 Closing out issue #44's three queued envs. Two built, one cannot be built, and the one that

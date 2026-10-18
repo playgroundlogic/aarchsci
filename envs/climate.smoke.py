@@ -34,6 +34,7 @@ HEADLINE = [
     "numpy", "pandas", "xarray", "dask", "netCDF4", "zarr",
     "cartopy", "cartopy.crs", "cfgrib", "eccodes", "metpy", "metpy.calc",
     "xesmf", "esmpy", "cftime", "pyproj", "gsw",
+    "flox",
 ]
 print("[smoke] 1. imports")
 for mod in HEADLINE:
@@ -244,6 +245,44 @@ def _gsw_identity():
     t_back = gsw.t_from_CT(SA, CT, p)
     assert abs(t_back - t) < 1e-9, f"t round-trip {t} -> {CT} -> {t_back}"
     print(f"       (SA={float(SA):.6f} g/kg, CT={float(CT):.6f} C, both round-trip)")
+
+
+# --- flox: two independent groupby engines must agree (issue #47) ----------------
+print("[smoke] 6. flox vs xarray's native groupby (independent implementations)")
+
+
+@check("flox and xarray's native groupby agree on a dask-backed climatology")
+def _flox():
+    import dask.array as da
+    import numpy as np
+    import pandas as pd
+    import xarray as xr
+    # Two INDEPENDENT implementations of the same reduction: flox's (numpy_groupies-based)
+    # and xarray's own groupby path, selected with `use_flox`. Agreement between them is a
+    # real check, the cross-implementation shape this catalog prefers. Not asserted as
+    # bit-identical because the engines sum in different orders; measured 2.8e-16.
+    t = pd.date_range("2021-01-01", periods=24 * 20, freq="h")
+    rng = np.random.default_rng(0)
+    x = xr.DataArray(da.from_array(rng.standard_normal((len(t), 8, 9)), chunks=(48, 8, 9)),
+                     dims=("time", "y", "x"), coords={"time": t})
+    with xr.set_options(use_flox=True):
+        clim_f = x.groupby("time.hour").mean().compute()
+        anom_f = (x.groupby("time.hour") - x.groupby("time.hour").mean()).compute()
+    with xr.set_options(use_flox=False):
+        clim_n = x.groupby("time.hour").mean().compute()
+    d_engines = float(abs(clim_f - clim_n).max())
+    assert d_engines < 1e-13, f"flox and native groupby disagree by {d_engines:.3e}"
+    # And both against a closed form: 20 whole days of hourly data, so the per-hour mean
+    # is a plain reshape-and-average in numpy, sharing no code with either engine.
+    ref = np.asarray(x).reshape(20, 24, 8, 9).mean(axis=0)
+    d_ref = float(np.abs(clim_f.values - ref).max())
+    assert d_ref < 1e-13, f"flox climatology differs from numpy reshape-mean by {d_ref:.3e}"
+    # Identity: an anomaly has zero mean within each group, by construction.
+    resid = float(abs(anom_f.groupby("time.hour").mean()).max())
+    assert resid < 1e-13, f"per-hour mean of the anomaly is {resid:.3e}, expected ~0"
+    import flox
+    print(f"       (flox {flox.__version__}: engines agree to {d_engines:.1e}, numpy "
+          f"reshape to {d_ref:.1e}; anomaly per-hour mean {resid:.1e})")
 
 
 # --- verdict --------------------------------------------------------------------

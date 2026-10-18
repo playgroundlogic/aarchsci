@@ -33,3 +33,13 @@ dependencies:
   - statsmodels
   - pandas
   - datashader
+  # --- SciPy's own test suite (issue #45) ---
+  # conda-forge ships SciPy's tests as a SEPARATE output, so `scipy.test()` in an image
+  # without it finds 0 test files. scipy-tests is pinned by its own dependency to the
+  # exact scipy build installed, and unlike nilearn's test deps (#43) it brings pytest and
+  # hypothesis with it, so the suite is genuinely runnable. Measured on aarch64: the full
+  # "fast" suite is 76,421 passed, 0 failed in 4 min. geo-ml.smoke.py runs the linalg and
+  # special subsets (~19,400 tests, ~24 s) on every build — linalg because it is SciPy's
+  # own coverage of the BLAS/LAPACK layer, the native code most likely to break on a new
+  # architecture. Reproducing upstream's suite beats any check we could write ourselves.
+  - scipy-tests

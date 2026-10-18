@@ -53,6 +53,26 @@ ARG BUILD_PLATFORM=${TARGETPLATFORM}
 
 USER root
 
+# Restore the legacy time-zone links (US/Pacific, US/Eastern, ...) that Debian 13 dropped.
+# A REGRESSION THIS PROJECT INTRODUCED, recorded so the line is never removed as clutter:
+# the Debian 12 base had /usr/share/zoneinfo/US; Debian 13 moved those backward-compatible
+# links into a separate `tzdata-legacy` package, and the base moved to Debian 13 on
+# 2026-10-08 (above). pyarrow resolves zones from /usr/share/zoneinfo rather than conda's
+# tzdata, so from that day every env carrying pyarrow failed on legacy names:
+#   pa.array([0], pa.timestamp("s", tz="US/Pacific"))
+#   -> ArrowInvalid: Cannot locate or parse timezone 'US/Pacific'
+# Pointing TZDIR at /opt/conda/share/zoneinfo does NOT help (measured). Found by running
+# pandas' own test suite in geo-ml (issue #45): 13 tests failed, and any user reading
+# Arrow/Parquet data stamped with a legacy zone name got a hard error. 3.9 MB.
+#
+# The `test -e` makes a regression fail the BUILD rather than ship: if a future base drops
+# these links again, no env can be published until this is revisited.
+RUN apt-get update -qq \
+    && apt-get install -y -qq --no-install-recommends tzdata-legacy \
+    && rm -rf /var/lib/apt/lists/* \
+    && test -e /usr/share/zoneinfo/US/Pacific \
+    && echo "[builder] legacy tz links present (US/Pacific)"
+
 # Install the curated env from its committed conda-forge spec into the base env.
 # The channel(s) come from the env YAML itself (conda-forge), so no -c flags here:
 # the spec is fully self-describing and stays the single source of truth.

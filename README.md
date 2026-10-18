@@ -107,10 +107,10 @@ neither moves; comparing one against the other just looks like a mismatch when i
 |-----|-----:|--------------|
 | [`geospatial`](envs/geospatial.yaml) | 110 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
 | [`earth-observation`](envs/earth-observation.yaml) | 246 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr |
-| [`geo-ml`](envs/geo-ml.yaml) | 361 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader |
-| [`climate`](envs/climate.yaml) | 265 | xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
+| [`geo-ml`](envs/geo-ml.yaml) | 368 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader, scipy-tests |
+| [`climate`](envs/climate.yaml) | 267 | xarray/dask + flox, cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
 | [`pointcloud`](envs/pointcloud.yaml) | 234 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
-| [`comp-chem`](envs/comp-chem.yaml) | 223 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, xtb, vina |
+| [`comp-chem`](envs/comp-chem.yaml) | 210 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, vina, cantera — **xtb removed 2026-10-18**, see below |
 | [`dft`](envs/dft.yaml) | 235 | gpaw, siesta, **cp2k**, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 245 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
 | [`viz`](envs/viz.yaml) | 247 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
@@ -147,7 +147,30 @@ in parallel the same way:
 docker run --rm quay.io/aarchsci/dft:latest mpiexec -n 4 python your_script.py
 ```
 
-Ten caveats worth knowing before you use them, all measured rather than assumed:
+Twelve caveats worth knowing before you use them, all measured rather than assumed:
+
+- **`comp-chem` images published before 2026-10-18 contain an xtb that returns WRONG
+  FORCES.** Read this one if you have ever pinned `comp-chem`. conda-forge's linux-aarch64
+  xtb computes wrong analytic gradients while its energies are exactly right — on xtb's
+  own `test_gfn2` water case the gradient norm is **0.134752** against upstream's pinned
+  **0.006457**, 21× too large, with one component of the wrong sign. All seven aarch64
+  builds do this, so no pin avoids it. Energy-only work was unaffected; **geometry
+  optimisation, frequencies and MD run with xtb from those images are not trustworthy and
+  should be re-run.** xtb has been removed from `comp-chem:latest`, and digest or
+  `<date>.<HHMMSS>` pins to older images keep the defective build, because those never
+  move by design. Found by a user running upstream's unit-test geometry
+  ([#46](https://github.com/playgroundlogic/aarchsci/issues/46)); our own gate checked only
+  that the H₂ energy was negative, which the bad build passed. Tracked upstream as
+  [conda-forge/xtb-feedstock#50](https://github.com/conda-forge/xtb-feedstock/issues/50).
+- **Legacy time-zone names (`US/Pacific`, `US/Eastern`, …) were broken from 2026-10-08 to
+  2026-10-18 in every env with pyarrow** — astro, climate, geo-ml, earth-observation,
+  pathology, neuroimaging, popgen, single-cell. A regression this project introduced:
+  moving the base to Debian 13 (for lammps's GLIBC_2.38) dropped those links into a
+  separate `tzdata-legacy` package, and pyarrow reads `/usr/share/zoneinfo` rather than
+  conda's tzdata, so `pa.timestamp("s", tz="US/Pacific")` raised `ArrowInvalid`. Fixed in
+  the base image, and the build now fails if the links are ever missing again. Images in
+  that window, pinned by digest, still have the bug. Found by running pandas' own test suite
+  ([#45](https://github.com/playgroundlogic/aarchsci/issues/45)).
 
 - **`gw` is on python 3.13, and `pycbc` is floored at 2.10 — both deliberate.** PyCBC has
   no py314 build on *any* platform (2.10.0 is py311–py313 on linux-64 too), so this is a

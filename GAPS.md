@@ -149,6 +149,7 @@ precedent.
 | Kind | Count | Notes |
 |------|------:|-------|
 | **solve-gap** | 16 | No `linux-aarch64` build at all. Engines/potentials: ~~`cp2k`~~ (**RESOLVED 2026-10-10 — see below**), `sisl`, `asap3`, `kimpy`, `openkim-models`, `quippy`, `chgnet`, `m3gnet`. Population genetics: `slim` (blocks current `stdpopsim`; see below). Phonons/transport: `phono3py`, `alamode`, `dynaphopy`, `boltztrap2`, `kwant`. DMFT: `triqs`, `triqs_dft_tools`, `edrixs`. All surfaced while scoping `dft` and probing its neighborhood; **none blocks a shipping env** — they are candidates we probed and declined. `cp2k` was the highest-value target and is now shipping as its own env; `phono3py` is the cheapest of what remains. |
+| **wrong results** | 1 | `xtb` — installs, imports and runs on aarch64, and returns wrong analytic gradients with correct energies, in all seven aarch64 builds. Removed from `comp-chem`. The most serious kind of gap, because nothing fails; see below |
 | **assemble-gap** | 2 | `whitebox` — solves, imports, but fetches an amd64 binary at runtime (wontfix). `casatools` — solves and installs but cannot even be IMPORTED without downloading CASA's measures tables, which no conda-forge package provides (stuck); blocks the proposed `radio` env. Both below |
 | **MPI-flavor conflict** | 1 | `abinit` — has an arm64 build, solves standalone, but MPICH-only (stuck); see below |
 | **python-ABI collision** | 3 | `psi4` in `comp-chem` — had no py313 arm64 build; relocated to `dft`, then to its own env in 2026-10 (it now HAS a py313 build, yet still drags comp-chem to py311 — re-measured, see below). `su2` in `fem-cfd` — arm64 builds stop at py311, which would cap the whole env; declined, so su2 got `cfd-fv` to itself. `warpx` in `cfd-fv` (#35) — would have *inherited* su2's py311 cap, so it got `pic` instead. None is a gap in any shipping image; see below |
@@ -701,6 +702,62 @@ hdf5             2.2.0  mpi_openmpi_h57bd46d_1     netcdf-fortran   4.6.4  mpi_o
 
 Still `stuck` (retry) rather than `wontfix`, because nothing technical blocks it now.
 Recorded in [`farm/skip-list.tsv`](farm/skip-list.tsv) with a 90-day revisit.
+
+### `xtb` — WRONG RESULTS on aarch64, removed from `comp-chem` (2026-10-18, issue #46)
+
+**Env affected:** `comp-chem` (removed; it shipped in every published image until
+2026-10-18 — see the note on old digests below).
+
+**This is the most serious entry in this file, and a new category: not a missing package
+and not a failure to import, but a package that runs and returns wrong numbers.**
+conda-forge's linux-aarch64 xtb computes wrong analytic gradients while its energies are
+exactly right. Water, coordinates verbatim from xtb's own `test/unit/test_gfn2.f90`:
+
+```
+                       total energy (Eh)    gradient norm      O dE/dz
+upstream test pin      -5.070451355118      0.006457420125
+aarch64 (all builds)   -5.070451354837      0.134752018160     +0.08282968
+aarch64 finite diff.                        0.006457530        -0.00507169
+```
+
+The energy agrees with upstream's pin to 2.8e-10, and the gradient is 21x too large with
+the oxygen z-component of the opposite sign. **The finite-difference row needs no x86
+reference:** it is a central difference of aarch64's own (correct) energies, and it
+reproduces upstream's pinned gradient to ~1e-7. So the energy surface is right and only the
+analytic gradient path is wrong.
+
+**No build to pin to.** All seven aarch64 builds — 6.6.1 `hcad76a7_0` and every 6.7.1
+build (`h0fb133d_0/_1/_2`, `ha9b52fb_3`, `hfc05e43_4`, `gfortran_hcd2ce30_5`) — return a
+bit-identical `0.134752018160`. Not a 6.7.1 regression. Not BLAS either: the filer showed
+it is bit-identical under three `OPENBLAS_CORETYPE` settings.
+
+**Why it shipped, upstream and here.** The feedstock cross-compiles aarch64 from linux-64
+and the recipe's tests never run there, so upstream's `test_gfn2` (which pins `gnorm`)
+never executed on aarch64. And this project's D3 check asserted only `energy < 0` on H2 —
+which the defective build passes. **An energy-only check cannot see a gradient bug.**
+
+**And the obvious invariant would not have caught it either.** The wrong gradient still
+satisfies C2v symmetry (the filer's observation) *and* still sums to zero over atoms
+(6.9e-18). So neither symmetry nor translational invariance detects it — only comparison
+against a reference value or a finite difference does. That is worth remembering
+generally: invariants prove a result is *self-consistent*, not that it is *right*.
+
+**Why removed rather than kept with a caveat, unlike `siesta` in `dft`:** siesta fails
+LOUDLY — it cannot run without pseudopotentials. xtb fails SILENTLY, with plausible
+energies and wrong forces, and geometry optimisation and MD are its main uses. Silent wrong
+answers are precisely what this project exists to keep out of a published image. Removing
+it was a clean subtraction: comp-chem goes 223 -> 210 packages with python (3.13.16) and
+every other member unchanged.
+
+**Old digests still contain it.** Every `comp-chem` image published before 2026-10-18 ships
+the defective xtb. Anyone pinned to one by digest or by `<date>.<HHMMSS>` tag keeps it,
+because those never move by design. The README says so.
+
+**Upstream:** [`conda-forge/xtb-feedstock#50`](https://github.com/conda-forge/xtb-feedstock/issues/50),
+with our three additional datapoints (all builds affected, the aarch64-only finite-difference
+confirmation, and the translational-invariance blind spot). **Re-add when** a fixed aarch64
+build exists — and the gate that comes back with it must compare against `test_gfn2`'s
+pinned `gnorm` or a finite difference, not an invariant.
 
 ### `casatools` — assemble-gap, stuck (2026-10-16, issue #44)
 

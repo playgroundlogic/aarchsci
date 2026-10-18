@@ -4,7 +4,7 @@
 # Same contract (assemble + import + do real work, inside the built arm64 image)
 # for the computational-chemistry stack. The risky natives here are RDKit (C++
 # cheminformatics), OpenMM (MD engine with a compute platform), PySCF (compiled
-# quantum-chemistry kernels), and xtb (a Fortran semi-empirical QM binary) — all
+# quantum-chemistry kernels) and AutoDock Vina — all
 # can solve yet fail to load/run. We exercise each through its native backend, not
 # just import it. Pure stdlib + the env's own packages. Exit 0 = functionally sound.
 import sys
@@ -33,7 +33,7 @@ HEADLINE = [
     "numpy", "scipy", "pandas",
     "rdkit", "rdkit.Chem", "openbabel",
     "openmm", "MDAnalysis", "mdtraj", "parmed", "pdbfixer",
-    "ase", "pyscf", "xtb",
+    "ase", "pyscf",
     "vina",
     "cantera",
 ]
@@ -131,18 +131,10 @@ def _pyscf():
     assert -1.2 < e < -1.0, f"H2 HF energy off: {e}"
 
 
-@check("xtb semi-empirical energy (Fortran binary)")
-def _xtb():
-    import numpy as np
-    from xtb.interface import Calculator
-    from xtb.utils import get_method
-    # H2 at ~0.74 Angstrom = 1.4 Bohr. xtb works in atomic units (Bohr).
-    numbers = np.array([1, 1])
-    positions = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]])
-    calc = Calculator(get_method("GFN2-xTB"), numbers, positions)
-    res = calc.singlepoint()
-    e = res.get_energy()
-    assert e < 0, f"xtb energy should be negative, got {e}"
+# xtb was removed from this env on 2026-10-18 (issue #46): every conda-forge aarch64 build
+# returns wrong analytic gradients with correct energies. The check that lived here asserted
+# only `energy < 0` on H2, which passed the defective build — a reminder that an energy-only
+# check cannot see a gradient bug. See envs/comp-chem.yaml for the measurements.
 
 
 # --- 5. docking -----------------------------------------------------------------

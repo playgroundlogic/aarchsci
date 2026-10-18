@@ -33,6 +33,7 @@ HEADLINE = [
     "skimage", "osgeo.gdal",
     "geopandas", "libpysal", "sklearn", "xgboost", "lightgbm",
     "statsmodels.api", "datashader",
+    "scipy", "pytest",
 ]
 print("[smoke] 1. imports")
 for mod in HEADLINE:
@@ -126,6 +127,29 @@ def _datashader():
     canvas = ds.Canvas(plot_width=20, plot_height=20)
     agg = canvas.points(df, "x", "y")
     assert int(agg.sum()) == 1000, "datashader dropped points"
+
+
+# --- SciPy's OWN test suite, not ours (issue #45) ----------------------------------
+print("[smoke] 4. SciPy's shipped test suite: linalg + special")
+
+
+@check("SciPy's own linalg and special test suites pass")
+def _scipy_suite():
+    import glob
+    import os
+    import scipy
+    # Upstream's tests, upstream's tolerances — the strongest source of truth available,
+    # for the same reason cp2k's committed regtests beat any reference we could write.
+    # linalg is SciPy's own coverage of BLAS/LAPACK, which is where an arm64 build is
+    # most likely to go wrong; special is cheap and exercises the compiled cephes layer.
+    n_files = len(glob.glob(os.path.join(os.path.dirname(scipy.__file__),
+                                         "**", "tests", "test_*.py"), recursive=True))
+    assert n_files > 100, f"only {n_files} SciPy test files — scipy-tests is not installed"
+    ok = scipy.test("fast", tests=["scipy.linalg", "scipy.special"],
+                    extra_argv=["-q", "-p", "no:cacheprovider"])
+    assert ok, "SciPy's own linalg/special tests reported failures (see pytest output)"
+    print(f"       (scipy {scipy.__version__}: {n_files} test files installed; "
+          "linalg + special suites passed)")
 
 
 # --- verdict --------------------------------------------------------------------

@@ -1,6 +1,6 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.10.18.121517   Builder: 5c3957b
-# lock-hash: db7c3b5af90c   packages: 223
+# Source spec: envs/comp-chem.yaml   Built: 2026.10.18.223334   Builder: 1b09136
+# lock-hash: 4fc665aeef7c   packages: 210
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -11,25 +11,22 @@ brotli-bin 1.2.0
 bzip2 1.0.8
 c-ares 1.34.8
 c-blosc2 3.3.5
-ca-certificates 2026.7.22
+ca-certificates 2026.10.18
 cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
 cantera 3.2.0
 certifi 2026.7.22
-cffi 2.1.1
 cftime 1.6.5
 charset-normalizer 3.5.1
 cloudpickle 3.1.2
 contourpy 1.4.0
-cpcm-x 1.1.0
 cpython 3.13.16
 cuda-version 11.8
 cycler 0.12.1
 cyrus-sasl 2.1.28
-dftd4 4.2.0
 eigen-abi 3.4.0.100
-filelock 4.2.1
+filelock 4.2.2
 fmt 12.0.0
 font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
@@ -53,7 +50,6 @@ hdf5 1.14.6
 icu 78.3
 interface_meta 1.3.0
 joblib 1.6.0
-jonquil 0.3.2
 keyutils 1.6.3
 kiwisolver 1.5.1
 krb5 1.22.2
@@ -132,7 +128,6 @@ libzip 1.12.1
 libzlib 1.3.2
 lz4-c 1.10.0
 matplotlib-base 3.11.2
-mctc-lib 0.5.2
 mda-xdrlib 0.2.0
 mdanalysis 2.10.0
 mdtraj 1.11.2
@@ -141,7 +136,6 @@ mmtf-python 1.1.3
 mpfr 4.2.2
 mrcfile 1.5.4
 msgpack-python 1.2.3
-multicharge 0.5.0
 munkres 1.1.4
 narwhals 2.27.1
 ncurses 6.6
@@ -149,7 +143,6 @@ netcdf4 1.7.4
 networkx 3.7
 numexpr 2.14.2
 numpy 2.5.4
-numsa 0.2.0
 ocl-icd 2.3.4
 ocl-icd-system 1.0.0
 openbabel 3.2.1
@@ -171,7 +164,6 @@ pthread-stubs 0.4
 py-cpuinfo 9.0.0
 pybind11-abi 4
 pycairo 1.29.2
-pycparser 3.11
 pyedr 0.8.0
 pyparsing 3.3.2
 pyscf 2.14.0
@@ -193,18 +185,15 @@ scipy 1.18.1
 seaborn 0.13.2
 seaborn-base 0.13.2
 setuptools 84.0.0
-simple-dftd3 1.4.0
 six 1.17.0
 snappy 1.2.2
 sqlalchemy 2.1.5
 statsmodels 0.15.0
 suitesparse 7.10.1
 sundials 7.5.0
-tblite 0.6.0
 threadpoolctl 3.7.0
 tidynamics 1.1.2
 tk 8.6.13
-toml-f 0.5.2
 tqdm 4.70.1
 typing-extensions 4.16.0
 typing_extensions 4.16.0
@@ -219,8 +208,6 @@ xorg-libxau 1.0.12
 xorg-libxdmcp 1.1.5
 xorg-libxext 1.3.7
 xorg-libxrender 0.9.12
-xtb 6.7.1
-xtb-python 22.1
 yaml-cpp 0.8.0
 zlib 1.3.2
 zlib-ng 2.3.3

@@ -65,9 +65,9 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     scikit-image, numpy, scipy).
   - `earth-observation` (246 pkgs — geospatial base + xarray, dask, rioxarray,
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
-  - `geo-ml` (361 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
+  - `geo-ml` (368 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (265 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+  - `climate` (267 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
     regridding, plus ocean thermodynamics. cdo and nco are the netCDF/GRIB command-line
     operators — the CLI complement to the Python stack; both are serial/OpenMP with no
@@ -77,8 +77,8 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     than asserting a tolerance band).
   - `pointcloud` (234 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
-  - `comp-chem` (223 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
-    pdbfixer, ase, pyscf, xtb-python, vina; cheminformatics + MD + quantum chemistry
+  - `comp-chem` (210 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
+    pdbfixer, ase, pyscf, vina, cantera (xtb REMOVED 2026-10-18 — its aarch64 build returns wrong analytic gradients with correct energies, in all seven builds; images before that date contain it); cheminformatics + MD + quantum chemistry
     + docking).
   - `dft` (235 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
     libvdwxc, elpa, scalapack, fftw, openmpi, mpi4py, spglib, phonopy, pymatgen; plane-wave/
@@ -429,6 +429,17 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     copy both 1 to round-off, a (20,20) template at 0.3396. Note the self-match measures
     1.0000000000000002, one ulp ABOVE one, so that check is a tolerance and `m <= 1.0`
     would fail.)
+- KNOWN-BAD WINDOWS, stated so pinned users can check themselves: (1) every `comp-chem`
+  image before 2026-10-18 ships an xtb whose ANALYTIC GRADIENTS ARE WRONG on aarch64
+  (test_gfn2 water: gnorm 0.134752 vs upstream's pinned 0.006457420125; finite differences of
+  aarch64's own correct energies give 0.006457530, so the defect is confirmed without any x86
+  reference; all seven aarch64 builds bit-identical; tracked as conda-forge/xtb-feedstock#50).
+  Energies were right, so energy-only use was unaffected, but optimisation/frequencies/MD with
+  it should be re-run. Notably the wrong gradient still sums to zero and respects C2v symmetry,
+  so invariant checks miss it — only a reference value or a finite difference catches it.
+  (2) from 2026-10-08 to 2026-10-18, every env with pyarrow failed on legacy tz names like
+  US/Pacific, a regression from moving the base to Debian 13, which split those links into
+  `tzdata-legacy`; fixed in the base, with a build-time check.
 - Tags: an immutable `<date>.<HHMMSS>` build tag (e.g. `2026.09.07.041233`), a date tag
   (e.g. `2026.06.25`), a content-addressed `s<lock-hash>` tag (the hash of the resolved
   package set), and `latest`.
