@@ -97,10 +97,18 @@ NATIVE_EXTS = {
     "astropy.wcs._wcs": "wcslib (all WCS transforms)",
     "erfa.ufunc": "ERFA/SOFA (all time scales + frame transforms)",
     "healpy._healpy_pixel_lib": "HEALPix C++ pixelization",
-    # NOT `photutils.geometry` — that is a plain package __init__.py. The compiled code
-    # is one level down, and it ships as `circular_overlap.abi3.so`: the stable ABI, so
-    # its filename carries no interpreter or platform tag at all.
-    "photutils.geometry.circular_overlap": "exact aperture-overlap geometry",
+    # NOT `photutils.geometry` — that is a plain package __init__.py; the compiled code is
+    # one level down. Its NAME changed between releases, so this entry lists both, oldest
+    # first, and the check accepts whichever this build ships (see _natives). Measured:
+    #   photutils 3.0.0  ->  circular_overlap.abi3.so                     (stable ABI)
+    #   photutils 3.1.1  ->  circle_overlap.cpython-314-aarch64-linux-gnu.so
+    # The rename also moved it OFF the stable ABI onto a per-python build. Found
+    # 2026-10-18 when a from-scratch rebuild picked up 3.1.1 and this check, which named
+    # only `circular_overlap`, failed D3 — correctly refusing to publish, but for a reason
+    # unrelated to whether the env works. A tuple keeps the check strict (one of these
+    # specific compiled modules must load) without breaking on the next rename-only release.
+    ("photutils.geometry.circular_overlap",
+     "photutils.geometry.circle_overlap"): "exact aperture-overlap geometry",
     "yt.utilities.lib.misc_utilities": "yt Cython kernels",
 }
 
@@ -116,15 +124,27 @@ def _arch():
 def _natives():
     import importlib
     tagged = []
-    for mod, what in sorted(NATIVE_EXTS.items()):
-        m = importlib.import_module(mod)
+    for key, what in sorted(NATIVE_EXTS.items(), key=lambda kv: str(kv[0])):
+        # A key is either one module path or a tuple of alternative paths for a module that
+        # was renamed across releases. Exactly one alternative has to import.
+        candidates = key if isinstance(key, tuple) else (key,)
+        m, errors = None, []
+        for name in candidates:
+            try:
+                m = importlib.import_module(name)
+                mod = name
+                break
+            except ModuleNotFoundError as exc:
+                errors.append(f"{name}: {exc}")
+        assert m is not None, f"no compiled module for {what} — tried " + "; ".join(errors)
         f = getattr(m, "__file__", None)
         assert f, f"{mod} ({what}) has no __file__"
         assert f.endswith(".so"), f"{mod} ({what}) is not a compiled extension: {f}"
         if "aarch64" in f:
             tagged.append(mod)
     # Two extension-naming conventions coexist here and the difference is instructive:
-    # photutils and pyerfa build against the limited API and land as `*.abi3.so`, whose
+    # pyerfa (and photutils before 3.1) build against the limited API and land as
+    # `*.abi3.so`, whose
     # filename encodes neither interpreter nor platform, while yt uses per-version tags
     # and lands as `*.cpython-3NN-aarch64-linux-gnu.so`. The latter is direct evidence
     # from a built artifact that this is a native arm64 wheel and not an emulated x86_64
