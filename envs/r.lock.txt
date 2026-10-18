@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.10.16.123938   Builder: 7d720e7
-# lock-hash: e23b8fc37d59   packages: 330
+# Source spec: envs/r.yaml   Built: 2026.10.18.121516   Builder: 5c3957b
+# lock-hash: 92b697ba3c38   packages: 328
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -108,7 +108,6 @@ libopenblas 0.3.34
 libopentelemetry-cpp 1.27.0
 libopentelemetry-cpp-headers 1.27.0
 libpango 1.58.2
-libpango-devel 1.58.2
 libparquet 25.0.0
 libpng 1.6.59
 libprotobuf 7.35.1
@@ -117,7 +116,7 @@ libre2-11 2025.11.05
 librttopo 1.1.0
 libsanitizer 16.2.0
 libspatialite 5.1.0
-libsqlite 3.54.0
+libsqlite 3.54.1
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-devel_linux-aarch64 16.2.0
@@ -144,7 +143,6 @@ nlohmann_json 3.12.0
 openssl 3.6.5
 orc 2.3.1
 pandoc 3.12.1
-pango 1.58.2
 pcre2 10.47
 pixman 0.46.4
 proj 9.9.0
@@ -197,7 +195,7 @@ r-foreach 1.5.2
 r-foreign 0.8_91
 r-fs 2.1.0
 r-future 1.80.0
-r-future.apply 1.20.2
+r-future.apply 1.21.0
 r-gargle 1.6.1
 r-generics 0.1.4
 r-ggplot2 4.0.3
@@ -262,7 +260,7 @@ r-rcolorbrewer 1.1_3
 r-rcpp 1.1.2
 r-rcppeigen 0.3.4.0.2
 r-readr 2.2.0
-r-readxl 1.5.0.1
+r-readxl 1.6.0
 r-recipes 1.4.0
 r-recommended 4.5
 r-rematch 2.0.0
@@ -315,7 +313,7 @@ readline 8.3
 s2n 1.7.5
 sed 4.10
 snappy 1.2.2
-sqlite 3.54.0
+sqlite 3.54.1
 sysroot_linux-aarch64 2.39
 tk 8.6.13
 tktable 2.10
