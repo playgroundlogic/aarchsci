@@ -1,6 +1,6 @@
 # quantum — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/quantum.yaml   Built: 2026.10.17.115149   Builder: 1b09136
-# lock-hash: 5eb328400f2a   packages: 165
+# Source spec: envs/quantum.yaml   Built: 2026.10.19.145706   Builder: 4c07aa6
+# lock-hash: d7db70729fbe   packages: 165
 # Regenerate with: ./builder/build-env.sh quantum
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -20,7 +20,7 @@ brotli-bin 1.2.0
 brotli-python 1.2.0
 bzip2 1.0.8
 c-ares 1.34.8
-ca-certificates 2026.7.22
+ca-certificates 2026.10.18
 cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
@@ -119,7 +119,7 @@ packaging 26.3
 pandas 2.3.3
 pbr 7.1.3
 pcre2 10.47
-pillow 12.3.0
+pillow 13.0.0
 pip 26.2.1
 pixman 0.46.4
 psutil 7.2.2
