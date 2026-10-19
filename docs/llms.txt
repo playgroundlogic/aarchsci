@@ -104,7 +104,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the R 4.5 line on purpose: r-base reaches 4.6.1 on arm64 but ZERO of conda-forge's
     3162 linux-aarch64 `r-*` packages have an r46 build, and `r-base=4.6.1 r-tidyverse`
     does not solve at all).
-  - `viz` (247 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
+  - `viz` (246 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
     rendering goes via GLX against Xvfb, which ships in the image).
