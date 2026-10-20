@@ -1,6 +1,6 @@
 # popgen — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/popgen.yaml   Built: 2026.10.19.145636   Builder: 4c07aa6
-# lock-hash: 29ea2584842b   packages: 246
+# Source spec: envs/popgen.yaml   Built: 2026.10.20.125715   Builder: 38cbf08
+# lock-hash: 8c6c9a20adbb   packages: 246
 # Regenerate with: ./builder/build-env.sh popgen
 _openmp_mutex 4.5
 apricot-select 0.6.1
@@ -28,7 +28,7 @@ brotli 1.2.0
 brotli-bin 1.2.0
 bzip2 1.0.8
 c-ares 1.34.8
-ca-certificates 2026.10.18
+ca-certificates 2026.10.19
 cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
@@ -213,7 +213,7 @@ scikit-learn 1.9.1
 scipy 1.18.1
 seaborn 0.13.2
 seaborn-base 0.13.2
-setuptools 84.0.0
+setuptools 84.2.0
 six 1.17.0
 sleef 3.9.0
 snappy 1.2.2
