@@ -1,6 +1,6 @@
 # geo-ml — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geo-ml.yaml   Built: 2026.10.19.145444   Builder: 4c07aa6
-# lock-hash: f4901cca2ce8   packages: 368
+# Source spec: envs/geo-ml.yaml   Built: 2026.10.20.125713   Builder: 38cbf08
+# lock-hash: fff3a9d99dfd   packages: 368
 # Regenerate with: ./builder/build-env.sh geo-ml
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -44,12 +44,12 @@ brotli-bin 1.2.0
 brotli-python 1.2.0
 bzip2 1.0.8
 c-ares 1.34.8
-ca-certificates 2026.10.18
+ca-certificates 2026.10.19
 cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
 cartopy 0.26.0
-certifi 2026.7.22
+certifi 2026.10.19
 cftime 1.6.5
 charset-normalizer 3.5.1
 click 8.5.0
@@ -112,7 +112,7 @@ hdf4 4.2.15
 hdf5 1.14.6
 hpack 4.2.0
 hyperframe 6.1.0
-hypothesis 6.170.2
+hypothesis 6.170.5
 icu 78.3
 idna 3.20
 imageio 2.38.1
@@ -231,7 +231,7 @@ mgwr 2.2.1
 minizip 4.2.2
 momepy 1.0.0
 msgpack-python 1.2.3
-multidict 6.8.0
+multidict 6.9.1
 multipledispatch 1.0.0
 munkres 1.1.4
 muparser 2.3.5
@@ -257,10 +257,10 @@ patsy 1.0.3
 pcre2 10.47
 pexpect 4.9.0
 pillow 13.0.0
-pint 0.26.1
+pint 0.26.2
 pip 26.2.1
 pixman 0.46.4
-platformdirs 4.13.4
+platformdirs 4.13.5
 pluggy 1.7.0
 pointpats 2.6.0
 pooch 1.9.0
@@ -309,7 +309,7 @@ scipy-tests 1.18.1
 seaborn 0.13.2
 seaborn-base 0.13.2
 segregation 2.6.0
-setuptools 84.0.0
+setuptools 84.2.0
 setuptools-scm 10.3.4
 setuptools_scm 10.3.4
 shapely 2.2.0
