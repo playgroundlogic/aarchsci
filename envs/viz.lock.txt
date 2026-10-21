@@ -1,6 +1,6 @@
 # viz — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/viz.yaml   Built: 2026.10.20.125948   Builder: 38cbf08
-# lock-hash: 27d2f48ca028   packages: 246
+# Source spec: envs/viz.yaml   Built: 2026.10.21.130939   Builder: 1cbbe28
+# lock-hash: 0e43e6eff893   packages: 246
 # Regenerate with: ./builder/build-env.sh viz
 _openmp_mutex 4.5
 aiohappyeyeballs 2.7.1
@@ -13,7 +13,7 @@ blosc 1.21.6
 brotli 1.2.0
 brotli-bin 1.2.0
 bzip2 1.0.8
-c-ares 1.34.8
+c-ares 1.34.9
 ca-certificates 2026.10.19
 cairo 1.18.6
 cgns 4.5.2
@@ -101,7 +101,7 @@ libiconv 1.18
 libjpeg-turbo 3.2.0
 libjxl 0.12.0
 liblapack 3.11.0
-libllvm23 23.1.3
+libllvm23 23.1.4
 libllvmspirv23 23.1.2
 liblzma 5.8.3
 libmpdec 4.0.0
@@ -111,18 +111,18 @@ libntlm 1.4
 libogg 1.3.5
 libopenblas 0.3.34
 libopengl 1.7.0
-libopenvino 2026.4.0
-libopenvino-arm-cpu-plugin 2026.4.0
-libopenvino-auto-batch-plugin 2026.4.0
-libopenvino-auto-plugin 2026.4.0
-libopenvino-gguf-frontend 2026.4.0
-libopenvino-hetero-plugin 2026.4.0
-libopenvino-ir-frontend 2026.4.0
-libopenvino-onnx-frontend 2026.4.0
-libopenvino-paddle-frontend 2026.4.0
-libopenvino-pytorch-frontend 2026.4.0
-libopenvino-tensorflow-frontend 2026.4.0
-libopenvino-tensorflow-lite-frontend 2026.4.0
+libopenvino 2026.4.1
+libopenvino-arm-cpu-plugin 2026.4.1
+libopenvino-auto-batch-plugin 2026.4.1
+libopenvino-auto-plugin 2026.4.1
+libopenvino-gguf-frontend 2026.4.1
+libopenvino-hetero-plugin 2026.4.1
+libopenvino-ir-frontend 2026.4.1
+libopenvino-onnx-frontend 2026.4.1
+libopenvino-paddle-frontend 2026.4.1
+libopenvino-pytorch-frontend 2026.4.1
+libopenvino-tensorflow-frontend 2026.4.1
+libopenvino-tensorflow-lite-frontend 2026.4.1
 libopus 1.6.1
 libpango 1.58.2
 libpango-devel 1.58.2
@@ -183,7 +183,7 @@ pango 1.58.2
 paraview 6.2.0
 pcre2 10.47
 pillow 13.0.0
-pip 26.2.1
+pip 26.2.2
 pixman 0.46.4
 proj 9.9.0
 propcache 0.5.4
@@ -227,7 +227,7 @@ xkbcomp 1.5.0
 xkeyboard-config 2.48
 xorg-libice 1.1.2
 xorg-libsm 1.2.6
-xorg-libx11 1.8.13
+xorg-libx11 1.8.14
 xorg-libxau 1.0.12
 xorg-libxcomposite 0.4.7
 xorg-libxcursor 1.2.3
@@ -235,9 +235,9 @@ xorg-libxdamage 1.1.6
 xorg-libxdmcp 1.1.5
 xorg-libxext 1.3.7
 xorg-libxfixes 6.0.2
-xorg-libxi 1.8.3
+xorg-libxi 1.8.4
 xorg-libxrandr 1.5.5
-xorg-libxrender 0.9.12
+xorg-libxrender 0.9.13
 xorg-libxscrnsaver 1.2.4
 xorg-libxshmfence 1.3.3
 xorg-libxtst 1.2.6
