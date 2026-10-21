@@ -158,7 +158,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     same problem. Note `scip` is pinned <10.1: pyscipopt 6.2.1 links libscip.so.10.0 while
     declaring `scip >=10.0.0,<11.0a0`, so an unpinned solve installs scip 10.1.0 and
     `import pyscipopt` then fails — an upstream soname/metadata bug, caught by D3.)
-  - `neuroimaging` (294 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
+  - `neuroimaging` (295 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
     volume-based fMRI, diffusion MRI and structural MRI. In scope for this project rather
     than the bioinformatics sister project because none of these packages are on bioconda at
     all — they are conda-forge only. Verified with no staged or downloaded data: a NIfTI
@@ -259,7 +259,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the support exactly and that both sampled distributions match the EXACT statevector
     probabilities within their own sampling error, sqrt(p(1−p)/N) — worst deviation
     1.67 sigma at 20000 shots.)
-  - `hep` (354 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
+  - `hep` (355 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
     datasets, hepmc3, fastjet, lhapdf, yoda, uproot, awkward; high-energy physics. ITS OWN
     env — nothing existing is close, and ROOT alone is a large self-contained framework.
     GEANT4 IS PINNED `noqt_*`, WHICH INVERTS WHAT ISSUE #34 ASKED FOR, and the reason is

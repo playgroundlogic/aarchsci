@@ -119,14 +119,14 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`fem-cfd`](envs/fem-cfd.yaml) | 131 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), CalculiX, OpenMPI, mpi4py, HDF5/ADIOS2 |
 | [`cfd-fv`](envs/cfd-fv.yaml) | 56 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
 | [`optimization`](envs/optimization.yaml) | 63 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
-| [`neuroimaging`](envs/neuroimaging.yaml) | 294 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
+| [`neuroimaging`](envs/neuroimaging.yaml) | 295 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
 | [`single-cell`](envs/single-cell.yaml) | 530 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
 | [`bayes`](envs/bayes.yaml) | 125 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
 | [`geoscience`](envs/geoscience.yaml) | 112 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
 | [`cp2k`](envs/cp2k.yaml) | 111 | **deprecated** — CP2K now ships inside [`dft`](envs/dft.yaml); kept as a transition alias |
 | [`pathology`](envs/pathology.yaml) | 208 | OpenSlide + openslide-python, tifffile/imagecodecs, scikit-image, zarr, dask — whole-slide imaging |
 | [`quantum`](envs/quantum.yaml) | 165 | Qiskit + Aer (CPU), qiskit-algorithms/optimization/machine-learning, openfermion, QuTiP — quantum circuit simulation |
-| [`hep`](envs/hep.yaml) | 354 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
+| [`hep`](envs/hep.yaml) | 355 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
 | [`pic`](envs/pic.yaml) | 166 | WarpX (electromagnetic particle-in-cell) + AMReX/pyAMReX, openPMD, yt — plasma physics, OpenMP-threaded |
 | [`structbio`](envs/structbio.yaml) | 121 | cctbx + gemmi (two independent symmetry implementations), biopython — crystallography |
 | [`popgen`](envs/popgen.yaml) | 246 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
