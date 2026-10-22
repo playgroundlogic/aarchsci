@@ -1,13 +1,13 @@
 # structbio — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/structbio.yaml   Built: 2026.10.21.130940   Builder: 1cbbe28
-# lock-hash: de633155b63a   packages: 121
+# Source spec: envs/structbio.yaml   Built: 2026.10.22.131045   Builder: 4538a2c
+# lock-hash: 4adfadbb026d   packages: 121
 # Regenerate with: ./builder/build-env.sh structbio
 _openmp_mutex 4.5
 backports.zstd 1.8.0
 biopython 1.88
-brotli 1.2.0
-brotli-bin 1.2.0
-brotli-python 1.2.0
+brotli 1.2.1
+brotli-bin 1.2.1
+brotli-python 1.2.1
 bzip2 1.0.8
 ca-certificates 2026.10.19
 cairo 1.18.6
@@ -42,9 +42,9 @@ lerc 4.2.0
 libblas 3.11.0
 libboost 1.90.0
 libboost-python 1.90.0
-libbrotlicommon 1.2.0
-libbrotlidec 1.2.0
-libbrotlienc 1.2.0
+libbrotlicommon 1.2.1
+libbrotlidec 1.2.1
+libbrotlienc 1.2.1
 libcblas 3.11.0
 libdeflate 1.25
 libexpat 2.8.5
@@ -70,7 +70,7 @@ libmpdec 4.0.0
 libopenblas 0.3.34
 libopengl 1.7.0
 libpng 1.6.59
-libpython 3.14.8
+libpython 3.14.9
 libraqm 0.11.0
 libsqlite 3.54.1
 libstdcxx 16.2.0
@@ -98,7 +98,7 @@ pthread-stubs 0.4
 pycairo 1.29.2
 pyparsing 3.3.3
 pysocks 1.7.1
-python 3.14.8
+python 3.14.9
 python-dateutil 2.9.0.post0
 python_abi 3.14
 pyyaml 6.0.3
