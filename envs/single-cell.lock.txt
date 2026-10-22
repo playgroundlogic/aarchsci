@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.10.21.130937   Builder: 1cbbe28
-# lock-hash: a3bb1ccb23e3   packages: 530
+# Source spec: envs/single-cell.yaml   Built: 2026.10.22.131045   Builder: 4538a2c
+# lock-hash: af88dfa629fa   packages: 531
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -38,9 +38,9 @@ binutils_linux-aarch64 2.46.1
 blosc 1.21.6
 bokeh 3.10.0
 branca 0.8.2
-brotli 1.2.0
-brotli-bin 1.2.0
-brotli-python 1.2.0
+brotli 1.2.1
+brotli-bin 1.2.1
+brotli-python 1.2.1
 brunsli 0.1
 bwidget 1.10.1
 bzip2 1.0.8
@@ -58,7 +58,7 @@ click 8.5.0
 cloudpickle 3.1.2
 colorcet 3.2.1
 contourpy 1.4.0
-cpython 3.14.8
+cpython 3.14.9
 curl 8.23.0
 cycler 0.12.1
 cytoolz 1.2.0
@@ -117,8 +117,9 @@ igraph 1.0.1
 imagecodecs 2025.11.11
 imageio 2.38.1
 importlib-metadata 9.0.1
-inflect 7.5.0
+inflect 7.6.0
 interface_meta 1.3.0
+jaraco.functools 4.6.0
 jinja2 3.1.6
 joblib 1.6.0
 json-c 0.18
@@ -143,9 +144,9 @@ libarrow-dataset 25.0.0
 libarrow-substrait 25.0.0
 libavif16 1.4.2
 libblas 3.11.0
-libbrotlicommon 1.2.0
-libbrotlidec 1.2.0
-libbrotlienc 1.2.0
+libbrotlicommon 1.2.1
+libbrotlidec 1.2.1
+libbrotlienc 1.2.1
 libcblas 3.11.0
 libcrc32c 1.1.2
 libcurl 8.23.0
@@ -190,7 +191,7 @@ libparquet 25.0.0
 libpng 1.6.59
 libprotobuf 7.35.1
 libpsl 0.23.1
-libpython 3.14.8
+libpython 3.14.9
 libraqm 0.11.0
 libre2-11 2025.11.05
 librttopo 1.1.0
@@ -249,7 +250,7 @@ nomkl 1.0
 numba 0.68.0
 numcodecs 0.17.1
 numpy 2.5.4
-numpy_groupies 0.14.2
+numpy_groupies 0.15.0
 ome-zarr 0.17.0
 omnipath 1.0.12
 onednn 3.13.4
@@ -293,7 +294,7 @@ pyogrio 0.13.0
 pyparsing 3.3.3
 pyproj 3.8.0
 pysocks 1.7.1
-python 3.14.8
+python 3.14.9
 python-dateutil 2.9.0.post0
 python-dotenv 1.2.4
 python-igraph 1.0.0
@@ -527,7 +528,7 @@ yarl 1.25.1
 zarr 3.4.1
 zfp 1.0.1
 zict 3.0.0
-zipp 4.1.1
+zipp 4.1.2
 zlib 1.3.2
 zlib-ng 2.3.3
 zstandard 0.25.0
