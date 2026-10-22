@@ -110,7 +110,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`geo-ml`](envs/geo-ml.yaml) | 368 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader, scipy-tests |
 | [`climate`](envs/climate.yaml) | 267 | xarray/dask + flox, cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
 | [`pointcloud`](envs/pointcloud.yaml) | 234 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
-| [`comp-chem`](envs/comp-chem.yaml) | 210 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, vina, cantera — **xtb removed 2026-10-18**, see below |
+| [`comp-chem`](envs/comp-chem.yaml) | 211 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, vina, cantera — **xtb removed 2026-10-18**, see below |
 | [`dft`](envs/dft.yaml) | 235 | gpaw, siesta, **cp2k**, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 245 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
 | [`viz`](envs/viz.yaml) | 246 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
@@ -120,7 +120,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`cfd-fv`](envs/cfd-fv.yaml) | 56 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
 | [`optimization`](envs/optimization.yaml) | 63 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
 | [`neuroimaging`](envs/neuroimaging.yaml) | 295 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
-| [`single-cell`](envs/single-cell.yaml) | 530 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
+| [`single-cell`](envs/single-cell.yaml) | 531 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
 | [`bayes`](envs/bayes.yaml) | 125 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
 | [`geoscience`](envs/geoscience.yaml) | 112 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
 | [`cp2k`](envs/cp2k.yaml) | 111 | **deprecated** — CP2K now ships inside [`dft`](envs/dft.yaml); kept as a transition alias |

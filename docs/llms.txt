@@ -77,7 +77,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     than asserting a tolerance band).
   - `pointcloud` (234 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
-  - `comp-chem` (210 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
+  - `comp-chem` (211 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, vina, cantera (xtb REMOVED 2026-10-18 — its aarch64 build returns wrong analytic gradients with correct energies, in all seven builds; images before that date contain it); cheminformatics + MD + quantum chemistry
     + docking).
   - `dft` (235 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
@@ -168,7 +168,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     `ants` has no linux-aarch64 build at all and FSL/FreeSurfer/MRtrix3 are not on
     conda-forge, so registration-heavy and surface-based pipelines are out of reach;
     `templateflow` is excluded because it downloads atlases at runtime.)
-  - `single-cell` (530 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
+  - `single-cell` (531 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
     python 3.14, AND r-seurat 5.5 on R 4.5, in one image; single-cell transcriptomics in
     both ecosystems. Here because it is an ENVIRONMENT (DESIGN D5: the split with the
     sister project is artifact shape, not subject) — aarch.bio also ships a single-tool
