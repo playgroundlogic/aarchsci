@@ -1,6 +1,6 @@
 # md — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/md.yaml   Built: 2026.10.21.130938   Builder: 1cbbe28
-# lock-hash: 3a69ef9b5fd5   packages: 245
+# Source spec: envs/md.yaml   Built: 2026.10.22.131235   Builder: 4538a2c
+# lock-hash: a6bb4f5542c6   packages: 245
 # Regenerate with: ./builder/build-env.sh md
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -20,8 +20,8 @@ binutils_impl_linux-aarch64 2.46.1
 binutils_linux-aarch64 2.46.1
 biopython 1.88
 blosc 1.21.6
-brotli 1.2.0
-brotli-bin 1.2.0
+brotli 1.2.1
+brotli-bin 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
 c-blosc2 3.3.5
@@ -34,7 +34,7 @@ cftime 1.6.5
 cloudpickle 3.1.2
 cmake 4.4.4
 contourpy 1.4.0
-cpython 3.14.8
+cpython 3.14.9
 cycler 0.12.1
 fftw 3.3.11
 filelock 4.2.4
@@ -85,9 +85,9 @@ libaec 1.1.5
 libasprintf 0.25.1
 libblas 3.11.0
 libboost 1.86.0
-libbrotlicommon 1.2.0
-libbrotlidec 1.2.0
-libbrotlienc 1.2.0
+libbrotlicommon 1.2.1
+libbrotlidec 1.2.1
+libbrotlienc 1.2.1
 libcap 2.78
 libcblas 3.11.0
 libcurl 8.23.0
@@ -125,7 +125,7 @@ libpmix 5.0.8
 libpnetcdf 1.15.0
 libpng 1.6.59
 libpsl 0.23.1
-libpython 3.14.8
+libpython 3.14.9
 libraqm 0.11.0
 libsanitizer 14.4.0
 libsqlite 3.54.1
@@ -152,7 +152,7 @@ make 4.4.1
 markdown-it-py 4.2.0
 matplotlib-base 3.11.2
 mda-xdrlib 0.2.0
-mdanalysis 2.10.0
+mdanalysis 2.11.0
 mdtraj 1.11.2
 mdurl 0.1.2
 mlip 3.0
@@ -200,9 +200,9 @@ pyedr 0.8.0
 pygments 2.21.0
 pyparsing 3.3.2
 pytables 3.11.1
-python 3.14.8
+python 3.14.9
 python-dateutil 2.9.0.post0
-python-gil 3.14.8
+python-gil 3.14.9
 python_abi 3.14
 pytng 0.3.4
 qhull 2020.2
