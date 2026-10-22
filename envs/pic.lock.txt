@@ -1,6 +1,6 @@
 # pic — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pic.yaml   Built: 2026.10.21.130937   Builder: 1cbbe28
-# lock-hash: 1e66943bf0b3   packages: 166
+# Source spec: envs/pic.yaml   Built: 2026.10.22.131047   Builder: 4538a2c
+# lock-hash: 3e3e4a43fc0f   packages: 166
 # Regenerate with: ./builder/build-env.sh pic
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -17,8 +17,8 @@ aws-c-s3 1.0.0
 aws-c-sdkutils 1.0.0
 aws-checksums 1.0.1
 blaspp 2025.05.28
-brotli 1.2.0
-brotli-bin 1.2.0
+brotli 1.2.1
+brotli-bin 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
 c-blosc2 3.3.5
@@ -27,7 +27,7 @@ cairo 1.18.6
 cmyt 2.0.4
 comm 0.2.3
 contourpy 1.4.0
-cpython 3.14.8
+cpython 3.14.9
 cycler 0.12.1
 ewah-bool-utils 1.3.0
 executing 2.3.0
@@ -62,9 +62,9 @@ lerc 4.2.0
 libadios2 2.12.1
 libaec 1.1.5
 libblas 3.11.0
-libbrotlicommon 1.2.0
-libbrotlidec 1.2.0
-libbrotlienc 1.2.0
+libbrotlicommon 1.2.1
+libbrotlidec 1.2.1
+libbrotlienc 1.2.1
 libcblas 3.11.0
 libcurl 8.23.0
 libdeflate 1.25
@@ -91,7 +91,7 @@ libnghttp2 1.68.1
 libopenblas 0.3.34
 libpng 1.6.59
 libpsl 0.23.1
-libpython 3.14.8
+libpython 3.14.9
 libraqm 0.11.0
 libsodium 1.0.22
 libsqlite 3.54.1
@@ -119,7 +119,7 @@ openssl 3.6.5
 packaging 26.3
 parso 0.8.7
 pcre2 10.47
-periodictable 1.7.1
+periodictable 2.1.0
 pexpect 4.9.0
 picmistandard 0.34.0
 pillow 13.0.0
@@ -134,10 +134,10 @@ pyamrex 26.10
 pybind11-abi 11
 pygments 2.21.0
 pyparsing 3.3.3
-python 3.14.8
+python 3.14.9
 python-abi3 3.14
 python-dateutil 2.9.0.post0
-python-gil 3.14.8
+python-gil 3.14.9
 python_abi 3.14
 qhull 2020.2
 readline 8.3
