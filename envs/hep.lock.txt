@@ -1,6 +1,6 @@
 # hep — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/hep.yaml   Built: 2026.10.22.131044   Builder: 4538a2c
-# lock-hash: 92868862de12   packages: 355
+# Source spec: envs/hep.yaml   Built: 2026.10.23.125006   Builder: abfbe9b
+# lock-hash: 875d624ca4ce   packages: 355
 # Regenerate with: ./builder/build-env.sh hep
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -117,7 +117,7 @@ httpx 0.28.1
 hyperframe 6.1.0
 icu 78.3
 idna 3.20
-importlib-metadata 9.0.1
+importlib-metadata 9.1.0
 ipykernel 7.4.0
 ipyparallel 9.2.0
 ipython 9.17.1
@@ -248,7 +248,7 @@ openjpeg 2.5.4
 openssl 3.6.5
 overrides 7.7.0
 packaging 26.3
-pandas 3.0.6
+pandas 3.1.0
 pandocfilters 1.5.1
 pango 1.58.2
 parso 0.8.7
@@ -266,14 +266,14 @@ psutil 7.2.2
 pthread-stubs 0.4
 ptyprocess 0.7.0
 pure_eval 0.2.4
-pycparser 3.11
+pycparser 3.12
 pygments 2.21.0
 pyparsing 3.3.3
 pysocks 1.7.1
 pythia8 8.312
 python 3.14.9
 python-abi3 3.14
-python-dateutil 2.9.0.post0
+python-dateutil 3.0.0
 python-fastjsonschema 2.22.2
 python-gil 3.14.9
 python-json-logger 4.2.0
