@@ -1,6 +1,6 @@
 # optimization — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/optimization.yaml   Built: 2026.10.22.131047   Builder: 4538a2c
-# lock-hash: 12d4fc8f96ce   packages: 63
+# Source spec: envs/optimization.yaml   Built: 2026.10.23.125151   Builder: abfbe9b
+# lock-hash: 223ce3e11b0e   packages: 64
 # Regenerate with: ./builder/build-env.sh optimization
 _openmp_mutex 4.5
 ampl-asl 1.0.0
@@ -50,11 +50,12 @@ mumps-seq 5.8.2
 ncurses 6.6
 numpy 2.5.4
 openssl 3.6.5
-pandas 3.0.6
+pandas 3.1.0
 pip 26.2.2
 pyscipopt 6.2.1
 python 3.14.9
-python-dateutil 2.9.0.post0
+python-dateutil 3.0.0
+python-tzdata 2026.5
 python_abi 3.14
 readline 8.3
 scip 10.0.3
