@@ -1,6 +1,6 @@
 # gw — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/gw.yaml   Built: 2026.10.22.131045   Builder: 4538a2c
-# lock-hash: 5f6a00deab5f   packages: 215
+# Source spec: envs/gw.yaml   Built: 2026.10.23.125006   Builder: abfbe9b
+# lock-hash: d82199e6a09c   packages: 216
 # Regenerate with: ./builder/build-env.sh gw
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -64,7 +64,7 @@ idna 3.20
 igwn-auth-utils 1.4.0
 igwn-ligolw 2.0.1
 igwn-segments 2.1.1
-importlib-metadata 9.0.1
+importlib-metadata 9.1.0
 invoke 3.0.3
 jinja2 3.1.6
 jplephem 2.24
@@ -158,7 +158,7 @@ oniguruma 6.9.10
 openjpeg 2.5.4
 openssl 3.6.5
 packaging 26.3
-pandas 3.0.6
+pandas 3.1.0
 paramiko 5.1.0
 pegasus-wms.api 5.1.3
 pegasus-wms.common 5.1.3
@@ -167,7 +167,7 @@ pip 26.2.2
 pkg-config 0.29.2
 pthread-stubs 0.4
 pycbc 2.10.0
-pycparser 3.11
+pycparser 3.12
 pyerfa 2.0.1.5
 pyjwt 2.15.1
 pykerr 0.2.0
@@ -175,7 +175,7 @@ pynacl 1.6.2
 pyparsing 3.3.3
 pysocks 1.7.1
 python 3.13.16
-python-dateutil 2.9.0.post0
+python-dateutil 3.0.0
 python-gil 3.13.17
 python-gssapi 1.12.0
 python-lal 7.6.1
@@ -187,6 +187,7 @@ python-lalmetaio 4.0.5
 python-lalpulsar 7.1.0
 python-lalsimulation 6.1.0
 python-ligo-lw 1.8.3
+python-tzdata 2026.5
 python_abi 3.13
 pytz 2026.5
 pyyaml 6.0.3
@@ -207,7 +208,7 @@ tqdm 4.70.1
 typing-extensions 4.16.0
 typing_extensions 4.16.0
 tzdata 2026c
-tzlocal 5.4.4
+tzlocal 5.4.5
 urllib3 2.8.0
 xarray 2026.9.0
 xarray-einstats 0.11.0
