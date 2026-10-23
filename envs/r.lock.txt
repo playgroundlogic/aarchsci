@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.10.21.131232   Builder: 1cbbe28
-# lock-hash: acc2f80d3cdf   packages: 328
+# Source spec: envs/r.yaml   Built: 2026.10.23.125004   Builder: abfbe9b
+# lock-hash: 0be5f91b2ecf   packages: 328
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -68,9 +68,9 @@ libarrow-compute 25.0.0
 libarrow-dataset 25.0.0
 libarrow-substrait 25.0.0
 libblas 3.11.0
-libbrotlicommon 1.2.0
-libbrotlidec 1.2.0
-libbrotlienc 1.2.0
+libbrotlicommon 1.2.1
+libbrotlidec 1.2.1
+libbrotlienc 1.2.1
 libcblas 3.11.0
 libcrc32c 1.1.2
 libcurl 8.23.0
