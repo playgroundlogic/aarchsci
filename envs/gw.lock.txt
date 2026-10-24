@@ -1,6 +1,6 @@
 # gw — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/gw.yaml   Built: 2026.10.23.125006   Builder: abfbe9b
-# lock-hash: d82199e6a09c   packages: 216
+# Source spec: envs/gw.yaml   Built: 2026.10.24.121405   Builder: f987e87
+# lock-hash: 9e4835dcbf90   packages: 216
 # Regenerate with: ./builder/build-env.sh gw
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -22,10 +22,10 @@ brotli-bin 1.2.1
 brotli-python 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
-ca-certificates 2026.10.19
+ca-certificates 2026.10.23
 cached-property 2.0.1
 cached_property 2.0.1
-certifi 2026.10.19
+certifi 2026.10.23
 cffi 2.1.1
 cfitsio 4.6.2
 charset-normalizer 3.5.1
@@ -64,7 +64,7 @@ idna 3.20
 igwn-auth-utils 1.4.0
 igwn-ligolw 2.0.1
 igwn-segments 2.1.1
-importlib-metadata 9.1.0
+importlib-metadata 10.0.0
 invoke 3.0.3
 jinja2 3.1.6
 jplephem 2.24
@@ -207,7 +207,7 @@ tk 8.6.13
 tqdm 4.70.1
 typing-extensions 4.16.0
 typing_extensions 4.16.0
-tzdata 2026c
+tzdata 2026e
 tzlocal 5.4.5
 urllib3 2.8.0
 xarray 2026.9.0
