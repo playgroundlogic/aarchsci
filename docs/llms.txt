@@ -67,7 +67,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
   - `geo-ml` (368 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (267 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+  - `climate` (270 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
     regridding, plus ocean thermodynamics. cdo and nco are the netCDF/GRIB command-line
     operators — the CLI complement to the Python stack; both are serial/OpenMP with no
@@ -183,7 +183,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     would pass a cross-check alone; ARI rather than label equality because cluster names
     are arbitrary. `louvain` is excluded — its aarch64 builds stop at py312 and scanpy
     deprecates it in favour of leiden.)
-  - `bayes` (125 pkgs — cmdstan 2.40 + cmdstanpy + arviz, xarray; Bayesian inference and
+  - `bayes` (126 pkgs — cmdstan 2.40 + cmdstanpy + arviz, xarray; Bayesian inference and
     MCMC with Stan. Fills a domain the catalog had nothing for. TWO runtime requirements
     that a naive spec misses, both found by building: (1) Stan ships NO precompiled models
     — it translates each model to C++ with stanc and COMPILES it at run time, and the
@@ -324,7 +324,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     scheme is not symplectic. One thing NOT asserted: a multi-level convergence ladder —
     the error floors near 3e-5 and wanders (3.59e-4, 8.25e-5, 3.25e-5, 7.08e-5 for n_cell
     128..1024), so only one refinement step is claimed.)
-  - `structbio` (121 pkgs — cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88; crystallography
+  - `structbio` (122 pkgs — cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88; crystallography
     and structural biology. ITS OWN ENV rather than an addition to `md` (issue #39): md is
     trajectory production, this is symmetry/coordinate/map work, and cctbx-base is a 161 MB
     solve with its own boost stack that should not be able to perturb md's shipped recipes.
