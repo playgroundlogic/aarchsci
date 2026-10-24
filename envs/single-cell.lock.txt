@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.10.23.125004   Builder: abfbe9b
-# lock-hash: 31fc3bef9bde   packages: 532
+# Source spec: envs/single-cell.yaml   Built: 2026.10.24.121409   Builder: f987e87
+# lock-hash: 444d65d3a4f3   packages: 532
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -46,11 +46,11 @@ bwidget 1.10.1
 bzip2 1.0.8
 c-ares 1.34.9
 c-blosc2 2.22.0
-ca-certificates 2026.10.19
+ca-certificates 2026.10.23
 cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
-certifi 2026.10.19
+certifi 2026.10.23
 cffi 2.1.1
 charls 2.4.5
 charset-normalizer 3.5.1
@@ -116,7 +116,7 @@ idna 3.20
 igraph 1.0.1
 imagecodecs 2025.11.11
 imageio 2.38.1
-importlib-metadata 9.1.0
+importlib-metadata 10.0.0
 inflect 7.6.0
 interface_meta 1.3.0
 jaraco.functools 4.6.0
@@ -170,7 +170,7 @@ libgomp 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
 libgrpc 1.82.1
-libharfbuzz 14.6.0
+libharfbuzz 15.0.0
 libhwloc 2.15.0
 libhwy 1.4.0
 libiconv 1.18
@@ -253,7 +253,7 @@ numpy 2.5.4
 numpy_groupies 0.15.0
 ome-zarr 0.17.0
 omnipath 1.0.12
-onednn 3.13.4
+onednn 3.14
 openjpeg 2.5.4
 openssl 3.6.5
 optree 0.20.0
@@ -503,7 +503,7 @@ typeguard 4.6.0
 typing-extensions 4.16.0
 typing-inspection 0.4.4
 typing_extensions 4.16.0
-tzdata 2026c
+tzdata 2026e
 umap-learn 0.5.12
 universal-pathlib 0.3.10
 universal_pathlib 0.3.10
