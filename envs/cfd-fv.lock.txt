@@ -1,10 +1,10 @@
 # cfd-fv — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/cfd-fv.yaml   Built: 2026.10.21.130937   Builder: 1cbbe28
-# lock-hash: a29130ff7e67   packages: 56
+# Source spec: envs/cfd-fv.yaml   Built: 2026.10.24.121649   Builder: f987e87
+# lock-hash: 3b79ac4d028b   packages: 56
 # Regenerate with: ./builder/build-env.sh cfd-fv
 _openmp_mutex 4.5
 bzip2 1.0.8
-ca-certificates 2026.10.19
+ca-certificates 2026.10.23
 lapack 3.11.0
 ld_impl_linux-aarch64 2.46.1
 libblas 3.11.0
@@ -12,8 +12,8 @@ libcap 2.78
 libcblas 3.11.0
 libevent 2.1.12
 libexpat 2.8.5
-libfabric 2.6.0
-libfabric1 2.6.0
+libfabric 2.7.0
+libfabric1 2.7.0
 libffi 3.7.0
 libgcc 16.2.0
 libgfortran 16.2.0
@@ -53,7 +53,7 @@ scipy 1.17.1
 setuptools 84.2.1
 su2 8.5.0
 tk 8.6.13
-tzdata 2026c
+tzdata 2026e
 ucc 1.8.0
 ucx 1.22.0
 wheel 0.48.0
