@@ -1,6 +1,6 @@
 # pic — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pic.yaml   Built: 2026.10.23.125002   Builder: abfbe9b
-# lock-hash: 0b3aaee5a7a3   packages: 167
+# Source spec: envs/pic.yaml   Built: 2026.10.24.121405   Builder: f987e87
+# lock-hash: 1c21db2bd35e   packages: 167
 # Regenerate with: ./builder/build-env.sh pic
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -14,7 +14,7 @@ aws-c-compression 1.0.0
 aws-c-http 1.0.0
 aws-c-io 1.0.0
 aws-c-s3 1.0.0
-aws-c-sdkutils 1.0.0
+aws-c-sdkutils 1.0.1
 aws-checksums 1.0.1
 blaspp 2025.05.28
 brotli 1.2.1
@@ -22,7 +22,7 @@ brotli-bin 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
 c-blosc2 3.3.5
-ca-certificates 2026.10.19
+ca-certificates 2026.10.23
 cairo 1.18.6
 cmyt 2.0.4
 comm 0.2.3
@@ -80,7 +80,7 @@ libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.1
 libgomp 16.2.0
-libharfbuzz 14.6.0
+libharfbuzz 15.0.0
 libiconv 1.18
 libjpeg-turbo 3.2.0
 liblapack 3.11.0
@@ -152,7 +152,7 @@ tomli-w 1.2.0
 tqdm 4.70.1
 traitlets 5.16.1
 typing_extensions 4.16.0
-tzdata 2026c
+tzdata 2026e
 unyt 3.2.0
 warpx 26.10
 wcwidth 0.9.3
