@@ -1,6 +1,6 @@
 # popgen — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/popgen.yaml   Built: 2026.10.23.125006   Builder: abfbe9b
-# lock-hash: aa790bb018fd   packages: 247
+# Source spec: envs/popgen.yaml   Built: 2026.10.24.121542   Builder: f987e87
+# lock-hash: 575b7de78214   packages: 247
 # Regenerate with: ./builder/build-env.sh popgen
 _openmp_mutex 4.5
 apricot-select 0.6.1
@@ -28,7 +28,7 @@ brotli 1.2.1
 brotli-bin 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
-ca-certificates 2026.10.19
+ca-certificates 2026.10.23
 cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
@@ -69,7 +69,7 @@ h5py 3.16.0
 hdf5 1.14.6
 humanize 4.16.0
 icu 78.3
-importlib-metadata 9.1.0
+importlib-metadata 10.0.0
 interface_meta 1.3.0
 jinja2 3.1.6
 joblib 1.6.0
@@ -112,7 +112,7 @@ libglib 2.90.1
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
 libgrpc 1.82.1
-libharfbuzz 14.6.0
+libharfbuzz 15.0.0
 libiconv 1.18
 libjpeg-turbo 3.2.0
 liblapack 3.11.0
@@ -169,7 +169,7 @@ numba 0.68.0
 numcodecs 0.17.1
 numexpr 2.14.2
 numpy 2.5.4
-onednn 3.13.4
+onednn 3.14
 openjpeg 2.5.4
 openssl 3.6.5
 optree 0.20.0
@@ -232,7 +232,7 @@ tskit 1.0.3
 tszip 0.3.1
 typing-extensions 4.16.0
 typing_extensions 4.16.0
-tzdata 2026c
+tzdata 2026e
 wrapt 2.5.1
 xorg-libice 1.1.2
 xorg-libsm 1.2.6
