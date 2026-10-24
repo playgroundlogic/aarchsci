@@ -1,6 +1,6 @@
 # quantum — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/quantum.yaml   Built: 2026.10.23.125204   Builder: abfbe9b
-# lock-hash: f1a3727bcd71   packages: 165
+# Source spec: envs/quantum.yaml   Built: 2026.10.24.121518   Builder: f987e87
+# lock-hash: 05ae30d7e134   packages: 165
 # Regenerate with: ./builder/build-env.sh quantum
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -12,7 +12,7 @@ aws-c-compression 1.0.0
 aws-c-http 1.0.0
 aws-c-io 1.0.0
 aws-c-s3 1.0.0
-aws-c-sdkutils 1.0.0
+aws-c-sdkutils 1.0.1
 aws-checksums 1.0.1
 backports.zstd 1.8.0
 brotli 1.2.1
@@ -20,11 +20,11 @@ brotli-bin 1.2.1
 brotli-python 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
-ca-certificates 2026.10.19
+ca-certificates 2026.10.23
 cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
-certifi 2026.10.19
+certifi 2026.10.23
 charset-normalizer 3.5.1
 cirq-core 1.7.0
 cloudpickle 3.1.2
@@ -82,7 +82,7 @@ libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.1
 libgomp 16.2.0
-libharfbuzz 14.6.0
+libharfbuzz 15.0.0
 libiconv 1.18
 libjpeg-turbo 3.2.0
 liblapack 3.11.0
@@ -156,7 +156,7 @@ threadpoolctl 3.7.0
 tk 8.6.13
 tqdm 4.70.1
 typing_extensions 4.16.0
-tzdata 2026c
+tzdata 2026e
 urllib3 2.8.0
 xorg-libice 1.1.2
 xorg-libsm 1.2.6
