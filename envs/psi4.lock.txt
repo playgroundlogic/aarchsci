@@ -1,6 +1,6 @@
 # psi4 — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/psi4.yaml   Built: 2026.10.22.131246   Builder: 4538a2c
-# lock-hash: d81086d033a9   packages: 82
+# Source spec: envs/psi4.yaml   Built: 2026.10.24.121612   Builder: f987e87
+# lock-hash: a8d99cacacf0   packages: 82
 # Regenerate with: ./builder/build-env.sh psi4
 _openmp_mutex 4.5
 annotated-types 0.8.0
@@ -8,7 +8,7 @@ armadillo 15.6.2
 arpack 3.9.1
 bzip2 1.0.8
 c-ares 1.34.9
-ca-certificates 2026.10.19
+ca-certificates 2026.10.23
 dkh 1.2
 exchcxx 1.0.0
 flexcache 0.3
@@ -81,6 +81,6 @@ tk 8.6.13
 typing-extensions 4.16.0
 typing-inspection 0.4.4
 typing_extensions 4.16.0
-tzdata 2026c
+tzdata 2026e
 yaml 0.2.5
 zstd 1.5.7
