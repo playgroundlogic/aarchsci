@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.10.24.121407   Builder: f987e87
-# lock-hash: 2c2c88488c40   packages: 361
+# Source spec: envs/astro.yaml   Built: 2026.10.25.124701   Builder: 7ddefe7
+# lock-hash: 6ccfdd6d3045   packages: 361
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -338,7 +338,7 @@ uncompresspy 0.4.1
 unyt 3.2.0
 uriparser 0.9.8
 urllib3 2.8.0
-wcwidth 0.9.3
+wcwidth 0.9.4
 webencodings 0.6.1
 widgetsnbextension 4.0.16
 wrapt 2.5.1
