@@ -1,6 +1,6 @@
 # gw — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/gw.yaml   Built: 2026.10.24.121405   Builder: f987e87
-# lock-hash: 9e4835dcbf90   packages: 216
+# Source spec: envs/gw.yaml   Built: 2026.10.26.143314   Builder: 2f84070
+# lock-hash: e961c93ad69c   packages: 216
 # Regenerate with: ./builder/build-env.sh gw
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -32,7 +32,7 @@ charset-normalizer 3.5.1
 click 8.5.0
 contourpy 1.4.0
 corner 2.3.0
-cpython 3.13.17
+cpython 3.13.18
 cryptography 50.0.2
 cycler 0.12.1
 cython 3.3.0
@@ -176,7 +176,7 @@ pyparsing 3.3.3
 pysocks 1.7.1
 python 3.13.16
 python-dateutil 3.0.0
-python-gil 3.13.17
+python-gil 3.13.18
 python-gssapi 1.12.0
 python-lal 7.6.1
 python-lalburst 2.0.6
