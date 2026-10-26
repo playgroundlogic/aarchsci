@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.10.24.121409   Builder: f987e87
-# lock-hash: 444d65d3a4f3   packages: 532
+# Source spec: envs/single-cell.yaml   Built: 2026.10.26.143503   Builder: 2f84070
+# lock-hash: a411bdb4c002   packages: 532
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -12,7 +12,7 @@ annotated-types 0.8.0
 annsel 0.1.2
 aom 3.14.1
 arpack 3.9.1
-array-api-compat 1.15.0
+array-api-compat 1.16.0
 attrs 26.1.0
 aws-c-auth 0.10.4
 aws-c-cal 0.9.14
@@ -58,7 +58,7 @@ click 8.5.0
 cloudpickle 3.1.2
 colorcet 3.2.1
 contourpy 1.4.0
-cpython 3.14.9
+cpython 3.14.10
 curl 8.23.0
 cycler 0.12.1
 cytoolz 1.2.0
@@ -191,7 +191,7 @@ libparquet 25.0.0
 libpng 1.6.59
 libprotobuf 7.35.1
 libpsl 0.23.1
-libpython 3.14.9
+libpython 3.14.10
 libraqm 0.11.0
 libre2-11 2025.11.05
 librttopo 1.1.0
@@ -236,7 +236,7 @@ mpfr 4.2.2
 mpmath 1.4.1
 msgpack-python 1.2.3
 msgspec 0.22.0
-multidict 7.1.0
+multidict 7.2.1
 multipledispatch 1.0.0
 multiscale-spatial-image 2.0.3
 munkres 1.1.4
@@ -294,7 +294,7 @@ pyogrio 0.13.0
 pyparsing 3.3.3
 pyproj 3.8.0
 pysocks 1.7.1
-python 3.14.9
+python 3.14.10
 python-dateutil 3.0.0
 python-dotenv 1.2.4
 python-igraph 1.0.0
