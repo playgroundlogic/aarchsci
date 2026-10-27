@@ -120,7 +120,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`cfd-fv`](envs/cfd-fv.yaml) | 56 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
 | [`optimization`](envs/optimization.yaml) | 64 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
 | [`neuroimaging`](envs/neuroimaging.yaml) | 296 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
-| [`single-cell`](envs/single-cell.yaml) | 532 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
+| [`single-cell`](envs/single-cell.yaml) | 529 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
 | [`bayes`](envs/bayes.yaml) | 126 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
 | [`geoscience`](envs/geoscience.yaml) | 113 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
 | [`cp2k`](envs/cp2k.yaml) | 111 | **deprecated** — CP2K now ships inside [`dft`](envs/dft.yaml); kept as a transition alias |
