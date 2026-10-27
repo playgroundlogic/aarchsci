@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.10.26.143503   Builder: 2f84070
-# lock-hash: a411bdb4c002   packages: 532
+# Source spec: envs/single-cell.yaml   Built: 2026.10.27.133056   Builder: 490171b
+# lock-hash: f4b2a9e50876   packages: 529
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -51,7 +51,6 @@ cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
 certifi 2026.10.23
-cffi 2.1.1
 charls 2.4.5
 charset-normalizer 3.5.1
 click 8.5.0
@@ -155,7 +154,7 @@ libdeflate 1.25
 libedit 3.1.20260512
 libev 4.33
 libevent 2.1.12
-libexpat 2.8.5
+libexpat 2.9.0
 libffi 3.7.0
 libfreetype 2.14.3
 libfreetype6 2.14.3
@@ -250,7 +249,7 @@ nomkl 1.0
 numba 0.68.0
 numcodecs 0.17.1
 numpy 2.5.4
-numpy_groupies 0.15.0
+numpy_groupies 0.16.0
 ome-zarr 0.17.0
 omnipath 1.0.12
 onednn 3.14
@@ -260,7 +259,7 @@ optree 0.20.0
 orc 2.3.1
 packaging 26.3
 pandas 3.1.0
-pandoc 3.12.1
+pandoc 3.13
 param 2.4.2
 partd 1.4.2
 pathlib-abc 0.5.2
@@ -271,7 +270,7 @@ pillow 13.0.0
 pims 0.7
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.13.5
+platformdirs 4.13.6
 pooch 1.9.0
 proj 9.8.1
 prometheus-cpp 1.3.0
@@ -283,7 +282,6 @@ pyarrow-core 25.0.0
 pybind11 3.0.4
 pybind11-abi 11
 pybind11-global 3.0.4
-pycparser 3.12
 pyct 0.6.0
 pydantic 2.14.1
 pydantic-core 2.50.1
@@ -513,7 +511,7 @@ validators 0.36.0
 wrapt 2.5.1
 xarray 2026.9.0
 xarray-dataclass 3.0.0
-xarray-spatial 0.10.17
+xarray-spatial 0.10.20
 xerces-c 3.3.0
 xorg-libice 1.1.2
 xorg-libsm 1.2.6
@@ -532,5 +530,4 @@ zict 3.0.0
 zipp 4.1.2
 zlib 1.3.2
 zlib-ng 2.3.3
-zstandard 0.25.0
 zstd 1.5.7
