@@ -1,6 +1,6 @@
 # pic — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pic.yaml   Built: 2026.10.27.133051   Builder: 490171b
-# lock-hash: 00ab12b1718c   packages: 167
+# Source spec: envs/pic.yaml   Built: 2026.10.28.141637   Builder: 68105e8
+# lock-hash: 13f6e4107f69   packages: 167
 # Regenerate with: ./builder/build-env.sh pic
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -9,7 +9,7 @@ amrex 26.10
 asttokens 3.0.2
 aws-c-auth 1.0.0
 aws-c-cal 1.0.0
-aws-c-common 1.0.3
+aws-c-common 1.0.5
 aws-c-compression 1.0.0
 aws-c-http 1.0.0
 aws-c-io 1.0.0
@@ -39,7 +39,7 @@ font-ttf-ubuntu 0.83
 fontconfig 2.18.3
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
-fonttools 4.67.0
+fonttools 4.68.0
 freetype 2.14.3
 fribidi 1.0.17
 gmp 6.3.0
@@ -82,12 +82,12 @@ libglib 2.90.1
 libgomp 16.2.0
 libharfbuzz 15.0.0
 libiconv 1.18
-libjpeg-turbo 3.2.0
+libjpeg-turbo 3.2.1
 liblapack 3.11.0
 liblapacke 3.11.0
 liblzma 5.8.3
 libmpdec 4.0.0
-libnghttp2 1.68.1
+libnghttp2 1.70.0
 libopenblas 0.3.34
 libpng 1.6.59
 libpsl 0.23.1
