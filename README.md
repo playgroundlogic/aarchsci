@@ -107,8 +107,8 @@ neither moves; comparing one against the other just looks like a mismatch when i
 |-----|-----:|--------------|
 | [`geospatial`](envs/geospatial.yaml) | 110 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
 | [`earth-observation`](envs/earth-observation.yaml) | 246 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr |
-| [`geo-ml`](envs/geo-ml.yaml) | 368 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader, scipy-tests |
-| [`climate`](envs/climate.yaml) | 270 | xarray/dask + flox, cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
+| [`geo-ml`](envs/geo-ml.yaml) | 367 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader, scipy-tests |
+| [`climate`](envs/climate.yaml) | 268 | xarray/dask + flox, cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
 | [`pointcloud`](envs/pointcloud.yaml) | 234 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
 | [`comp-chem`](envs/comp-chem.yaml) | 212 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, vina, cantera — **xtb removed 2026-10-18**, see below |
 | [`dft`](envs/dft.yaml) | 236 | gpaw, siesta, **cp2k**, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
