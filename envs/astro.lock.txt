@@ -1,11 +1,11 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.10.27.133247   Builder: 490171b
-# lock-hash: aae44f7e29e3   packages: 361
+# Source spec: envs/astro.yaml   Built: 2026.10.28.141639   Builder: 68105e8
+# lock-hash: 5bf9a10f54ee   packages: 361
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
 affine 3.0.1
-aiobotocore 3.9.2
+aiobotocore 3.10.0
 aiofiles 25.1.0
 aioftp 0.28.0
 aiohappyeyeballs 2.7.1
@@ -50,7 +50,7 @@ beautifulsoup4 4.15.0
 bleach 6.4.0
 blosc 1.21.6
 bokeh 3.10.0
-botocore 1.43.106
+botocore 1.43.117
 bottleneck 1.6.0
 bqplot 0.13.1
 bqscales 0.3.7
@@ -97,7 +97,7 @@ font-ttf-ubuntu 0.83
 fontconfig 2.18.3
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
-fonttools 4.67.0
+fonttools 4.68.0
 freetype 2.14.3
 freexl 2.0.0
 fribidi 1.0.17
@@ -115,7 +115,7 @@ google-crc32c 1.8.0
 graphite2 1.3.15
 gwcs 1.0.3
 h2 4.4.1
-h5netcdf 1.8.1
+h5netcdf 1.8.2
 h5py 3.16.0
 hdf5 1.14.6
 healpy 1.20.1
@@ -188,13 +188,13 @@ libgrpc 1.82.1
 libharfbuzz 15.0.0
 libhwy 1.4.0
 libiconv 1.18
-libjpeg-turbo 3.2.0
+libjpeg-turbo 3.2.1
 libjxl 0.12.0
 libkml 1.3.0
 liblapack 3.11.0
 liblzma 5.8.3
 libmpdec 4.0.0
-libnghttp2 1.68.1
+libnghttp2 1.70.0
 libnsl 2.0.1
 libopenblas 0.3.34
 libopentelemetry-cpp 1.27.0
@@ -238,14 +238,14 @@ mpc 1.4.0
 mpfr 4.2.2
 mpl_animators 1.2.4
 mpmath 1.4.1
-msgpack-python 1.2.3
+msgpack-python 1.2.4
 msgspec 0.22.0
-multidict 6.9.1
+multidict 7.2.1
 munkres 1.1.4
 muparser 2.3.5
-narwhals 2.27.1
+narwhals 2.28.0
 ncurses 6.6
-ndcube 2.4.2
+ndcube 2.4.3
 nest-asyncio2 1.7.4
 nlohmann_json 3.12.0
 numcodecs 0.17.1
@@ -266,7 +266,7 @@ pillow 13.0.0
 pims 0.7
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.13.6
+platformdirs 4.13.7
 proj 9.9.0
 prometheus-cpp 1.3.0
 prompt-toolkit 3.0.53
@@ -355,7 +355,7 @@ xyzservices 2026.9.1
 yaml 0.2.5
 yarl 1.25.1
 yt 4.4.2
-zarr 3.4.1
+zarr 3.4.2
 zeep 4.3.3
 zeromq 4.3.5
 zict 3.0.0
