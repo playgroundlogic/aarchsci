@@ -1,12 +1,12 @@
 # geo-ml — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geo-ml.yaml   Built: 2026.10.27.133050   Builder: 490171b
-# lock-hash: 6d2bc744537b   packages: 368
+# Source spec: envs/geo-ml.yaml   Built: 2026.10.28.141639   Builder: 68105e8
+# lock-hash: b66a6e964bf6   packages: 367
 # Regenerate with: ./builder/build-env.sh geo-ml
 _openmp_mutex 4.5
 _python_abi3_support 1.0
 access 1.1.10.post3
 affine 3.0.1
-aiobotocore 3.9.2
+aiobotocore 3.10.0
 aiohappyeyeballs 2.7.1
 aiohttp 3.14.5
 aioitertools 0.13.0
@@ -37,7 +37,7 @@ backports.zstd 1.8.0
 beautifulsoup4 4.15.0
 blosc 1.21.6
 bokeh 3.10.0
-botocore 1.43.106
+botocore 1.43.117
 branca 0.8.2
 brotli 1.2.1
 brotli-bin 1.2.1
@@ -62,7 +62,6 @@ coin-or-cgl 0.60.10
 coin-or-clp 1.17.11
 coin-or-osi 0.108.12
 coin-or-utils 2.11.13
-colorama 0.4.6
 colorcet 3.2.1
 comm 0.2.3
 contourpy 1.4.0
@@ -89,7 +88,7 @@ font-ttf-ubuntu 0.83
 fontconfig 2.18.3
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
-fonttools 4.67.0
+fonttools 4.68.0
 formulaic 1.2.2
 freetype 2.14.3
 freexl 2.0.0
@@ -106,7 +105,7 @@ giflib 6.1.3
 glog 0.7.1
 graphite2 1.3.15
 h2 4.4.1
-h5netcdf 1.8.1
+h5netcdf 1.8.2
 h5py 3.16.0
 hdf4 4.2.15
 hdf5 1.14.6
@@ -175,7 +174,7 @@ libgrpc 1.82.1
 libharfbuzz 15.0.0
 libhwy 1.4.0
 libiconv 1.18
-libjpeg-turbo 3.2.0
+libjpeg-turbo 3.2.1
 libjxl 0.12.0
 libkml 1.3.0
 liblapack 3.11.0
@@ -184,7 +183,7 @@ liblightgbm 4.7.0
 liblzma 5.8.3
 libmpdec 4.0.0
 libnetcdf 4.10.1
-libnghttp2 1.68.1
+libnghttp2 1.70.0
 libnsl 2.0.1
 libopenblas 0.3.34
 libopentelemetry-cpp 1.27.0
@@ -230,12 +229,12 @@ mda-xdrlib 0.2.0
 mgwr 2.2.1
 minizip 4.2.2
 momepy 1.0.0
-msgpack-python 1.2.3
-multidict 6.9.1
+msgpack-python 1.2.4
+multidict 7.2.1
 multipledispatch 1.0.0
 munkres 1.1.4
 muparser 2.3.5
-narwhals 2.27.1
+narwhals 2.28.0
 ncurses 6.6
 netcdf4 1.7.4
 networkx 3.7
@@ -260,7 +259,7 @@ pillow 13.0.0
 pint 0.26.2
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.13.6
+platformdirs 4.13.7
 pluggy 1.7.0
 pointpats 2.6.0
 pooch 1.9.0
@@ -284,7 +283,7 @@ pyproj 3.8.0
 pysal 26.7
 pyshp 3.1.6
 pysocks 1.7.1
-pytest 9.1.1
+pytest 9.2.0
 python 3.14.10
 python-abi3 3.14
 python-dateutil 2.9.0.post0
