@@ -1,6 +1,6 @@
 # geoscience — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geoscience.yaml   Built: 2026.10.28.141636   Builder: 68105e8
-# lock-hash: 3f9934e9b0a9   packages: 113
+# Source spec: envs/geoscience.yaml   Built: 2026.10.29.144014   Builder: ed43619
+# lock-hash: 0e32713be67c   packages: 113
 # Regenerate with: ./builder/build-env.sh geoscience
 _openmp_mutex 4.5
 backports.zstd 1.8.0
@@ -93,7 +93,7 @@ pyparsing 3.3.3
 pysocks 1.7.1
 python 3.14.10
 python-dateutil 3.0.0
-python-tzdata 2026.5
+python-tzdata 2026.6
 python_abi 3.14
 qhull 2020.2
 readline 8.3
