@@ -1,6 +1,6 @@
 # gw — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/gw.yaml   Built: 2026.10.28.141831   Builder: 68105e8
-# lock-hash: 54a7a5821cc3   packages: 216
+# Source spec: envs/gw.yaml   Built: 2026.10.29.143751   Builder: ed43619
+# lock-hash: 828109e99207   packages: 216
 # Regenerate with: ./builder/build-env.sh gw
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -92,7 +92,7 @@ ld_impl_linux-aarch64 2.46.1
 ldas-tools-al 2.8.1
 ldas-tools-framecpp 2.9.3
 lerc 4.2.0
-libaec 1.1.5
+libaec 1.1.7
 libblas 3.11.0
 libboost 1.90.0
 libbrotlicommon 1.2.1
@@ -187,7 +187,7 @@ python-lalmetaio 4.0.5
 python-lalpulsar 7.1.0
 python-lalsimulation 6.1.0
 python-ligo-lw 1.8.3
-python-tzdata 2026.5
+python-tzdata 2026.6
 python_abi 3.13
 pytz 2026.5
 pyyaml 6.0.3
