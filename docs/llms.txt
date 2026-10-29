@@ -65,7 +65,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     scikit-image, numpy, scipy).
   - `earth-observation` (246 pkgs — geospatial base + xarray, dask, rioxarray,
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
-  - `geo-ml` (367 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
+  - `geo-ml` (368 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
   - `climate` (268 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
@@ -93,7 +93,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     nwchem is pinned to the `mpi_ts` (two-sided) ARMCI network, which works on 1, 2 and 4
     ranks with a container's default 64 MB `/dev/shm`; the `mpi_pr` progress-ranks variant
     aborts on 1 rank and exhausts `/dev/shm` on 3).
-  - `md` (246 pkgs — gromacs, lammps, ambertools, openmpi, mpi4py, mdanalysis, mdtraj,
+  - `md` (258 pkgs — gromacs, lammps, ambertools, openmpi, mpi4py, mdanalysis, mdtraj,
     parmed; classical molecular dynamics, MPI-parallel. Two caveats: the gromacs binary
     is `gmx_mpi`, not `gmx`, and conda-forge builds it `ARM_NEON_ASIMD`, so it uses NEON
     and leaves SVE/SVE2 idle on Graviton 3+. `pmemd` is not included — paid Amber
@@ -104,7 +104,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the R 4.5 line on purpose: r-base reaches 4.6.1 on arm64 but ZERO of conda-forge's
     3162 linux-aarch64 `r-*` packages have an r46 build, and `r-base=4.6.1 r-tidyverse`
     does not solve at all).
-  - `viz` (246 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
+  - `viz` (249 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
     rendering goes via GLX against Xvfb, which ships in the image).
