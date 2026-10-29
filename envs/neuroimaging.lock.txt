@@ -1,6 +1,6 @@
 # neuroimaging — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/neuroimaging.yaml   Built: 2026.10.28.141651   Builder: 68105e8
-# lock-hash: 96340bde40f5   packages: 296
+# Source spec: envs/neuroimaging.yaml   Built: 2026.10.29.143751   Builder: ed43619
+# lock-hash: 616d37e5d4ec   packages: 296
 # Regenerate with: ./builder/build-env.sh neuroimaging
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -103,7 +103,7 @@ lcms2 2.19.1
 ld_impl_linux-aarch64 2.46.1
 lerc 4.2.0
 libabseil 20260526.0
-libaec 1.1.5
+libaec 1.1.7
 libarrow 25.0.0
 libarrow-acero 25.0.0
 libarrow-compute 25.0.0
@@ -216,7 +216,7 @@ pcre2 10.47
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.13.7
+platformdirs 4.14.0
 polars 2.1.0
 polars-runtime-32 2.1.0
 pooch 1.9.0
@@ -235,7 +235,7 @@ pysocks 1.7.1
 python 3.14.10
 python-dateutil 3.0.0
 python-gil 3.14.10
-python-tzdata 2026.5
+python-tzdata 2026.6
 python_abi 3.14
 pywin32-on-windows 0.1.0
 qhull 2020.2
