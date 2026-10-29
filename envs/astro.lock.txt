@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.10.28.141639   Builder: 68105e8
-# lock-hash: 5bf9a10f54ee   packages: 361
+# Source spec: envs/astro.yaml   Built: 2026.10.29.143750   Builder: ed43619
+# lock-hash: 0a044cb09f19   packages: 361
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -153,7 +153,7 @@ lcms2 2.19.1
 ld_impl_linux-aarch64 2.46.1
 lerc 4.2.0
 libabseil 20260526.0
-libaec 1.1.5
+libaec 1.1.7
 libarchive 3.8.9
 libarrow 25.0.0
 libarrow-acero 25.0.0
@@ -266,7 +266,7 @@ pillow 13.0.0
 pims 0.7
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.13.7
+platformdirs 4.14.0
 proj 9.9.0
 prometheus-cpp 1.3.0
 prompt-toolkit 3.0.53
