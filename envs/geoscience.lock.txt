@@ -1,6 +1,6 @@
 # geoscience — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geoscience.yaml   Built: 2026.10.29.144014   Builder: ed43619
-# lock-hash: 0e32713be67c   packages: 113
+# Source spec: envs/geoscience.yaml   Built: 2026.10.30.143059   Builder: f66e10b
+# lock-hash: a1a411ba615f   packages: 113
 # Regenerate with: ./builder/build-env.sh geoscience
 _openmp_mutex 4.5
 backports.zstd 1.8.0
@@ -25,7 +25,7 @@ fonts-conda-ecosystem 1
 fonts-conda-forge 1
 fonttools 4.68.0
 freetype 2.14.3
-fribidi 1.0.17
+fribidi 1.0.18
 graphite2 1.3.15
 h2 4.4.1
 hpack 4.2.0
