@@ -1,6 +1,6 @@
 # pointcloud — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pointcloud.yaml   Built: 2026.10.29.143747   Builder: ed43619
-# lock-hash: 015d30b34bcd   packages: 234
+# Source spec: envs/pointcloud.yaml   Built: 2026.10.30.142858   Builder: f66e10b
+# lock-hash: da20dc066d82   packages: 234
 # Regenerate with: ./builder/build-env.sh pointcloud
 _openmp_mutex 4.5
 affine 3.0.1
@@ -106,7 +106,7 @@ libgfortran 16.2.0
 libgfortran5 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
-libgrpc 1.82.1
+libgrpc 1.82.2
 libhwloc 2.13.0
 libhwy 1.4.0
 libiconv 1.18
