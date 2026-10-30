@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.10.29.143748   Builder: ed43619
-# lock-hash: c295262434f7   packages: 529
+# Source spec: envs/single-cell.yaml   Built: 2026.10.30.142900   Builder: f66e10b
+# lock-hash: 0f99e55f5d63   packages: 529
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -85,7 +85,7 @@ fonttools 4.68.0
 formulaic 1.2.2
 freetype 2.14.3
 freexl 2.0.0
-fribidi 1.0.17
+fribidi 1.0.18
 frozenlist 1.8.0
 fsspec 2026.9.0
 gcc_impl_linux-aarch64 16.2.0
@@ -168,7 +168,7 @@ libglib 2.90.1
 libgomp 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
-libgrpc 1.82.1
+libgrpc 1.82.2
 libharfbuzz 15.0.0
 libhwloc 2.15.0
 libhwy 1.4.0
@@ -252,7 +252,7 @@ numpy 2.5.4
 numpy_groupies 0.16.0
 ome-zarr 0.17.0
 omnipath 1.0.12
-onednn 3.14
+onednn 3.14.1
 openjpeg 2.5.4
 openssl 3.6.5
 optree 0.20.0
@@ -283,8 +283,8 @@ pybind11 3.0.4
 pybind11-abi 11
 pybind11-global 3.0.4
 pyct 0.6.0
-pydantic 2.14.1
-pydantic-core 2.50.1
+pydantic 2.14.2
+pydantic-core 2.50.2
 pydantic-settings 2.16.2
 pygments 2.21.0
 pynndescent 0.7.0
@@ -458,7 +458,7 @@ readline 8.3
 requests 2.34.2
 rich 15.0.0
 s2n 1.7.5
-scanpy 1.12.4
+scanpy 1.12.5
 scikit-build-core 1.1.1
 scikit-image 0.26.0
 scikit-learn 1.9.1
@@ -508,7 +508,7 @@ universal_pathlib 0.3.10
 uriparser 0.9.8
 urllib3 2.8.0
 validators 0.36.0
-wrapt 2.5.1
+wrapt 2.5.2
 xarray 2026.9.0
 xarray-dataclass 3.0.0
 xarray-spatial 0.10.20
