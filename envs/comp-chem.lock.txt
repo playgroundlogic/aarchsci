@@ -1,13 +1,15 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.10.28.141641   Builder: 68105e8
-# lock-hash: 046105cabd70   packages: 212
+# Source spec: envs/comp-chem.yaml   Built: 2026.10.30.142857   Builder: f66e10b
+# lock-hash: 3639f236c84d   packages: 223
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
 ase 3.29.0
+backports.zstd 1.8.0
 blosc 1.21.6
 brotli 1.2.1
 brotli-bin 1.2.1
+brotli-python 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
 c-blosc2 3.3.5
@@ -39,16 +41,20 @@ fonttools 4.68.0
 formulaic 1.2.2
 freetype 2.14.3
 freetype-py 2.3.0
-fribidi 1.0.17
+fribidi 1.0.18
 gemmi 0.7.5
 gmp 6.3.0
 graphite2 1.3.15
 griddataformats 1.2.0
 gsd 5.0.1
+h2 4.4.1
 h5py 3.16.0
 hdf4 4.2.15
 hdf5 1.14.6
+hpack 4.2.0
+hyperframe 6.1.0
 icu 78.3
+idna 3.20
 interface_meta 1.3.0
 joblib 1.6.0
 keyutils 1.6.3
@@ -58,7 +64,7 @@ lcms2 2.19.1
 ld_impl_linux-aarch64 2.46.1
 legacy-cgi 2.6.4
 lerc 4.2.0
-libaec 1.1.5
+libaec 1.1.7
 libamd 3.3.3
 libblas 3.11.0
 libboost 1.86.0
@@ -161,6 +167,8 @@ pdbfixer 1.12
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
+platformdirs 4.14.0
+pooch 1.9.0
 pthread-stubs 0.4
 py-cpuinfo 9.0.0
 pybind11-abi 11
@@ -168,17 +176,19 @@ pycairo 1.29.2
 pyedr 0.8.0
 pyparsing 3.3.2
 pyscf 2.14.0
+pysocks 1.7.1
 pytables 3.11.1
 python 3.14.10
 python-dateutil 3.0.0
 python-gil 3.14.10
-python-tzdata 2026.5
+python-tzdata 2026.6
 python_abi 3.14
 pytng 0.3.4
 qhull 2020.2
 rdkit 2026.03.1
 readline 8.3
 reportlab 5.1.0
+requests 2.34.2
 rlpycairo 0.4.0
 ruamel.yaml 0.19.1
 ruamel.yaml.clib 0.2.15
@@ -200,8 +210,9 @@ tqdm 4.70.1
 typing-extensions 4.16.0
 typing_extensions 4.16.0
 tzdata 2026e
+urllib3 2.8.0
 vina 1.2.7
-wrapt 2.5.1
+wrapt 2.5.2
 xcfun 2.1.1
 xorg-libice 1.1.2
 xorg-libsm 1.2.6
