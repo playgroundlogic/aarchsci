@@ -1,6 +1,6 @@
 # climate — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/climate.yaml   Built: 2026.10.29.143748   Builder: ed43619
-# lock-hash: ad0f6960e9bc   packages: 268
+# Source spec: envs/climate.yaml   Built: 2026.10.30.143034   Builder: f66e10b
+# lock-hash: 26f1074c03e9   packages: 268
 # Regenerate with: ./builder/build-env.sh climate
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -58,7 +58,7 @@ esmf 8.9.1
 esmpy 8.9.1
 expat 2.9.0
 fftw 3.3.11
-findlibs 0.1.3
+findlibs 0.1.4
 flexcache 0.3
 flexparser 0.4
 flox 0.11.2
@@ -72,7 +72,7 @@ fonts-conda-forge 1
 fonttools 4.68.0
 freeglut 3.2.2
 freetype 2.14.3
-fribidi 1.0.17
+fribidi 1.0.18
 fsspec 2026.9.0
 geos 3.14.1
 gflags 2.3.1
@@ -131,7 +131,7 @@ libglx 1.7.0
 libgomp 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
-libgrpc 1.82.1
+libgrpc 1.82.2
 libharfbuzz 15.0.0
 libharfbuzz-devel 15.0.0
 libiconv 1.18
