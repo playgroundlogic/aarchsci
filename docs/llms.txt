@@ -77,7 +77,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     than asserting a tolerance band).
   - `pointcloud` (234 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
-  - `comp-chem` (212 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
+  - `comp-chem` (223 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, vina, cantera (xtb REMOVED 2026-10-18 — its aarch64 build returns wrong analytic gradients with correct energies, in all seven builds; images before that date contain it); cheminformatics + MD + quantum chemistry
     + docking).
   - `dft` (236 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
