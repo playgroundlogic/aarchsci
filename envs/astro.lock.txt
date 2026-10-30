@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.10.29.143750   Builder: ed43619
-# lock-hash: 0a044cb09f19   packages: 361
+# Source spec: envs/astro.yaml   Built: 2026.10.30.142857   Builder: f66e10b
+# lock-hash: a2558a2bb682   packages: 361
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -100,7 +100,7 @@ fonts-conda-forge 1
 fonttools 4.68.0
 freetype 2.14.3
 freexl 2.0.0
-fribidi 1.0.17
+fribidi 1.0.18
 frozenlist 1.8.0
 fsspec 2026.9.0
 gast 0.7.0
@@ -129,7 +129,7 @@ importlib-metadata 10.0.0
 importlib_resources 7.1.0
 ipydatagrid 1.4.0
 ipykernel 7.4.0
-ipython 9.17.1
+ipython 9.18.0
 ipython_pygments_lexers 1.1.1
 ipywidgets 8.1.9
 isodate 0.7.2
@@ -184,7 +184,7 @@ libglib 2.90.1
 libgomp 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
-libgrpc 1.82.1
+libgrpc 1.82.2
 libharfbuzz 15.0.0
 libhwy 1.4.0
 libiconv 1.18
@@ -289,7 +289,7 @@ python-abi3 3.14
 python-dateutil 2.9.0.post0
 python-gil 3.14.10
 python_abi 3.14
-pytz 2026.5
+pytz 2026.6
 pyvo 1.9.1
 pyyaml 6.0.3
 pyzmq 27.2.0
@@ -341,7 +341,7 @@ urllib3 2.8.0
 wcwidth 0.9.4
 webencodings 0.6.1
 widgetsnbextension 4.0.16
-wrapt 2.5.1
+wrapt 2.5.2
 xarray 2026.9.0
 xerces-c 3.3.0
 xorg-libice 1.1.2
