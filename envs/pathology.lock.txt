@@ -1,6 +1,6 @@
 # pathology — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pathology.yaml   Built: 2026.10.30.142858   Builder: f66e10b
-# lock-hash: 5655a71c9a21   packages: 209
+# Source spec: envs/pathology.yaml   Built: 2026.10.31.135303   Builder: c75d661
+# lock-hash: eb7162e0e124   packages: 209
 # Regenerate with: ./builder/build-env.sh pathology
 _openmp_mutex 4.5
 aom 3.14.1
@@ -70,7 +70,7 @@ krb5 1.22.2
 lazy-loader 0.6
 lcms2 2.19.1
 ld_impl_linux-aarch64 2.46.1
-lerc 4.2.0
+lerc 4.3.0
 libabseil 20260526.0
 libaec 1.1.7
 libarrow 25.0.0
