@@ -1,6 +1,6 @@
 # viz — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/viz.yaml   Built: 2026.10.29.143753   Builder: ed43619
-# lock-hash: 912277677b4d   packages: 249
+# Source spec: envs/viz.yaml   Built: 2026.10.31.135259   Builder: c75d661
+# lock-hash: 5243a3ccb212   packages: 249
 # Regenerate with: ./builder/build-env.sh viz
 _openmp_mutex 4.5
 aiohappyeyeballs 2.7.1
@@ -37,7 +37,7 @@ fonts-conda-ecosystem 1
 fonts-conda-forge 1
 fonttools 4.68.0
 freetype 2.14.3
-fribidi 1.0.17
+fribidi 1.0.18
 frozenlist 1.8.0
 gdk-pixbuf 2.44.8
 gl2ps 1.4.3
@@ -56,8 +56,8 @@ krb5 1.22.2
 lame 4.0
 lcms2 2.19.1
 ld_impl_linux-aarch64 2.46.1
-lerc 4.2.0
-libabseil 20260526.0
+lerc 4.3.0
+libabseil 20260817.0
 libaec 1.1.7
 libass 0.17.5
 libblas 3.11.0
