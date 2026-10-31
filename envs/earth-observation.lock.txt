@@ -1,6 +1,6 @@
 # earth-observation — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/earth-observation.yaml   Built: 2026.10.29.143756   Builder: ed43619
-# lock-hash: 85178ed8751c   packages: 246
+# Source spec: envs/earth-observation.yaml   Built: 2026.10.31.135305   Builder: c75d661
+# lock-hash: 034c24263c32   packages: 246
 # Regenerate with: ./builder/build-env.sh earth-observation
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -72,10 +72,10 @@ krb5 1.22.2
 lazy-loader 0.6
 lcms2 2.19.1
 ld_impl_linux-aarch64 2.46.1
-lerc 4.2.0
+lerc 4.3.0
 libabseil 20260526.0
 libaec 1.1.7
-libarchive 3.8.9
+libarchive 3.8.11
 libarrow 25.0.0
 libarrow-acero 25.0.0
 libarrow-compute 25.0.0
@@ -104,7 +104,7 @@ libgfortran5 16.2.0
 libgomp 16.2.0
 libgoogle-cloud 3.8.0
 libgoogle-cloud-storage 3.8.0
-libgrpc 1.82.1
+libgrpc 1.82.2
 libhwy 1.4.0
 libiconv 1.18
 libjpeg-turbo 3.2.1
@@ -209,13 +209,13 @@ python-dateutil 3.0.0
 python-gil 3.14.10
 python-tzdata 2026.6
 python_abi 3.14
-pytz 2026.5
+pytz 2026.6
 pyyaml 6.0.3
 rasterio 1.5.2
 re2 2025.11.05
 readline 8.3
 requests 2.34.2
-rioxarray 0.23.0
+rioxarray 0.24.0
 s2n 1.7.5
 scikit-image 0.26.0
 scipy 1.18.1
