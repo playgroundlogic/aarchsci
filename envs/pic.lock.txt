@@ -1,6 +1,6 @@
 # pic — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pic.yaml   Built: 2026.10.31.135304   Builder: c75d661
-# lock-hash: 835113c40000   packages: 167
+# Source spec: envs/pic.yaml   Built: 2026.11.01.143249   Builder: 428839e
+# lock-hash: 0cac60580f26   packages: 166
 # Regenerate with: ./builder/build-env.sh pic
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -136,7 +136,7 @@ pygments 2.21.0
 pyparsing 3.3.3
 python 3.14.10
 python-abi3 3.14
-python-dateutil 3.0.0
+python-dateutil 4.0.0
 python-gil 3.14.10
 python-tzdata 2026.6
 python_abi 3.14
@@ -144,7 +144,6 @@ qhull 2020.2
 readline 8.3
 s2n 1.7.7
 scipy 1.18.1
-six 1.17.0
 stack_data 0.6.3
 sympy 1.14.0
 tk 8.6.13
