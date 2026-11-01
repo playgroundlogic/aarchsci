@@ -1,6 +1,6 @@
 # hep — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/hep.yaml   Built: 2026.10.31.135439   Builder: c75d661
-# lock-hash: 1bc6cc8f8984   packages: 355
+# Source spec: envs/hep.yaml   Built: 2026.11.01.143053   Builder: 428839e
+# lock-hash: ad10a20baa56   packages: 355
 # Regenerate with: ./builder/build-env.sh hep
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -258,8 +258,8 @@ pexpect 4.9.0
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.14.0
-portalocker 3.2.0
+platformdirs 4.14.2
+portalocker 4.4.2
 prometheus_client 0.26.0
 prompt-toolkit 3.0.53
 psutil 7.2.2
@@ -273,7 +273,7 @@ pysocks 1.7.1
 pythia8 8.312
 python 3.14.10
 python-abi3 3.14
-python-dateutil 3.0.0
+python-dateutil 4.0.0
 python-fastjsonschema 2.22.2
 python-gil 3.14.10
 python-json-logger 4.2.0
