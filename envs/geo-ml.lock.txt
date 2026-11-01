@@ -1,6 +1,6 @@
 # geo-ml — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geo-ml.yaml   Built: 2026.10.31.135257   Builder: c75d661
-# lock-hash: 2fe422ab0a58   packages: 368
+# Source spec: envs/geo-ml.yaml   Built: 2026.11.01.143053   Builder: 428839e
+# lock-hash: 938e9a2512b8   packages: 370
 # Regenerate with: ./builder/build-env.sh geo-ml
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -15,19 +15,19 @@ amply 0.1.7
 arm_pyart 2.3.0
 asttokens 3.0.2
 attrs 26.1.0
-aws-c-auth 0.10.4
-aws-c-cal 0.9.14
-aws-c-common 0.14.2
-aws-c-compression 0.3.2
-aws-c-event-stream 0.7.1
-aws-c-http 0.11.0
-aws-c-io 0.27.3
-aws-c-mqtt 0.16.0
-aws-c-s3 0.12.8
-aws-c-sdkutils 0.2.7
-aws-checksums 0.2.10
-aws-crt-cpp 0.40.1
-aws-sdk-cpp 1.11.833
+aws-c-auth 1.0.0
+aws-c-cal 1.0.0
+aws-c-common 1.0.5
+aws-c-compression 1.0.0
+aws-c-event-stream 1.0.0
+aws-c-http 1.0.0
+aws-c-io 1.0.0
+aws-c-mqtt 1.0.0
+aws-c-s3 1.0.0
+aws-c-sdkutils 1.0.1
+aws-checksums 1.0.1
+aws-crt-cpp 0.43.8
+aws-sdk-cpp 1.11.905
 azure-core-cpp 1.16.3
 azure-identity-cpp 1.13.3
 azure-storage-blobs-cpp 12.18.0
@@ -35,7 +35,7 @@ azure-storage-common-cpp 12.14.0
 azure-storage-files-datalake-cpp 12.16.0
 backports.zstd 1.8.0
 beautifulsoup4 4.15.0
-blosc 1.21.6
+blosc 1.21.7
 bokeh 3.10.0
 botocore 1.43.117
 branca 0.8.2
@@ -109,7 +109,7 @@ h2 4.4.1
 h5netcdf 1.8.2
 h5py 3.16.0
 hdf4 4.2.15
-hdf5 1.14.6
+hdf5 2.2.0
 hpack 4.2.0
 hyperframe 6.1.0
 hypothesis 6.170.14
@@ -141,11 +141,12 @@ lerc 4.3.0
 libabseil 20260526.0
 libaec 1.1.7
 libarchive 3.8.11
-libarrow 25.0.0
-libarrow-acero 25.0.0
-libarrow-compute 25.0.0
-libarrow-dataset 25.0.0
-libarrow-substrait 25.0.0
+libarrow 26.0.0
+libarrow-acero 26.0.0
+libarrow-compute 26.0.0
+libarrow-dataset 26.0.0
+libarrow-s3 26.0.0
+libarrow-substrait 26.0.0
 libblas 3.11.0
 libboost 1.90.0
 libbrotlicommon 1.2.1
@@ -169,8 +170,8 @@ libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.1
 libgomp 16.2.0
-libgoogle-cloud 3.8.0
-libgoogle-cloud-storage 3.8.0
+libgoogle-cloud 3.12.0
+libgoogle-cloud-storage 3.12.0
 libgrpc 1.82.2
 libharfbuzz 15.0.0
 libhwy 1.4.0
@@ -187,9 +188,9 @@ libnetcdf 4.10.1
 libnghttp2 1.70.0
 libnsl 2.0.1
 libopenblas 0.3.34
-libopentelemetry-cpp 1.27.0
-libopentelemetry-cpp-headers 1.27.0
-libparquet 25.0.0
+libopentelemetry-cpp 1.30.0
+libopentelemetry-cpp-headers 1.30.0
+libparquet 26.0.0
 libpng 1.6.59
 libprotobuf 7.35.1
 libpsl 0.23.1
@@ -204,7 +205,7 @@ libsqlite 3.54.1
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
-libthrift 0.22.0
+libthrift 0.25.0
 libtiff 4.7.2
 libutf8proc 2.11.3
 libuuid 2.42.4
@@ -260,7 +261,7 @@ pillow 13.0.0
 pint 0.26.2
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.14.0
+platformdirs 4.14.2
 pluggy 1.7.0
 pointpats 2.6.0
 pooch 1.9.0
@@ -274,8 +275,8 @@ ptyprocess 0.7.0
 pulp 3.3.2
 pure_eval 0.2.4
 py-xgboost 3.4.2
-pyarrow 25.0.0
-pyarrow-core 25.0.0
+pyarrow 26.0.0
+pyarrow-core 26.0.0
 pyct 0.6.0
 pygments 2.21.0
 pyogrio 0.13.0
@@ -300,7 +301,7 @@ re2 2025.11.05
 readline 8.3
 requests 2.34.2
 rtree 1.4.1
-s2n 1.7.5
+s2n 1.7.7
 s3fs 2026.9.0
 scikit-image 0.26.0
 scikit-learn 1.9.1
@@ -313,6 +314,7 @@ setuptools 84.2.1
 setuptools-scm 10.3.4
 setuptools_scm 10.3.4
 shapely 2.2.0
+simdjson 5.1.1
 simplejson 4.2.0
 six 1.17.0
 snappy 1.2.2
