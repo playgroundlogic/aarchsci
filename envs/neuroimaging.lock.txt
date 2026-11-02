@@ -1,6 +1,6 @@
 # neuroimaging — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/neuroimaging.yaml   Built: 2026.10.31.135259   Builder: c75d661
-# lock-hash: 059e46c80923   packages: 296
+# Source spec: envs/neuroimaging.yaml   Built: 2026.11.02.172301   Builder: 2f57b26
+# lock-hash: 4717a07a769e   packages: 298
 # Regenerate with: ./builder/build-env.sh neuroimaging
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -12,19 +12,19 @@ annotated-doc 0.0.5
 at-spi2-atk 2.38.0
 at-spi2-core 2.40.3
 atk-1.0 2.38.0
-aws-c-auth 0.10.4
-aws-c-cal 0.9.14
-aws-c-common 0.14.2
-aws-c-compression 0.3.2
-aws-c-event-stream 0.7.1
-aws-c-http 0.11.0
-aws-c-io 0.27.3
-aws-c-mqtt 0.16.0
-aws-c-s3 0.12.8
-aws-c-sdkutils 0.2.7
-aws-checksums 0.2.10
-aws-crt-cpp 0.40.1
-aws-sdk-cpp 1.11.833
+aws-c-auth 1.0.0
+aws-c-cal 1.0.0
+aws-c-common 1.0.5
+aws-c-compression 1.0.0
+aws-c-event-stream 1.0.0
+aws-c-http 1.0.0
+aws-c-io 1.0.0
+aws-c-mqtt 1.0.0
+aws-c-s3 1.0.0
+aws-c-sdkutils 1.0.1
+aws-checksums 1.0.1
+aws-crt-cpp 0.43.8
+aws-sdk-cpp 1.11.905
 azure-core-cpp 1.16.3
 azure-identity-cpp 1.13.3
 azure-storage-blobs-cpp 12.18.0
@@ -82,7 +82,7 @@ gts 0.7.6
 h2 4.4.1
 h5py 3.16.0
 harfbuzz 15.0.0
-hdf5 1.14.6
+hdf5 2.2.0
 hicolor-icon-theme 0.17
 hpack 4.2.0
 hyperframe 6.1.0
@@ -99,16 +99,17 @@ kiwisolver 1.5.1
 krb5 1.22.2
 lazy-loader 0.6
 lazy_loader 0.6
-lcms2 2.19.1
+lcms2 2.20
 ld_impl_linux-aarch64 2.46.1
 lerc 4.3.0
 libabseil 20260526.0
 libaec 1.1.7
-libarrow 25.0.0
-libarrow-acero 25.0.0
-libarrow-compute 25.0.0
-libarrow-dataset 25.0.0
-libarrow-substrait 25.0.0
+libarrow 26.0.0
+libarrow-acero 26.0.0
+libarrow-compute 26.0.0
+libarrow-dataset 26.0.0
+libarrow-s3 26.0.0
+libarrow-substrait 26.0.0
 libasprintf 1.0
 libasprintf-devel 1.0
 libblas 3.11.0
@@ -145,8 +146,8 @@ libglvnd 1.7.0
 libglx 1.7.0
 libglx-devel 1.7.0
 libgomp 16.2.0
-libgoogle-cloud 3.8.0
-libgoogle-cloud-storage 3.8.0
+libgoogle-cloud 3.12.0
+libgoogle-cloud-storage 3.12.0
 libgrpc 1.82.2
 libharfbuzz 15.0.0
 libharfbuzz-devel 15.0.0
@@ -155,14 +156,14 @@ libjpeg-turbo 3.2.1
 liblapack 3.11.0
 liblzma 5.8.3
 libmpdec 4.0.0
-libnghttp2 1.70.0
+libnghttp2 1.71.0
 libopenblas 0.3.34
 libopengl 1.7.0
-libopentelemetry-cpp 1.27.0
-libopentelemetry-cpp-headers 1.27.0
+libopentelemetry-cpp 1.30.0
+libopentelemetry-cpp-headers 1.30.0
 libpango 1.58.2
 libpango-devel 1.58.2
-libparquet 25.0.0
+libparquet 26.0.0
 libpciaccess 0.19
 libpng 1.6.59
 libprotobuf 7.35.1
@@ -175,7 +176,7 @@ libsqlite 3.54.1
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
-libthrift 0.22.0
+libthrift 0.25.0
 libtiff 4.7.2
 libutf8proc 2.11.3
 libuuid 2.42.4
@@ -216,7 +217,7 @@ pcre2 10.47
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.14.0
+platformdirs 4.14.3
 polars 2.1.0
 polars-runtime-32 2.1.0
 pooch 1.9.0
@@ -226,14 +227,14 @@ prov-core 3.2.3
 psutil 7.2.2
 pthread-stubs 0.4
 puremagic 2.2.0
-pyarrow 25.0.0
-pyarrow-core 25.0.0
+pyarrow 26.0.0
+pyarrow-core 26.0.0
 pydot 4.0.1
 pygments 2.21.0
 pyparsing 3.3.3
 pysocks 1.7.1
 python 3.14.10
-python-dateutil 3.0.0
+python-dateutil 4.0.0
 python-gil 3.14.10
 python-tzdata 2026.6
 python_abi 3.14
@@ -245,12 +246,12 @@ readline 8.3
 requests 2.34.2
 rich 15.0.0
 roman-numerals 4.1.0
-s2n 1.7.5
+s2n 1.7.7
 scikit-learn 1.9.1
 scipy 1.18.1
 shellingham 1.5.4
+simdjson 5.1.1
 simplejson 4.2.0
-six 1.17.0
 snappy 1.2.2
 snowballstemmer 3.1.1
 sphinx 9.2.0
@@ -268,6 +269,7 @@ trx-python 0.5.0
 typer 0.27.3
 typing_extensions 4.16.0
 tzdata 2026e
+uriparser 0.9.8
 urllib3 2.8.0
 wayland 1.26.0
 xkeyboard-config 2.48
