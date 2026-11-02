@@ -1,6 +1,6 @@
 # geoscience — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geoscience.yaml   Built: 2026.11.01.143051   Builder: 428839e
-# lock-hash: 0cf173faa804   packages: 112
+# Source spec: envs/geoscience.yaml   Built: 2026.11.02.172310   Builder: 2f57b26
+# lock-hash: 36824af8cd38   packages: 112
 # Regenerate with: ./builder/build-env.sh geoscience
 _openmp_mutex 4.5
 backports.zstd 1.8.0
@@ -33,7 +33,7 @@ hyperframe 6.1.0
 icu 78.3
 idna 3.20
 kiwisolver 1.5.1
-lcms2 2.19.1
+lcms2 2.20
 ld_impl_linux-aarch64 2.46.1
 lerc 4.3.0
 libblas 3.11.0
