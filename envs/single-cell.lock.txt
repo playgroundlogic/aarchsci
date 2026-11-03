@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.11.02.172300   Builder: 2f57b26
-# lock-hash: b15c098aaf00   packages: 531
+# Source spec: envs/single-cell.yaml   Built: 2026.11.03.152817   Builder: 41a546e
+# lock-hash: 03a2dcbeb7ce   packages: 531
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -337,7 +337,7 @@ r-fitdistrplus 1.2_6
 r-fnn 1.1.4.1
 r-fontawesome 0.5.3
 r-fs 2.1.0
-r-future 1.80.0
+r-future 1.82.0
 r-future.apply 1.21.0
 r-generics 0.1.4
 r-ggplot2 4.0.3
@@ -382,7 +382,7 @@ r-mime 0.13
 r-miniui 0.1.2
 r-munsell 0.5.1
 r-nlme 3.1_170
-r-openssl 2.4.2
+r-openssl 2.5.0
 r-otel 0.2.0
 r-parallelly 1.50.0
 r-patchwork 1.3.2
@@ -460,7 +460,7 @@ requests 2.34.2
 rich 15.0.0
 s2n 1.7.7
 scanpy 1.12.5
-scikit-build-core 1.1.1
+scikit-build-core 1.1.2
 scikit-image 0.26.0
 scikit-learn 1.9.1
 scikit-misc 0.5.3
