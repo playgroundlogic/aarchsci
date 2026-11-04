@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.11.03.152813   Builder: 41a546e
-# lock-hash: 4a96441f34ae   packages: 328
+# Source spec: envs/r.yaml   Built: 2026.11.04.154031   Builder: eafe9ba
+# lock-hash: 959afdb7866e   packages: 328
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -92,7 +92,7 @@ libglib 2.90.1
 libgomp 16.2.0
 libgoogle-cloud 3.12.0
 libgoogle-cloud-storage 3.12.0
-libgrpc 1.82.2
+libgrpc 1.82.3
 libharfbuzz 15.0.0
 libharfbuzz-devel 15.0.0
 libhwy 1.4.0
