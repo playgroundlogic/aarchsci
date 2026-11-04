@@ -1,6 +1,6 @@
 # pathology — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pathology.yaml   Built: 2026.11.02.172530   Builder: 2f57b26
-# lock-hash: f82daf1deed5   packages: 211
+# Source spec: envs/pathology.yaml   Built: 2026.11.04.154030   Builder: eafe9ba
+# lock-hash: 2570492ebeee   packages: 214
 # Regenerate with: ./builder/build-env.sh pathology
 _openmp_mutex 4.5
 aom 3.14.1
@@ -56,7 +56,7 @@ fsspec 2026.9.0
 gflags 2.3.1
 giflib 6.1.3
 glog 0.7.1
-google-crc32c 1.8.0
+google-crc32c 1.9.0
 graphite2 1.3.15
 icu 78.3
 imagecodecs 2026.8.16
@@ -71,7 +71,7 @@ lazy-loader 0.6
 lcms2 2.20
 ld_impl_linux-aarch64 2.46.1
 lerc 4.3.0
-libabseil 20260526.0
+libabseil 20260817.0
 libaec 1.1.7
 libarrow 26.0.0
 libarrow-acero 26.0.0
@@ -84,6 +84,7 @@ libblas 3.11.0
 libbrotlicommon 1.2.1
 libbrotlidec 1.2.1
 libbrotlienc 1.2.1
+libcap 2.78
 libcblas 3.11.0
 libcrc32c 1.1.2
 libcurl 8.23.0
@@ -105,7 +106,7 @@ libglib 2.90.1
 libgomp 16.2.0
 libgoogle-cloud 3.12.0
 libgoogle-cloud-storage 3.12.0
-libgrpc 1.82.2
+libgrpc 1.85.1
 libharfbuzz 15.0.0
 libhwy 1.4.0
 libiconv 1.18
@@ -129,6 +130,8 @@ libsqlite 3.54.1
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
+libsystemd 262.1
+libsystemd0 262.1
 libthrift 0.25.0
 libtiff 4.7.2
 libutf8proc 2.11.3
