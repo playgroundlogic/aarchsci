@@ -1,6 +1,6 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.11.02.172308   Builder: 2f57b26
-# lock-hash: 1810f9d758eb   packages: 222
+# Source spec: envs/comp-chem.yaml   Built: 2026.11.04.154030   Builder: eafe9ba
+# lock-hash: 8222dd7d3df3   packages: 222
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -198,7 +198,7 @@ seaborn 0.13.2
 seaborn-base 0.13.2
 setuptools 84.2.1
 snappy 1.2.2
-sqlalchemy 2.1.6
+sqlalchemy 2.1.8
 statsmodels 0.15.0
 suitesparse 7.10.1
 sundials 7.5.0
