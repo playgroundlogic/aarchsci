@@ -1,6 +1,6 @@
 # geo-ml — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geo-ml.yaml   Built: 2026.11.04.154030   Builder: eafe9ba
-# lock-hash: 395b0230d275   packages: 373
+# Source spec: envs/geo-ml.yaml   Built: 2026.11.05.154526   Builder: df5b5a1
+# lock-hash: f2b85748f453   packages: 374
 # Regenerate with: ./builder/build-env.sh geo-ml
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -28,11 +28,11 @@ aws-c-sdkutils 1.0.1
 aws-checksums 1.0.1
 aws-crt-cpp 0.43.8
 aws-sdk-cpp 1.11.905
-azure-core-cpp 1.16.3
+azure-core-cpp 1.16.4
 azure-identity-cpp 1.13.3
-azure-storage-blobs-cpp 12.18.0
-azure-storage-common-cpp 12.14.0
-azure-storage-files-datalake-cpp 12.16.0
+azure-storage-blobs-cpp 12.19.0
+azure-storage-common-cpp 12.15.0
+azure-storage-files-datalake-cpp 12.17.0
 backports.zstd 1.8.0
 beautifulsoup4 4.15.0
 blosc 1.21.7
@@ -141,12 +141,12 @@ lerc 4.3.0
 libabseil 20260817.0
 libaec 1.1.7
 libarchive 3.8.11
-libarrow 26.0.0
-libarrow-acero 26.0.0
-libarrow-compute 26.0.0
-libarrow-dataset 26.0.0
-libarrow-s3 26.0.0
-libarrow-substrait 26.0.0
+libarrow 26.0.1
+libarrow-acero 26.0.1
+libarrow-compute 26.0.1
+libarrow-dataset 26.0.1
+libarrow-s3 26.0.1
+libarrow-substrait 26.0.1
 libblas 3.11.0
 libboost 1.90.0
 libbrotlicommon 1.2.1
@@ -185,13 +185,14 @@ liblapacke 3.11.0
 liblightgbm 4.7.0
 liblzma 5.8.3
 libmpdec 4.0.0
+libnanoarrow 0.9.0
 libnetcdf 4.10.1
 libnghttp2 1.71.0
 libnsl 2.0.1
 libopenblas 0.3.34
 libopentelemetry-cpp 1.30.0
 libopentelemetry-cpp-headers 1.30.0
-libparquet 26.0.0
+libparquet 26.0.1
 libpng 1.6.59
 libprotobuf 7.35.1
 libpsl 0.23.1
@@ -253,7 +254,7 @@ openjpeg 2.5.4
 openssl 3.6.5
 orc 2.3.1
 packaging 26.3
-pandas 3.1.0
+pandas 3.1.1
 param 2.4.2
 parso 0.8.7
 partd 1.4.2
@@ -264,7 +265,7 @@ pillow 13.0.0
 pint 0.26.2
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.14.3
+platformdirs 4.14.5
 pluggy 1.7.0
 pointpats 2.6.0
 pooch 1.9.0
@@ -278,8 +279,8 @@ ptyprocess 0.7.0
 pulp 3.3.2
 pure_eval 0.2.4
 py-xgboost 3.4.2
-pyarrow 26.0.0
-pyarrow-core 26.0.0
+pyarrow 26.0.1
+pyarrow-core 26.0.1
 pyct 0.6.0
 pygments 2.21.0
 pyogrio 0.13.0
@@ -323,7 +324,7 @@ six 1.17.0
 snappy 1.2.2
 snuggs 1.4.7
 sortedcontainers 2.4.0
-soupsieve 4.0
+soupsieve 4.0.1
 spaghetti 1.7.6
 spglm 1.1.0
 spint 1.1.0
