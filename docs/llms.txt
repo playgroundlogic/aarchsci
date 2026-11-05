@@ -63,11 +63,11 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
 - Available envs (all native arm64, verified, signed, public):
   - `geospatial` (110 pkgs — gdal, proj, geos, rasterio, fiona, shapely, pyproj,
     scikit-image, numpy, scipy).
-  - `earth-observation` (250 pkgs — geospatial base + xarray, dask, rioxarray,
+  - `earth-observation` (251 pkgs — geospatial base + xarray, dask, rioxarray,
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
-  - `geo-ml` (373 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
+  - `geo-ml` (374 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (274 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+  - `climate` (286 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
     regridding, plus ocean thermodynamics. cdo and nco are the netCDF/GRIB command-line
     operators — the CLI complement to the Python stack; both are serial/OpenMP with no
@@ -75,7 +75,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     ocean equation of state); it ships the official TEOS-10 check-value table inside the
     package, so its verification reproduces published reference numbers offline rather
     than asserting a tolerance band).
-  - `pointcloud` (235 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
+  - `pointcloud` (236 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
   - `comp-chem` (222 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, vina, cantera (xtb REMOVED 2026-10-18 — its aarch64 build returns wrong analytic gradients with correct energies, in all seven builds; images before that date contain it); cheminformatics + MD + quantum chemistry
@@ -168,7 +168,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     `ants` has no linux-aarch64 build at all and FSL/FreeSurfer/MRtrix3 are not on
     conda-forge, so registration-heavy and surface-based pipelines are out of reach;
     `templateflow` is excluded because it downloads atlases at runtime.)
-  - `single-cell` (534 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
+  - `single-cell` (535 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
     python 3.14, AND r-seurat 5.5 on R 4.5, in one image; single-cell transcriptomics in
     both ecosystems. Here because it is an ENVIRONMENT (DESIGN D5: the split with the
     sister project is artifact shape, not subject) — aarch.bio also ships a single-tool
@@ -224,7 +224,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     basis/pseudopotential files), though the package sets no CP2K_DATA_DIR — the builder
     exports it, so this is a third env after `dft` and `bayes` needing `apptainer run`
     rather than `exec`. Large: cp2k alone is ~445 MB.)
-  - `pathology` (214 pkgs — openslide 4.0.1 + openslide-python 1.4.6, tifffile +
+  - `pathology` (215 pkgs — openslide 4.0.1 + openslide-python 1.4.6, tifffile +
     imagecodecs, scikit-image, zarr, dask; digital pathology / whole-slide imaging. ITS OWN
     env rather than an addition to `geospatial` as issue #32 proposed: a whole-slide image
     is a tiled pyramidal TIFF, but that is a FORMAT affinity rather than a domain one, and
@@ -342,7 +342,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     implementations disagreeing with your constant means re-check the constant. NOT in
     scope: dxtbx and reciprocalspaceship have no aarch64 build at latest, so DIALS-style
     diffraction-image processing is out of reach even with cctbx present.)
-  - `popgen` (252 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
+  - `popgen` (253 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
     coalescent simulation and population genetics, a domain the catalog could not touch.
     Both compiled headliners have py314 aarch64 builds at current versions. Verification is
     unusually strong because a tree sequence is a CONSERVATION STRUCTURE: dump-to-disk and
