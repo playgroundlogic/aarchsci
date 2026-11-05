@@ -1,6 +1,6 @@
 # gw — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/gw.yaml   Built: 2026.11.04.154038   Builder: eafe9ba
-# lock-hash: b508c8e0e96b   packages: 216
+# Source spec: envs/gw.yaml   Built: 2026.11.05.154642   Builder: df5b5a1
+# lock-hash: 82a9818b196a   packages: 216
 # Regenerate with: ./builder/build-env.sh gw
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -16,7 +16,7 @@ backports.zstd 1.8.0
 bcrypt 5.0.0
 beautifulsoup4 4.15.0
 bilby 2.8.2
-bilby.cython 0.5.4
+bilby.cython 0.6.0
 brotli 1.2.1
 brotli-bin 1.2.1
 brotli-python 1.2.1
@@ -36,7 +36,7 @@ cpython 3.13.18
 cryptography 50.0.2
 cycler 0.12.1
 cython 3.3.1
-dateparser 1.4.3
+dateparser 1.5.0
 decorator 5.3.1
 dill 0.4.1
 dqsegdb2 1.3.1
@@ -158,7 +158,7 @@ oniguruma 6.9.10
 openjpeg 2.5.4
 openssl 3.6.5
 packaging 26.3
-pandas 3.1.0
+pandas 3.1.1
 paramiko 5.1.0
 pegasus-wms.api 5.1.3
 pegasus-wms.common 5.1.3
@@ -200,7 +200,7 @@ scipy 1.18.1
 scitokens 1.9.7
 setuptools 84.2.1
 six 1.17.0
-soupsieve 4.0
+soupsieve 4.0.1
 sympy 1.14.0
 tenacity 9.2.1
 tk 8.6.13
