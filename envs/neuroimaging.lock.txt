@@ -1,6 +1,6 @@
 # neuroimaging — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/neuroimaging.yaml   Built: 2026.11.04.154148   Builder: eafe9ba
-# lock-hash: df5147d8fef8   packages: 301
+# Source spec: envs/neuroimaging.yaml   Built: 2026.11.06.151946   Builder: e1498d3
+# lock-hash: f4704705e481   packages: 302
 # Regenerate with: ./builder/build-env.sh neuroimaging
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -25,11 +25,11 @@ aws-c-sdkutils 1.0.1
 aws-checksums 1.0.1
 aws-crt-cpp 0.43.8
 aws-sdk-cpp 1.11.905
-azure-core-cpp 1.16.3
+azure-core-cpp 1.16.4
 azure-identity-cpp 1.13.3
-azure-storage-blobs-cpp 12.18.0
-azure-storage-common-cpp 12.14.0
-azure-storage-files-datalake-cpp 12.16.0
+azure-storage-blobs-cpp 12.19.0
+azure-storage-common-cpp 12.15.0
+azure-storage-files-datalake-cpp 12.17.0
 babel 2.18.0
 backports.zstd 1.8.0
 brotli 1.2.1
@@ -58,7 +58,7 @@ dipy 1.12.1
 docutils 0.22.4
 epoxy 1.5.10
 etelemetry 0.3.1
-filelock 4.2.4
+filelock 4.2.9
 font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
@@ -104,12 +104,12 @@ ld_impl_linux-aarch64 2.46.1
 lerc 4.3.0
 libabseil 20260817.0
 libaec 1.1.7
-libarrow 26.0.0
-libarrow-acero 26.0.0
-libarrow-compute 26.0.0
-libarrow-dataset 26.0.0
-libarrow-s3 26.0.0
-libarrow-substrait 26.0.0
+libarrow 26.0.1
+libarrow-acero 26.0.1
+libarrow-compute 26.0.1
+libarrow-dataset 26.0.1
+libarrow-s3 26.0.1
+libarrow-substrait 26.0.1
 libasprintf 1.0
 libasprintf-devel 1.0
 libblas 3.11.0
@@ -157,6 +157,7 @@ libjpeg-turbo 3.2.1
 liblapack 3.11.0
 liblzma 5.8.3
 libmpdec 4.0.0
+libnanoarrow 0.9.0
 libnghttp2 1.71.0
 libopenblas 0.3.34
 libopengl 1.7.0
@@ -164,7 +165,7 @@ libopentelemetry-cpp 1.30.0
 libopentelemetry-cpp-headers 1.30.0
 libpango 1.58.2
 libpango-devel 1.58.2
-libparquet 26.0.0
+libparquet 26.0.1
 libpciaccess 0.19
 libpng 1.6.59
 libprotobuf 7.35.1
@@ -177,8 +178,8 @@ libsqlite 3.54.1
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
-libsystemd 262.1
-libsystemd0 262.1
+libsystemd 262.2
+libsystemd0 262.2
 libthrift 0.25.0
 libtiff 4.7.2
 libutf8proc 2.11.3
@@ -214,13 +215,13 @@ openssl 3.6.5
 orc 2.3.1
 orderly-set 5.5.0
 packaging 26.3
-pandas 3.1.0
+pandas 3.1.1
 pango 1.58.2
 pcre2 10.47
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.14.3
+platformdirs 4.14.5
 polars 2.1.0
 polars-runtime-32 2.1.0
 pooch 1.9.0
@@ -230,8 +231,8 @@ prov-core 3.2.3
 psutil 7.2.2
 pthread-stubs 0.4
 puremagic 2.2.0
-pyarrow 26.0.0
-pyarrow-core 26.0.0
+pyarrow 26.0.1
+pyarrow-core 26.0.1
 pydot 4.0.1
 pygments 2.21.0
 pyparsing 3.3.3
@@ -269,7 +270,7 @@ tk 8.6.13
 tqdm 4.70.1
 traits 7.3.0
 trx-python 0.5.0
-typer 0.27.3
+typer 0.28.0
 typing_extensions 4.16.0
 tzdata 2026e
 uriparser 0.9.8
