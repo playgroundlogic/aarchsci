@@ -1,6 +1,6 @@
 # climate — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/climate.yaml   Built: 2026.11.05.154522   Builder: df5b5a1
-# lock-hash: 808d685933e1   packages: 286
+# Source spec: envs/climate.yaml   Built: 2026.11.06.151946   Builder: e1498d3
+# lock-hash: 4efc673bc7c6   packages: 275
 # Regenerate with: ./builder/build-env.sh climate
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -118,8 +118,6 @@ libedit 3.1.20260512
 libev 4.33
 libevent 2.1.12
 libexpat 2.9.0
-libfabric 2.7.0
-libfabric1 2.7.0
 libffi 3.7.0
 libfreetype 2.14.3
 libfreetype6 2.14.3
@@ -138,7 +136,6 @@ libgoogle-cloud-storage 3.12.0
 libgrpc 1.85.1
 libharfbuzz 15.0.0
 libharfbuzz-devel 15.0.0
-libhwloc 2.15.0
 libiconv 1.18
 libjpeg-turbo 3.2.1
 liblapack 3.11.0
@@ -147,7 +144,6 @@ libmpdec 4.0.0
 libnanoarrow 0.9.0
 libnetcdf 4.10.1
 libnghttp2 1.71.0
-libnl 3.11.0
 libopenblas 0.3.34
 libopengl 1.7.0
 libopentelemetry-cpp 1.30.0
@@ -155,7 +151,6 @@ libopentelemetry-cpp-headers 1.30.0
 libpango 1.58.2
 libpango-devel 1.58.2
 libparquet 26.0.1
-libpnetcdf 1.15.0
 libpng 1.6.59
 libprotobuf 7.35.1
 libpsl 0.23.1
@@ -166,11 +161,10 @@ libsqlite 3.54.1
 libssh2 1.11.1
 libstdcxx 16.2.0
 libstdcxx-ng 16.2.0
-libsystemd 262.1
-libsystemd0 262.1
+libsystemd 262.2
+libsystemd0 262.2
 libthrift 0.25.0
 libtiff 4.7.2
-libudev1 262.1
 libudunits2 2.2.28
 libutf8proc 2.11.3
 libuuid 2.42.4
@@ -190,8 +184,6 @@ magics-python 1.5.8
 markupsafe 3.0.4
 matplotlib-base 3.11.2
 metpy 1.7.1
-mpi 1.0.1
-mpich 5.0.2
 msgpack-python 1.2.4
 msgspec 0.22.0
 munkres 1.1.4
@@ -204,14 +196,13 @@ nlohmann_json 3.12.0
 numba 0.68.1
 numcodecs 0.17.1
 numpy 2.5.4
-numpy_groupies 0.16.2
+numpy_groupies 0.16.3
 openjpeg 2.5.4
 openssl 3.6.5
 orc 2.3.1
 packaging 26.3
 pandas 3.1.1
 pango 1.58.2
-parallelio 2.6.9
 partd 1.4.2
 pcre2 10.47
 pillow 13.0.0
@@ -240,7 +231,6 @@ python-tzdata 2026.6
 python_abi 3.14
 pyyaml 6.0.3
 qhull 2020.2
-rdma-core 65.0
 re2 2025.11.05
 readline 8.3
 requests 2.34.2
@@ -258,12 +248,11 @@ tblib 3.2.2
 tempest-remap 2.2.0
 tk 8.6.13
 toolz 1.2.0
-tornado 6.5.10
+tornado 6.6
 traitlets 5.16.1
 typing-extensions 4.16.0
 typing_extensions 4.16.0
 tzdata 2026e
-ucx 1.22.0
 udunits2 2.2.28
 uriparser 0.9.8
 urllib3 2.8.0
