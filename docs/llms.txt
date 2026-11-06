@@ -67,7 +67,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
   - `geo-ml` (374 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (286 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+  - `climate` (275 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
     regridding, plus ocean thermodynamics. cdo and nco are the netCDF/GRIB command-line
     operators — the CLI complement to the Python stack; both are serial/OpenMP with no
@@ -108,7 +108,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
     rendering goes via GLX against Xvfb, which ships in the image).
-  - `astro` (366 pkgs — astropy, photutils, sunpy, healpy, yt, regions, reproject,
+  - `astro` (367 pkgs — astropy, photutils, sunpy, healpy, yt, regions, reproject,
     specutils, astroquery, rebound; astronomy/astrophysics analysis plus N-body
     gravitational dynamics (rebound is the env's only simulation code — everything else
     reduces data). Verified by a method-discriminating energy-conservation ladder over
@@ -158,7 +158,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     same problem. Note `scip` is pinned <10.1: pyscipopt 6.2.1 links libscip.so.10.0 while
     declaring `scip >=10.0.0,<11.0a0`, so an unpinned solve installs scip 10.1.0 and
     `import pyscipopt` then fails — an upstream soname/metadata bug, caught by D3.)
-  - `neuroimaging` (301 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
+  - `neuroimaging` (302 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
     volume-based fMRI, diffusion MRI and structural MRI. In scope for this project rather
     than the bioinformatics sister project because none of these packages are on bioconda at
     all — they are conda-forge only. Verified with no staged or downloaded data: a NIfTI
@@ -183,7 +183,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     would pass a cross-check alone; ARI rather than label equality because cluster names
     are arbitrary. `louvain` is excluded — its aarch64 builds stop at py312 and scanpy
     deprecates it in favour of leiden.)
-  - `bayes` (125 pkgs — cmdstan 2.40 + cmdstanpy + arviz, xarray; Bayesian inference and
+  - `bayes` (123 pkgs — cmdstan 2.40 + cmdstanpy + arviz, xarray; Bayesian inference and
     MCMC with Stan. Fills a domain the catalog had nothing for. TWO runtime requirements
     that a naive spec misses, both found by building: (1) Stan ships NO precompiled models
     — it translates each model to C++ with stanc and COMPILES it at run time, and the
@@ -196,7 +196,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     Beta(1,1) prior has posterior exactly Beta(3,9), mean 0.25 and sd 0.120096, and the
     bound is computed from the draw count — measured 0.249395, i.e. 0.64 MCMC standard
     errors, R-hat 1.0007.)
-  - `geoscience` (112 pkgs — obspy (seismology), modflow6 + flopy (groundwater flow),
+  - `geoscience` (110 pkgs — obspy (seismology), modflow6 + flopy (groundwater flow),
     numpy/scipy/pandas/matplotlib; solid-earth and subsurface, the complement to the
     surface/atmosphere envs (climate, earth-observation, geospatial, pointcloud). Both
     halves have an EXACT check. MODFLOW 6: one-dimensional steady confined flow between
@@ -239,7 +239,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     tifffile cannot encode or decode JPEG tiles, and real whole-slide images are JPEG-tiled.
     Note the py-ABI trap issue #32 flagged — openslide-python 1.4.6 has aarch64 builds for
     py310 through py314, and selecting by highest build number lands on py310.)
-  - `quantum` (165 pkgs — qiskit 2.5.2 + qiskit-aer (CPU), qiskit-algorithms/-optimization/
+  - `quantum` (163 pkgs — qiskit 2.5.2 + qiskit-aer (CPU), qiskit-algorithms/-optimization/
     -machine-learning, openfermion, pylatexenc, qutip 5.3.1; quantum circuit simulation.
     ITS OWN env: the nearest existing env is `optimization` (HiGHS/SCIP/CBC), which is
     classical mathematical programming. The interesting finding is an abi3 one that looks
@@ -294,7 +294,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     still works, every G4*DATA is unset, and Pythia8 aborts with a misleading
     "unmatched version numbers : in code 8.312 but in XML 0.000" whose real cause is an
     unset PYTHIA8DATA.)
-  - `pic` (166 pkgs — warpx 26.10 (electromagnetic particle-in-cell) + amrex/pyamrex,
+  - `pic` (164 pkgs — warpx 26.10 (electromagnetic particle-in-cell) + amrex/pyamrex,
     openpmd-api, yt, numpy/scipy/matplotlib; plasma physics. ITS OWN ENV rather than an
     addition to `cfd-fv` as issue #35 preferred, and the reason is a python cap rather than
     the thin-env argument: `cfd-fv` is capped at python 3.11 BY SU2 (the very reason it is
@@ -324,7 +324,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     scheme is not symplectic. One thing NOT asserted: a multi-level convergence ladder —
     the error floors near 3e-5 and wanders (3.59e-4, 8.25e-5, 3.25e-5, 7.08e-5 for n_cell
     128..1024), so only one refinement step is claimed.)
-  - `structbio` (122 pkgs — cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88; crystallography
+  - `structbio` (120 pkgs — cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88; crystallography
     and structural biology. ITS OWN ENV rather than an addition to `md` (issue #39): md is
     trajectory production, this is symmetry/coordinate/map work, and cctbx-base is a 161 MB
     solve with its own boost stack that should not be able to perturb md's shipped recipes.
