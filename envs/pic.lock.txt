@@ -1,6 +1,6 @@
 # pic — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pic.yaml   Built: 2026.11.02.172300   Builder: 2f57b26
-# lock-hash: 7fa74d071f3f   packages: 166
+# Source spec: envs/pic.yaml   Built: 2026.11.06.151948   Builder: e1498d3
+# lock-hash: 7c7205bf5e8b   packages: 164
 # Regenerate with: ./builder/build-env.sh pic
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -75,7 +75,6 @@ libffi 3.7.0
 libfreetype 2.14.3
 libfreetype6 2.14.3
 libgcc 16.2.0
-libgcc-ng 16.2.0
 libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.1
@@ -97,7 +96,6 @@ libsodium 1.0.22
 libsqlite 3.54.1
 libssh2 1.11.1
 libstdcxx 16.2.0
-libstdcxx-ng 16.2.0
 libtiff 4.7.2
 libuuid 2.42.4
 libwebp-base 1.6.0
