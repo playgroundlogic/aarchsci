@@ -1,13 +1,13 @@
 # viz — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/viz.yaml   Built: 2026.11.06.151947   Builder: e1498d3
-# lock-hash: aa7f934f2e99   packages: 248
+# Source spec: envs/viz.yaml   Built: 2026.11.08.143309   Builder: 9f0dae1
+# lock-hash: 1deec02f03d3   packages: 248
 # Regenerate with: ./builder/build-env.sh viz
 _openmp_mutex 4.5
 aiohappyeyeballs 2.7.1
 aiohttp 3.14.5
 aiosignal 1.4.0
 alsa-lib 1.2.16.1
-aom 3.14.1
+aom 3.15.3
 attrs 26.1.0
 blosc 1.21.7
 brotli 1.2.1
@@ -69,7 +69,7 @@ libcblas 3.11.0
 libcups 2.3.3
 libcurl 8.23.0
 libdav1d7 1.5.4
-libdeflate 1.25
+libdeflate 1.26
 libdovi 3.4.0
 libdrm 2.4.129
 libedit 3.1.20260512
@@ -129,7 +129,7 @@ libopus 1.6.1
 libpango 1.58.2
 libpango-devel 1.58.2
 libpciaccess 0.19
-libplacebo 7.360.1
+libplacebo 7.387.0
 libpng 1.6.59
 libpq 18.6
 libprotobuf 7.35.1
@@ -176,7 +176,7 @@ munkres 1.1.4
 ncurses 6.6
 nlohmann_json 3.12.0
 numpy 2.5.4
-openh264 2.6.0
+openh264 2.7.0
 openjpeg 2.5.4
 openldap 2.6.13
 openssl 3.6.5
@@ -203,10 +203,10 @@ readline 8.3
 sdl2 2.32.56
 sdl3 3.4.20
 shaderc 2026.4
-snappy 1.2.2
+snappy 1.3.1
 spirv-tools 2026.4
 sqlite 3.54.1
-svt-av1 4.2.0
+svt-av1 4.3.0
 tbb 2023.1.0
 tk 8.6.13
 typing_extensions 4.16.0
