@@ -1,6 +1,6 @@
 # nlp — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/nlp.yaml   Built: 2026.11.06.151946   Builder: e1498d3
-# lock-hash: 6a7ec568cd8e   packages: 91
+# Source spec: envs/nlp.yaml   Built: 2026.11.08.143048   Builder: 9f0dae1
+# lock-hash: 6dd868f13160   packages: 91
 # Regenerate with: ./builder/build-env.sh nlp
 _openmp_mutex 4.5
 annotated-doc 0.0.5
@@ -13,7 +13,7 @@ ca-certificates 2026.10.23
 catalogue 2.0.10
 certifi 2026.10.23
 charset-normalizer 3.5.1
-click 8.5.0
+click 8.5.1
 cloudpathlib 0.26.0
 cloudpickle 3.1.2
 colorama 0.4.6
