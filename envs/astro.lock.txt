@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.11.06.152133   Builder: e1498d3
-# lock-hash: 6c26e7e73018   packages: 367
+# Source spec: envs/astro.yaml   Built: 2026.11.08.143236   Builder: 9f0dae1
+# lock-hash: dfe698b5d912   packages: 367
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -68,7 +68,7 @@ certifi 2026.10.23
 cffi 2.1.1
 cfitsio 4.6.4
 charset-normalizer 3.5.1
-click 8.5.0
+click 8.5.1
 click-plugins 1.1.1.2
 cligj 0.7.2
 cloudpickle 3.1.2
@@ -172,7 +172,7 @@ libcurl 8.23.0
 libdeflate 1.25
 libedit 3.1.20260512
 libev 4.33
-libevent 2.1.12
+libevent 2.1.13
 libexpat 2.9.0
 libffi 3.7.0
 libfreetype 2.14.3
@@ -220,7 +220,7 @@ libsystemd 262.2
 libsystemd0 262.2
 libthrift 0.25.0
 libtiff 4.7.2
-libutf8proc 2.11.3
+libutf8proc 2.12.0
 libuuid 2.42.4
 libwebp-base 1.6.0
 libxcb 1.17.0
@@ -318,7 +318,7 @@ shapely 2.2.0
 simdjson 5.1.1
 six 1.17.0
 slicerator 1.1.0
-snappy 1.2.2
+snappy 1.3.1
 snuggs 1.4.7
 sortedcontainers 2.4.0
 soupsieve 4.0.1
@@ -360,7 +360,7 @@ xorg-libxrender 0.9.13
 xyzservices 2026.9.1
 yaml 0.2.5
 yarl 1.25.1
-yt 4.4.2
+yt 4.4.4
 zarr 3.4.2
 zeep 4.3.3
 zeromq 4.3.5
