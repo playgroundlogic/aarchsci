@@ -1,6 +1,6 @@
 # md — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/md.yaml   Built: 2026.11.06.152017   Builder: e1498d3
-# lock-hash: b448c6c7ac88   packages: 257
+# Source spec: envs/md.yaml   Built: 2026.11.08.143048   Builder: 9f0dae1
+# lock-hash: 1a72e1e4d469   packages: 256
 # Regenerate with: ./builder/build-env.sh md
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -26,7 +26,7 @@ brotli-bin 1.2.1
 brotli-python 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
-c-blosc2 3.3.5
+c-blosc2 3.5.0
 ca-certificates 2026.10.23
 cached-property 2.0.1
 cached_property 2.0.1
@@ -91,14 +91,13 @@ lerc 4.3.0
 libaec 1.1.7
 libasprintf 0.25.1
 libblas 3.11.0
-libboost 1.86.0
 libbrotlicommon 1.2.1
 libbrotlidec 1.2.1
 libbrotlienc 1.2.1
 libcap 2.78
 libcblas 3.11.0
 libcurl 8.23.0
-libdeflate 1.25
+libdeflate 1.26
 libedit 3.1.20260512
 libev 4.33
 libevent 2.1.12
@@ -228,7 +227,7 @@ scipy 1.18.1
 seaborn 0.13.2
 seaborn-base 0.13.2
 setuptools 84.2.1
-snappy 1.2.2
+snappy 1.3.1
 statsmodels 0.15.0
 sympy 1.14.0
 sysroot_linux-aarch64 2.39
