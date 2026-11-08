@@ -1,6 +1,6 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.11.04.154030   Builder: eafe9ba
-# lock-hash: 8222dd7d3df3   packages: 222
+# Source spec: envs/comp-chem.yaml   Built: 2026.11.08.143050   Builder: 9f0dae1
+# lock-hash: db26b45e1857   packages: 222
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -12,7 +12,7 @@ brotli-bin 1.2.1
 brotli-python 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
-c-blosc2 3.3.5
+c-blosc2 3.5.0
 ca-certificates 2026.10.23
 cached-property 2.0.1
 cached_property 2.0.1
@@ -28,7 +28,7 @@ cuda-version 11.8
 cycler 0.12.1
 cyrus-sasl 2.1.28
 eigen-abi 3.4.0.100
-filelock 4.2.4
+filelock 4.2.9
 fmt 12.0.0
 font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
@@ -82,7 +82,7 @@ libcint 6.1.3
 libcolamd 3.3.4
 libcurl 8.23.0
 libcxsparse 4.4.1
-libdeflate 1.25
+libdeflate 1.26
 libedit 3.1.20260512
 libev 4.33
 libexpat 2.9.0
@@ -159,7 +159,7 @@ openldap 2.6.13
 openmm 8.6.1
 openssl 3.6.5
 packaging 26.3
-pandas 3.1.0
+pandas 3.1.1
 parmed 4.3.1
 patsy 1.0.3
 pcre2 10.47
@@ -167,7 +167,7 @@ pdbfixer 1.12
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.14.3
+platformdirs 4.14.5
 pooch 1.9.0
 pthread-stubs 0.4
 py-cpuinfo 9.0.0
@@ -175,7 +175,7 @@ pybind11-abi 11
 pycairo 1.29.2
 pyedr 0.8.0
 pyparsing 3.3.2
-pyscf 2.14.0
+pyscf 2.15.0
 pysocks 1.7.1
 pytables 3.11.1
 python 3.14.10
@@ -197,7 +197,7 @@ scipy 1.18.1
 seaborn 0.13.2
 seaborn-base 0.13.2
 setuptools 84.2.1
-snappy 1.2.2
+snappy 1.3.1
 sqlalchemy 2.1.8
 statsmodels 0.15.0
 suitesparse 7.10.1
