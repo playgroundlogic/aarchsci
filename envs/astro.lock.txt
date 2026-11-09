@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.11.08.143236   Builder: 9f0dae1
-# lock-hash: dfe698b5d912   packages: 367
+# Source spec: envs/astro.yaml   Built: 2026.11.09.174826   Builder: fd92b07
+# lock-hash: 2aa1fc9b6fa7   packages: 367
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -21,7 +21,7 @@ asdf-wcs-schemas 0.5.0
 astropy 8.0.2
 astropy-base 8.0.2
 astropy-healpix 2.0.1
-astropy-iers-data 0.2026.11.2.0.34.55
+astropy-iers-data 0.2026.11.9.0.35.9
 astroquery 0.4.11
 asttokens 3.0.2
 attrs 26.1.0
@@ -169,7 +169,7 @@ libcap 2.78
 libcblas 3.11.0
 libcrc32c 1.1.2
 libcurl 8.23.0
-libdeflate 1.25
+libdeflate 1.26
 libedit 3.1.20260512
 libev 4.33
 libevent 2.1.13
@@ -329,7 +329,7 @@ stack_data 0.6.3
 sunpy 8.0.0
 sympy 1.14.0
 tblib 3.2.2
-tifffile 2026.10.15
+tifffile 2026.11.8
 tk 8.6.13
 tomli-w 1.2.0
 toolz 1.2.0
