@@ -158,7 +158,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     same problem. Note `scip` is pinned <10.1: pyscipopt 6.2.1 links libscip.so.10.0 while
     declaring `scip >=10.0.0,<11.0a0`, so an unpinned solve installs scip 10.1.0 and
     `import pyscipopt` then fails — an upstream soname/metadata bug, caught by D3.)
-  - `neuroimaging` (302 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
+  - `neuroimaging` (307 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
     volume-based fMRI, diffusion MRI and structural MRI. In scope for this project rather
     than the bioinformatics sister project because none of these packages are on bioconda at
     all — they are conda-forge only. Verified with no staged or downloaded data: a NIfTI
@@ -294,7 +294,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     still works, every G4*DATA is unset, and Pythia8 aborts with a misleading
     "unmatched version numbers : in code 8.312 but in XML 0.000" whose real cause is an
     unset PYTHIA8DATA.)
-  - `pic` (142 pkgs — warpx 26.10 (electromagnetic particle-in-cell) + amrex/pyamrex,
+  - `pic` (148 pkgs — warpx 26.10 (electromagnetic particle-in-cell) + amrex/pyamrex,
     openpmd-api, yt, numpy/scipy/matplotlib; plasma physics. ITS OWN ENV rather than an
     addition to `cfd-fv` as issue #35 preferred, and the reason is a python cap rather than
     the thin-env argument: `cfd-fv` is capped at python 3.11 BY SU2 (the very reason it is

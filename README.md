@@ -119,7 +119,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`fem-cfd`](envs/fem-cfd.yaml) | 131 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), CalculiX, OpenMPI, mpi4py, HDF5/ADIOS2 |
 | [`cfd-fv`](envs/cfd-fv.yaml) | 56 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
 | [`optimization`](envs/optimization.yaml) | 63 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
-| [`neuroimaging`](envs/neuroimaging.yaml) | 302 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
+| [`neuroimaging`](envs/neuroimaging.yaml) | 307 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
 | [`single-cell`](envs/single-cell.yaml) | 535 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
 | [`bayes`](envs/bayes.yaml) | 123 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
 | [`geoscience`](envs/geoscience.yaml) | 110 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
@@ -127,7 +127,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`pathology`](envs/pathology.yaml) | 215 | OpenSlide + openslide-python, tifffile/imagecodecs, scikit-image, zarr, dask — whole-slide imaging |
 | [`quantum`](envs/quantum.yaml) | 163 | Qiskit + Aer (CPU), qiskit-algorithms/optimization/machine-learning, openfermion, QuTiP — quantum circuit simulation |
 | [`hep`](envs/hep.yaml) | 355 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
-| [`pic`](envs/pic.yaml) | 142 | WarpX (electromagnetic particle-in-cell) + AMReX/pyAMReX, openPMD, yt — plasma physics, OpenMP-threaded |
+| [`pic`](envs/pic.yaml) | 148 | WarpX (electromagnetic particle-in-cell) + AMReX/pyAMReX, openPMD, yt — plasma physics, OpenMP-threaded |
 | [`structbio`](envs/structbio.yaml) | 120 | cctbx + gemmi (two independent symmetry implementations), biopython — crystallography |
 | [`popgen`](envs/popgen.yaml) | 253 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
 | [`tomography`](envs/tomography.yaml) | 88 | ASTRA (CPU) + TomoPy, scikit-image, tifffile — CT reconstruction |
