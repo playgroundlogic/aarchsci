@@ -67,7 +67,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
   - `geo-ml` (374 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (286 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+  - `climate` (275 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
     regridding, plus ocean thermodynamics. cdo and nco are the netCDF/GRIB command-line
     operators — the CLI complement to the Python stack; both are serial/OpenMP with no
@@ -75,7 +75,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     ocean equation of state); it ships the official TEOS-10 check-value table inside the
     package, so its verification reproduces published reference numbers offline rather
     than asserting a tolerance band).
-  - `pointcloud` (228 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
+  - `pointcloud` (236 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
   - `comp-chem` (222 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, vina, cantera (xtb REMOVED 2026-10-18 — its aarch64 build returns wrong analytic gradients with correct energies, in all seven builds; images before that date contain it); cheminformatics + MD + quantum chemistry
