@@ -1,6 +1,6 @@
 # hep — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/hep.yaml   Built: 2026.11.11.153513   Builder: 13780ef
-# lock-hash: af423ff7b2f6   packages: 355
+# Source spec: envs/hep.yaml   Built: 2026.11.12.161142   Builder: 8d9db99
+# lock-hash: 8bc03a3125cd   packages: 355
 # Regenerate with: ./builder/build-env.sh hep
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -127,7 +127,7 @@ jedi 0.20.1
 jinja2 3.1.6
 json-c 0.19
 json5 0.17.3
-jsonpointer 3.11
+jsonpointer 3.12
 jsonschema 4.26.0
 jsonschema-specifications 2025.9.1
 jsonschema-with-format-nongpl 4.26.0
@@ -150,7 +150,7 @@ lcms2 2.20
 ld_impl_linux-aarch64 2.46.1
 lerc 4.3.0
 lhapdf 6.5.6
-libaec 1.1.7
+libaec 1.1.8
 libasprintf 1.0
 libasprintf-devel 1.0
 libblas 3.11.0
