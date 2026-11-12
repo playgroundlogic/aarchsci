@@ -1,6 +1,6 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.11.11.153516   Builder: 13780ef
-# lock-hash: 425f62296b3b   packages: 222
+# Source spec: envs/comp-chem.yaml   Built: 2026.11.12.161311   Builder: 8d9db99
+# lock-hash: db5375e0a347   packages: 222
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -64,7 +64,7 @@ lcms2 2.20
 ld_impl_linux-aarch64 2.46.1
 legacy-cgi 2.6.4
 lerc 4.3.0
-libaec 1.1.7
+libaec 1.1.8
 libamd 3.3.3
 libblas 3.11.0
 libboost 1.86.0
@@ -133,7 +133,7 @@ libxml2 2.15.4
 libxml2-16 2.15.4
 libzip 1.12.1
 libzlib 1.3.2
-lz4-c 1.10.0
+lz4-c 1.11.1
 matplotlib-base 3.11.2
 mda-xdrlib 0.2.0
 mdanalysis 2.11.0
