@@ -1,13 +1,11 @@
 # nlp — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/nlp.yaml   Built: 2026.11.12.161144   Builder: 8d9db99
-# lock-hash: f368a63d664e   packages: 91
+# Source spec: envs/nlp.yaml   Built: 2026.11.13.153853   Builder: 84cfe24
+# lock-hash: 4867d9320fb8   packages: 88
 # Regenerate with: ./builder/build-env.sh nlp
 _openmp_mutex 4.5
 annotated-doc 0.0.6
 annotated-types 0.8.0
 anyio 4.16.0
-backports.zstd 1.8.0
-brotli-python 1.2.1
 bzip2 1.0.8
 ca-certificates 2026.10.23
 catalogue 2.0.10
@@ -60,7 +58,6 @@ preshed 3.0.13
 pydantic 2.14.3
 pydantic-core 2.50.4
 pygments 2.21.0
-pysocks 1.7.1
 python 3.14.10
 python_abi 3.14
 readline 8.3
