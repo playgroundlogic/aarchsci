@@ -63,11 +63,11 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
 - Available envs (all native arm64, verified, signed, public):
   - `geospatial` (110 pkgs — gdal, proj, geos, rasterio, fiona, shapely, pyproj,
     scikit-image, numpy, scipy).
-  - `earth-observation` (251 pkgs — geospatial base + xarray, dask, rioxarray,
+  - `earth-observation` (245 pkgs — geospatial base + xarray, dask, rioxarray,
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
-  - `geo-ml` (374 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
+  - `geo-ml` (368 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (275 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+  - `climate` (269 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
     regridding, plus ocean thermodynamics. cdo and nco are the netCDF/GRIB command-line
     operators — the CLI complement to the Python stack; both are serial/OpenMP with no
@@ -77,10 +77,10 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     than asserting a tolerance band).
   - `pointcloud` (236 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
-  - `comp-chem` (222 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
+  - `comp-chem` (216 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, vina, cantera (xtb REMOVED 2026-10-18 — its aarch64 build returns wrong analytic gradients with correct energies, in all seven builds; images before that date contain it); cheminformatics + MD + quantum chemistry
     + docking).
-  - `dft` (235 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
+  - `dft` (229 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
     libvdwxc, elpa, scalapack, fftw, openmpi, mpi4py, spglib, phonopy, pymatgen; plane-wave/
     LCAO density-functional theory plus Gaussian-basis quantum chemistry, MPI-parallel. Run
     in parallel with
@@ -93,7 +93,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     nwchem is pinned to the `mpi_ts` (two-sided) ARMCI network, which works on 1, 2 and 4
     ranks with a container's default 64 MB `/dev/shm`; the `mpi_pr` progress-ranks variant
     aborts on 1 rank and exhausts `/dev/shm` on 3).
-  - `md` (256 pkgs — gromacs, lammps, ambertools, openmpi, mpi4py, mdanalysis, mdtraj,
+  - `md` (250 pkgs — gromacs, lammps, ambertools, openmpi, mpi4py, mdanalysis, mdtraj,
     parmed; classical molecular dynamics, MPI-parallel. Two caveats: the gromacs binary
     is `gmx_mpi`, not `gmx`, and conda-forge builds it `ARM_NEON_ASIMD`, so it uses NEON
     and leaves SVE/SVE2 idle on Graviton 3+. `pmemd` is not included — paid Amber
@@ -108,7 +108,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
     rendering goes via GLX against Xvfb, which ships in the image).
-  - `astro` (367 pkgs — astropy, photutils, sunpy, healpy, yt, regions, reproject,
+  - `astro` (361 pkgs — astropy, photutils, sunpy, healpy, yt, regions, reproject,
     specutils, astroquery, rebound; astronomy/astrophysics analysis plus N-body
     gravitational dynamics (rebound is the env's only simulation code — everything else
     reduces data). Verified by a method-discriminating energy-conservation ladder over
@@ -158,7 +158,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     same problem. Note `scip` is pinned <10.1: pyscipopt 6.2.1 links libscip.so.10.0 while
     declaring `scip >=10.0.0,<11.0a0`, so an unpinned solve installs scip 10.1.0 and
     `import pyscipopt` then fails — an upstream soname/metadata bug, caught by D3.)
-  - `neuroimaging` (307 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
+  - `neuroimaging` (301 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
     volume-based fMRI, diffusion MRI and structural MRI. In scope for this project rather
     than the bioinformatics sister project because none of these packages are on bioconda at
     all — they are conda-forge only. Verified with no staged or downloaded data: a NIfTI
@@ -239,7 +239,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     tifffile cannot encode or decode JPEG tiles, and real whole-slide images are JPEG-tiled.
     Note the py-ABI trap issue #32 flagged — openslide-python 1.4.6 has aarch64 builds for
     py310 through py314, and selecting by highest build number lands on py310.)
-  - `quantum` (163 pkgs — qiskit 2.5.2 + qiskit-aer (CPU), qiskit-algorithms/-optimization/
+  - `quantum` (157 pkgs — qiskit 2.5.2 + qiskit-aer (CPU), qiskit-algorithms/-optimization/
     -machine-learning, openfermion, pylatexenc, qutip 5.3.1; quantum circuit simulation.
     ITS OWN env: the nearest existing env is `optimization` (HiGHS/SCIP/CBC), which is
     classical mathematical programming. The interesting finding is an abi3 one that looks
@@ -259,7 +259,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the support exactly and that both sampled distributions match the EXACT statevector
     probabilities within their own sampling error, sqrt(p(1−p)/N) — worst deviation
     1.67 sigma at 20000 shots.)
-  - `hep` (355 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
+  - `hep` (352 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
     datasets, hepmc3, fastjet, lhapdf, yoda, uproot, awkward; high-energy physics. ITS OWN
     env — nothing existing is close, and ROOT alone is a large self-contained framework.
     GEANT4 IS PINNED `noqt_*`, WHICH INVERTS WHAT ISSUE #34 ASKED FOR, and the reason is
@@ -324,7 +324,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     scheme is not symplectic. One thing NOT asserted: a multi-level convergence ladder —
     the error floors near 3e-5 and wanders (3.59e-4, 8.25e-5, 3.25e-5, 7.08e-5 for n_cell
     128..1024), so only one refinement step is claimed.)
-  - `structbio` (120 pkgs — cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88; crystallography
+  - `structbio` (114 pkgs — cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88; crystallography
     and structural biology. ITS OWN ENV rather than an addition to `md` (issue #39): md is
     trajectory production, this is symmetry/coordinate/map work, and cctbx-base is a 161 MB
     solve with its own boost stack that should not be able to perturb md's shipped recipes.
@@ -342,7 +342,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     implementations disagreeing with your constant means re-check the constant. NOT in
     scope: dxtbx and reciprocalspaceship have no aarch64 build at latest, so DIALS-style
     diffraction-image processing is out of reach even with cctbx present.)
-  - `popgen` (253 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
+  - `popgen` (252 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
     coalescent simulation and population genetics, a domain the catalog could not touch.
     Both compiled headliners have py314 aarch64 builds at current versions. Verification is
     unusually strong because a tree sequence is a CONSERVATION STRUCTURE: dump-to-disk and
@@ -395,7 +395,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     no bug satisfies by accident; and the SCF energy invariant under a rigid 5 A translation
     to 1e-8 Hartree. The `psi4 >=1.11` floor is load-bearing: 1.10 installs cleanly against
     libxc-c 7.1.2 and then dies during `import psi4` building its functional table.)
-  - `nlp` (91 pkgs — spacy 3.8.16 + spacy-model-en_core_web_sm, numpy; natural-language
+  - `nlp` (88 pkgs — spacy 3.8.16 + spacy-model-en_core_web_sm, numpy; natural-language
     processing. ITS OWN ENV: nothing in the catalog is adjacent (issue #44). THE MODEL IS A
     PACKAGE, NOT A DOWNLOAD, which is what makes this env viable — spaCy's documented path
     is `python -m spacy download en_core_web_sm`, a runtime fetch from GitHub, and
@@ -409,7 +409,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     vocab.vectors.shape is (0,0) and has_vector is True anyway via tok2vec fallback — so
     similarity scores here are not static-embedding similarities; the smoke test asserts
     the absence so it is discoverable.)
-  - `gw` (216 pkgs — bilby 2.8.2, lalsuite 7.25 / python-lal 7.6.1, pycbc 2.10.0,
+  - `gw` (210 pkgs — bilby 2.8.2, lalsuite 7.25 / python-lal 7.6.1, pycbc 2.10.0,
     numpy/scipy/matplotlib on PYTHON 3.13; gravitational-wave parameter estimation. ITS OWN
     ENV and on 3.13 deliberately: pycbc has no py314 build on ANY platform (2.10.0 is
     py311-py313 on linux-64 too), so it is a python cap rather than an arm64 gap, and
