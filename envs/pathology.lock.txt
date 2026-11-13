@@ -1,6 +1,6 @@
 # pathology — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pathology.yaml   Built: 2026.11.12.161217   Builder: 8d9db99
-# lock-hash: b19e2c1cf5f6   packages: 215
+# Source spec: envs/pathology.yaml   Built: 2026.11.13.154128   Builder: 84cfe24
+# lock-hash: 53bfae42d83a   packages: 215
 # Regenerate with: ./builder/build-env.sh pathology
 _openmp_mutex 4.5
 aom 3.15.3
@@ -29,7 +29,7 @@ brotli-bin 1.2.1
 brunsli 0.1
 bzip2 1.0.8
 c-ares 1.34.9
-c-blosc2 3.6.1
+c-blosc2 3.6.2
 ca-certificates 2026.10.23
 cairo 1.18.6
 charls 2.4.5
@@ -106,7 +106,7 @@ libglib 2.90.1
 libgomp 16.2.0
 libgoogle-cloud 3.12.0
 libgoogle-cloud-storage 3.12.0
-libgrpc 1.85.1
+libgrpc 1.85.2
 libharfbuzz 15.0.0
 libhwy 1.4.0
 libiconv 1.18
@@ -145,7 +145,7 @@ libzlib 1.3.2
 libzopfli 1.0.3
 locket 1.0.0
 lz4 4.4.5
-lz4-c 1.10.0
+lz4-c 1.11.1
 markupsafe 3.0.4
 matplotlib-base 3.11.2
 msgpack-python 1.2.4
@@ -166,7 +166,7 @@ orc 2.3.1
 packaging 26.3
 pandas 3.1.1
 partd 1.4.2
-pcre2 10.47
+pcre2 10.49
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
@@ -194,10 +194,10 @@ snappy 1.3.1
 sortedcontainers 2.4.0
 svt-av1 4.3.0
 tblib 3.2.2
-tifffile 2026.11.8
+tifffile 2026.11.12
 tk 8.6.13
 toolz 1.2.0
-tornado 6.6
+tornado 6.6.1
 typing_extensions 4.16.0
 tzdata 2026e
 uriparser 0.9.8
