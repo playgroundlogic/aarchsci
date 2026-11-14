@@ -1,6 +1,6 @@
 # gw — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/gw.yaml   Built: 2026.11.13.153853   Builder: 84cfe24
-# lock-hash: cc113ffcdb00   packages: 210
+# Source spec: envs/gw.yaml   Built: 2026.11.14.142646   Builder: 884810a
+# lock-hash: cc62ae04e285   packages: 210
 # Regenerate with: ./builder/build-env.sh gw
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -142,7 +142,7 @@ lscsoft-glue 4.1.1
 mako 1.4.3
 markupsafe 3.0.4
 matplotlib-base 3.10.9
-mpc 1.4.0
+mpc 1.4.1
 mpfr 4.2.2
 mpld3 0.5.12
 mpmath 1.4.1
