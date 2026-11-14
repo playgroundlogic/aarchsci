@@ -75,12 +75,12 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     ocean equation of state); it ships the official TEOS-10 check-value table inside the
     package, so its verification reproduces published reference numbers offline rather
     than asserting a tolerance band).
-  - `pointcloud` (236 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
+  - `pointcloud` (228 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
   - `comp-chem` (216 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, vina, cantera (xtb REMOVED 2026-10-18 — its aarch64 build returns wrong analytic gradients with correct energies, in all seven builds; images before that date contain it); cheminformatics + MD + quantum chemistry
     + docking).
-  - `dft` (229 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
+  - `dft` (231 pkgs — gpaw, siesta, psi4, nwchem, quantum-espresso (qe) + sssp, ase, libxc,
     libvdwxc, elpa, scalapack, fftw, openmpi, mpi4py, spglib, phonopy, pymatgen; plane-wave/
     LCAO density-functional theory plus Gaussian-basis quantum chemistry, MPI-parallel. Run
     in parallel with
@@ -196,7 +196,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     Beta(1,1) prior has posterior exactly Beta(3,9), mean 0.25 and sd 0.120096, and the
     bound is computed from the draw count — measured 0.249395, i.e. 0.64 MCMC standard
     errors, R-hat 1.0007.)
-  - `geoscience` (110 pkgs — obspy (seismology), modflow6 + flopy (groundwater flow),
+  - `geoscience` (104 pkgs — obspy (seismology), modflow6 + flopy (groundwater flow),
     numpy/scipy/pandas/matplotlib; solid-earth and subsurface, the complement to the
     surface/atmosphere envs (climate, earth-observation, geospatial, pointcloud). Both
     halves have an EXACT check. MODFLOW 6: one-dimensional steady confined flow between
@@ -208,7 +208,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     leave a mean of exactly zero (3.6e-15). flopy is included although only obspy and
     modflow6 were requested: mf6 alone reads and writes its own formats, so the solver is
     near-unusable without it, and flopy is noarch.)
-  - `cp2k` (111 pkgs — cp2k 2026.2 `mpi_openmpi`, openmpi, mpi4py; Gaussian-and-plane-waves
+  - `cp2k` (113 pkgs — cp2k 2026.2 `mpi_openmpi`, openmpi, mpi4py; Gaussian-and-plane-waves
     DFT, ab-initio MD, QM/MM. Closes what GAPS.md had called "the one most worth upstream
     effort" since the first coverage probe: cp2k had NO linux-aarch64 build at all, and
     conda-forge now ships one. ITS OWN ENV rather than part of `dft`, and the obstacle was
@@ -342,7 +342,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     implementations disagreeing with your constant means re-check the constant. NOT in
     scope: dxtbx and reciprocalspaceship have no aarch64 build at latest, so DIALS-style
     diffraction-image processing is out of reach even with cctbx present.)
-  - `popgen` (252 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
+  - `popgen` (253 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
     coalescent simulation and population genetics, a domain the catalog could not touch.
     Both compiled headliners have py314 aarch64 builds at current versions. Verification is
     unusually strong because a tree sequence is a CONSERVATION STRUCTURE: dump-to-disk and

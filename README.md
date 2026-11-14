@@ -109,9 +109,9 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`earth-observation`](envs/earth-observation.yaml) | 245 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr |
 | [`geo-ml`](envs/geo-ml.yaml) | 368 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader, scipy-tests |
 | [`climate`](envs/climate.yaml) | 269 | xarray/dask + flox, cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
-| [`pointcloud`](envs/pointcloud.yaml) | 236 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
+| [`pointcloud`](envs/pointcloud.yaml) | 228 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
 | [`comp-chem`](envs/comp-chem.yaml) | 216 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, vina, cantera — **xtb removed 2026-10-18**, see below |
-| [`dft`](envs/dft.yaml) | 229 | gpaw, siesta, **cp2k**, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
+| [`dft`](envs/dft.yaml) | 231 | gpaw, siesta, **cp2k**, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 250 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
 | [`viz`](envs/viz.yaml) | 248 | paraview (`pvbatch`), vtk, mesa/llvmpipe, Xvfb, pillow — headless CPU rendering |
 | [`r`](envs/r.yaml) | 328 | R 4.5 + tidyverse, data.table, arrow, sf, terra, glmnet, randomForest, caret, knitr/rmarkdown + pandoc, Rcpp |
@@ -122,14 +122,14 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`neuroimaging`](envs/neuroimaging.yaml) | 301 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
 | [`single-cell`](envs/single-cell.yaml) | 535 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
 | [`bayes`](envs/bayes.yaml) | 123 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
-| [`geoscience`](envs/geoscience.yaml) | 110 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
-| [`cp2k`](envs/cp2k.yaml) | 111 | **deprecated** — CP2K now ships inside [`dft`](envs/dft.yaml); kept as a transition alias |
+| [`geoscience`](envs/geoscience.yaml) | 104 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
+| [`cp2k`](envs/cp2k.yaml) | 113 | **deprecated** — CP2K now ships inside [`dft`](envs/dft.yaml); kept as a transition alias |
 | [`pathology`](envs/pathology.yaml) | 215 | OpenSlide + openslide-python, tifffile/imagecodecs, scikit-image, zarr, dask — whole-slide imaging |
 | [`quantum`](envs/quantum.yaml) | 157 | Qiskit + Aer (CPU), qiskit-algorithms/optimization/machine-learning, openfermion, QuTiP — quantum circuit simulation |
 | [`hep`](envs/hep.yaml) | 352 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
 | [`pic`](envs/pic.yaml) | 148 | WarpX (electromagnetic particle-in-cell) + AMReX/pyAMReX, openPMD, yt — plasma physics, OpenMP-threaded |
 | [`structbio`](envs/structbio.yaml) | 114 | cctbx + gemmi (two independent symmetry implementations), biopython — crystallography |
-| [`popgen`](envs/popgen.yaml) | 252 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
+| [`popgen`](envs/popgen.yaml) | 253 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
 | [`tomography`](envs/tomography.yaml) | 88 | ASTRA (CPU) + TomoPy, scikit-image, tifffile — CT reconstruction |
 | [`psi4`](envs/psi4.yaml) | 82 | Psi4 — correlated-wavefunction molecular quantum chemistry (HF, DFT, MP2, CC) |
 | [`nlp`](envs/nlp.yaml) | 88 | spaCy + the packaged `en_core_web_sm` pipeline — NLP, no model download |
