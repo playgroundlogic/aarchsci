@@ -1,6 +1,6 @@
 # pointcloud — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pointcloud.yaml   Built: 2026.11.12.161154   Builder: 8d9db99
-# lock-hash: d03ad7fe16fa   packages: 236
+# Source spec: envs/pointcloud.yaml   Built: 2026.11.14.142643   Builder: 884810a
+# lock-hash: b3e5430e995d   packages: 228
 # Regenerate with: ./builder/build-env.sh pointcloud
 _openmp_mutex 4.5
 affine 3.0.1
@@ -88,10 +88,8 @@ libcxsparse 4.4.1
 libdeflate 1.26
 libedit 3.1.20260512
 libev 4.33
-libevent 2.1.12
+libevent 2.1.13
 libexpat 2.9.0
-libfabric 2.7.0
-libfabric1 2.7.0
 libffi 3.7.0
 libfreetype 2.14.3
 libfreetype6 2.14.3
@@ -103,11 +101,11 @@ libgdal-hdf5 3.13.3
 libgdal-pg 3.13.3
 libgdal-tiledb 3.13.3
 libgfortran 16.2.0
+libgfortran-ng 16.2.0
 libgfortran5 16.2.0
 libgoogle-cloud 3.12.0
 libgoogle-cloud-storage 3.12.0
-libgrpc 1.85.1
-libhwloc 2.13.0
+libgrpc 1.85.2
 libhwy 1.4.0
 libiconv 1.18
 libjpeg-turbo 3.2.1
@@ -120,7 +118,6 @@ liblzma 5.8.3
 libmpdec 4.0.0
 libnanoarrow 0.9.0
 libnghttp2 1.71.0
-libnl 3.11.0
 libnsl 2.0.1
 libntlm 1.4
 libopenblas 0.3.34
@@ -140,7 +137,6 @@ libpdal-nitf 2.10.2
 libpdal-pgpointcloud 2.10.2
 libpdal-tiledb 2.10.2
 libpdal-trajectory 2.10.2
-libpmix 5.0.8
 libpng 1.6.59
 libpq 18.6
 libprotobuf 7.35.1
@@ -161,7 +157,6 @@ libsystemd 262.2
 libsystemd0 262.2
 libthrift 0.25.0
 libtiff 4.7.2
-libudev1 262.2
 libumfpack 6.3.5
 liburing 2.15
 libutf8proc 2.12.0
@@ -182,7 +177,7 @@ metis 5.1.0
 minizip 4.2.2
 mistune 3.3.4
 mpfr 4.2.2
-mpi 1.0.1
+mpi 1.0
 muparser 2.3.5
 ncurses 6.6
 networkx 3.7
@@ -191,7 +186,7 @@ nlohmann_json 3.12.0
 numpy 2.5.4
 openjpeg 2.5.4
 openldap 2.6.13
-openmpi 5.0.11
+openmpi 4.1.6
 openssl 3.6.5
 orc 2.3.1
 packaging 26.3
@@ -209,7 +204,6 @@ python 3.14.10
 python-pdal 3.5.5
 python_abi 3.14
 rasterio 1.5.2
-rdma-core 65.0
 re2 2025.11.05
 readline 8.3
 richdem 2.4.3
@@ -223,14 +217,12 @@ snuggs 1.4.7
 spdlog 1.17.0
 sqlite 3.54.1
 suitesparse 7.10.1
-tifffile 2026.11.8
+tifffile 2026.11.12
 tiledb 2.30.1
 tk 8.6.13
 typing_extensions 4.16.0
 tzcode 2026f
 tzdata 2026e
-ucc 1.8.0
-ucx 1.22.0
 uriparser 0.9.8
 xerces-c 3.3.0
 xorg-libxau 1.0.12
