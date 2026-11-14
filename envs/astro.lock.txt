@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.11.13.153852   Builder: 84cfe24
-# lock-hash: 9d2f7b87c89b   packages: 361
+# Source spec: envs/astro.yaml   Built: 2026.11.14.142644   Builder: 884810a
+# lock-hash: 6a522cf67101   packages: 361
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -234,7 +234,7 @@ matplotlib-base 3.11.2
 matplotlib-inline 0.2.2
 minizip 4.2.2
 more-itertools 11.2.1
-mpc 1.4.0
+mpc 1.4.1
 mpfr 4.2.2
 mpl_animators 1.2.4
 mpmath 1.4.1
