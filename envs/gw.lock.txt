@@ -1,6 +1,6 @@
 # gw — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/gw.yaml   Built: 2026.11.14.142646   Builder: 884810a
-# lock-hash: cc62ae04e285   packages: 210
+# Source spec: envs/gw.yaml   Built: 2026.11.15.150044   Builder: e5869f8
+# lock-hash: f742ba91a8e2   packages: 210
 # Regenerate with: ./builder/build-env.sh gw
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -194,7 +194,7 @@ scipy 1.18.1
 scitokens 1.9.7
 setuptools 84.2.1
 six 1.17.0
-soupsieve 4.1
+soupsieve 4.1.1
 sympy 1.14.0
 tenacity 9.2.1
 tk 8.6.13
