@@ -1,19 +1,19 @@
 # pic — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pic.yaml   Built: 2026.11.14.142644   Builder: 884810a
-# lock-hash: a232e80fb842   packages: 148
+# Source spec: envs/pic.yaml   Built: 2026.11.16.171904   Builder: 218ed32
+# lock-hash: 385eedb0d1df   packages: 149
 # Regenerate with: ./builder/build-env.sh pic
 _openmp_mutex 4.5
 _python_abi3_support 1.0
 adios2 2.12.1
 amrex 26.11
 annotated-types 0.8.0
-aws-c-auth 1.0.0
+aws-c-auth 1.0.2
 aws-c-cal 1.0.0
 aws-c-common 1.0.5
 aws-c-compression 1.0.0
 aws-c-http 1.0.0
-aws-c-io 1.0.0
-aws-c-s3 1.0.0
+aws-c-io 1.1.2
+aws-c-s3 1.3.1
 aws-c-sdkutils 1.0.1
 aws-checksums 1.0.1
 blaspp 2025.05.28
@@ -102,7 +102,7 @@ mpfr 4.2.2
 mpmath 1.4.1
 munkres 1.1.4
 ncurses 6.6
-numpy 2.5.4
+numpy 2.5.5
 openjpeg 2.5.4
 openpmd-api 0.17.1
 openssl 3.6.5
@@ -113,6 +113,7 @@ picmistandard 0.35.0
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
+pkgconf 3.0.11
 pthread-stubs 0.4
 pyamrex 26.11
 pybind11-abi 11
@@ -126,7 +127,7 @@ python-tzdata 2026.6
 python_abi 3.14
 qhull 2020.2
 readline 8.3
-s2n 1.7.7
+s2n 1.7.13
 scipy 1.18.1
 sympy 1.14.0
 tk 8.6.13
