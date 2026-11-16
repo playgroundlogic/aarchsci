@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.11.14.142645   Builder: 884810a
-# lock-hash: 1432b8621633   packages: 328
+# Source spec: envs/r.yaml   Built: 2026.11.16.172055   Builder: 218ed32
+# lock-hash: 06fe4b9e32e3   packages: 328
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -286,7 +286,7 @@ r-stringi 1.8.9
 r-stringr 1.6.0
 r-survival 3.8_12
 r-sys 3.4.3
-r-systemfonts 1.3.2
+r-systemfonts 1.3.3
 r-terra 1.9_50
 r-textshaping 1.0.5
 r-tibble 3.3.1
