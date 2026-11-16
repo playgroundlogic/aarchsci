@@ -1,6 +1,6 @@
 # pathology — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pathology.yaml   Built: 2026.11.15.150037   Builder: e5869f8
-# lock-hash: 71ec99565505   packages: 215
+# Source spec: envs/pathology.yaml   Built: 2026.11.16.171906   Builder: 218ed32
+# lock-hash: c20d4955cf75   packages: 216
 # Regenerate with: ./builder/build-env.sh pathology
 _openmp_mutex 4.5
 aom 3.15.3
@@ -60,7 +60,7 @@ google-crc32c 1.9.0
 graphite2 1.3.15
 icu 78.3
 imagecodecs 2026.11.11
-imageio 2.38.1
+imageio 2.38.2
 importlib-metadata 10.0.0
 jinja2 3.1.6
 jxrlib 1.1
@@ -156,7 +156,7 @@ ncurses 6.6
 networkx 3.7
 nlohmann_json 3.12.0
 numcodecs 0.17.1
-numpy 2.5.4
+numpy 2.5.5
 openjpeg 2.5.4
 openjph 0.33.0
 openslide 4.0.1
@@ -170,6 +170,7 @@ pcre2 10.49
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
+pkgconf 3.0.11
 prometheus-cpp 1.3.0
 psutil 7.2.2
 pthread-stubs 0.4
