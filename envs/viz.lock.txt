@@ -1,6 +1,6 @@
 # viz — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/viz.yaml   Built: 2026.11.14.142644   Builder: 884810a
-# lock-hash: e4eccccfedde   packages: 248
+# Source spec: envs/viz.yaml   Built: 2026.11.16.171904   Builder: 218ed32
+# lock-hash: c1ea7b80bd9d   packages: 248
 # Regenerate with: ./builder/build-env.sh viz
 _openmp_mutex 4.5
 aiohappyeyeballs 2.7.1
@@ -175,7 +175,7 @@ multidict 7.2.1
 munkres 1.1.4
 ncurses 6.6
 nlohmann_json 3.12.0
-numpy 2.5.4
+numpy 2.5.5
 openh264 2.7.0
 openjpeg 2.5.4
 openldap 2.6.13
@@ -211,7 +211,7 @@ tbb 2023.1.0
 tk 8.6.13
 typing_extensions 4.16.0
 tzdata 2026e
-utfcpp 4.09
+utfcpp 5.0.0
 viskores 1.1.0
 vtk-base 9.7.2
 vtk-io-ffmpeg 9.7.2
