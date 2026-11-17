@@ -1,6 +1,6 @@
 # structbio — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/structbio.yaml   Built: 2026.11.13.153855   Builder: 84cfe24
-# lock-hash: 0087c97d20b4   packages: 114
+# Source spec: envs/structbio.yaml   Built: 2026.11.17.170627   Builder: 8f528c2
+# lock-hash: 71812eb32c60   packages: 115
 # Regenerate with: ./builder/build-env.sh structbio
 _openmp_mutex 4.5
 biopython 1.88
@@ -78,7 +78,7 @@ matplotlib-base 3.11.2
 mrcfile 1.5.4
 munkres 1.1.4
 ncurses 6.6
-numpy 2.5.4
+numpy 2.5.5
 openjpeg 2.5.4
 openssl 3.6.5
 packaging 26.3
@@ -86,6 +86,7 @@ pcre2 10.49
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
+pkgconf 3.0.11
 psutil 7.2.2
 pthread-stubs 0.4
 pycairo 1.29.2
