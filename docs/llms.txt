@@ -67,7 +67,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
   - `geo-ml` (369 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (270 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+  - `climate` (269 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
     regridding, plus ocean thermodynamics. cdo and nco are the netCDF/GRIB command-line
     operators — the CLI complement to the Python stack; both are serial/OpenMP with no
@@ -75,7 +75,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     ocean equation of state); it ships the official TEOS-10 check-value table inside the
     package, so its verification reproduces published reference numbers offline rather
     than asserting a tolerance band).
-  - `pointcloud` (237 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
+  - `pointcloud` (232 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
   - `comp-chem` (216 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, vina, cantera (xtb REMOVED 2026-10-18 — its aarch64 build returns wrong analytic gradients with correct energies, in all seven builds; images before that date contain it); cheminformatics + MD + quantum chemistry
@@ -324,7 +324,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     scheme is not symplectic. One thing NOT asserted: a multi-level convergence ladder —
     the error floors near 3e-5 and wanders (3.59e-4, 8.25e-5, 3.25e-5, 7.08e-5 for n_cell
     128..1024), so only one refinement step is claimed.)
-  - `structbio` (114 pkgs — cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88; crystallography
+  - `structbio` (115 pkgs — cctbx-base 2026.9, gemmi 0.7.5, biopython 1.88; crystallography
     and structural biology. ITS OWN ENV rather than an addition to `md` (issue #39): md is
     trajectory production, this is symmetry/coordinate/map work, and cctbx-base is a 161 MB
     solve with its own boost stack that should not be able to perturb md's shipped recipes.
@@ -342,7 +342,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     implementations disagreeing with your constant means re-check the constant. NOT in
     scope: dxtbx and reciprocalspaceship have no aarch64 build at latest, so DIALS-style
     diffraction-image processing is out of reach even with cctbx present.)
-  - `popgen` (254 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
+  - `popgen` (253 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
     coalescent simulation and population genetics, a domain the catalog could not touch.
     Both compiled headliners have py314 aarch64 builds at current versions. Verification is
     unusually strong because a tree sequence is a CONSERVATION STRUCTURE: dump-to-disk and

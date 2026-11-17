@@ -108,8 +108,8 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`geospatial`](envs/geospatial.yaml) | 111 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
 | [`earth-observation`](envs/earth-observation.yaml) | 246 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr |
 | [`geo-ml`](envs/geo-ml.yaml) | 369 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader, scipy-tests |
-| [`climate`](envs/climate.yaml) | 270 | xarray/dask + flox, cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
-| [`pointcloud`](envs/pointcloud.yaml) | 237 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
+| [`climate`](envs/climate.yaml) | 269 | xarray/dask + flox, cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
+| [`pointcloud`](envs/pointcloud.yaml) | 232 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
 | [`comp-chem`](envs/comp-chem.yaml) | 216 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, vina, cantera — **xtb removed 2026-10-18**, see below |
 | [`dft`](envs/dft.yaml) | 232 | gpaw, siesta, **cp2k**, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 251 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
@@ -128,8 +128,8 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`quantum`](envs/quantum.yaml) | 158 | Qiskit + Aer (CPU), qiskit-algorithms/optimization/machine-learning, openfermion, QuTiP — quantum circuit simulation |
 | [`hep`](envs/hep.yaml) | 353 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
 | [`pic`](envs/pic.yaml) | 149 | WarpX (electromagnetic particle-in-cell) + AMReX/pyAMReX, openPMD, yt — plasma physics, OpenMP-threaded |
-| [`structbio`](envs/structbio.yaml) | 114 | cctbx + gemmi (two independent symmetry implementations), biopython — crystallography |
-| [`popgen`](envs/popgen.yaml) | 254 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
+| [`structbio`](envs/structbio.yaml) | 115 | cctbx + gemmi (two independent symmetry implementations), biopython — crystallography |
+| [`popgen`](envs/popgen.yaml) | 253 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
 | [`tomography`](envs/tomography.yaml) | 89 | ASTRA (CPU) + TomoPy, scikit-image, tifffile — CT reconstruction |
 | [`psi4`](envs/psi4.yaml) | 83 | Psi4 — correlated-wavefunction molecular quantum chemistry (HF, DFT, MP2, CC) |
 | [`nlp`](envs/nlp.yaml) | 88 | spaCy + the packaged `en_core_web_sm` pipeline — NLP, no model download |
