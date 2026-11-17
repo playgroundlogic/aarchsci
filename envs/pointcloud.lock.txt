@@ -1,6 +1,6 @@
 # pointcloud — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pointcloud.yaml   Built: 2026.11.16.171906   Builder: 218ed32
-# lock-hash: 616a00f16deb   packages: 237
+# Source spec: envs/pointcloud.yaml   Built: 2026.11.17.170627   Builder: 8f528c2
+# lock-hash: 9e13639c4691   packages: 232
 # Regenerate with: ./builder/build-env.sh pointcloud
 _openmp_mutex 4.5
 affine 3.0.1
@@ -13,7 +13,7 @@ aws-c-event-stream 1.0.0
 aws-c-http 1.0.0
 aws-c-io 1.0.0
 aws-c-mqtt 1.0.0
-aws-c-s3 1.1.3
+aws-c-s3 1.0.0
 aws-c-sdkutils 1.0.1
 aws-checksums 1.0.1
 aws-crt-cpp 0.43.8
@@ -37,7 +37,7 @@ cligj 0.7.2
 cpd 0.5.5
 cyrus-sasl 2.1.28
 docutils 0.23
-draco 1.5.7
+draco 1.5.9
 eigen 5.0.1
 eigen-abi 5.0.1.100
 fgt 0.4.11
@@ -51,14 +51,14 @@ gflags 2.3.1
 giflib 6.1.3
 glog 0.7.1
 gmp 6.3.0
-hdf5 1.14.6
+hdf5 2.2.0
 icu 78.3
 imageio 2.38.2
 json-c 0.18
 keyutils 1.6.3
 krb5 1.22.2
 laspy 2.7.0
-lazrs-python 0.8.2
+lazrs-python 0.9.0
 lazy-loader 0.6
 lcms2 2.20
 ld_impl_linux-aarch64 2.46.1
@@ -100,7 +100,6 @@ libgcc-ng 16.2.0
 libgdal-arrow-parquet 3.13.3
 libgdal-core 3.13.3
 libgdal-hdf5 3.13.3
-libgdal-pg 3.13.3
 libgdal-tiledb 3.13.3
 libgfortran 16.2.0
 libgfortran5 16.2.0
@@ -122,7 +121,7 @@ libnanoarrow 0.9.0
 libnghttp2 1.71.0
 libnl 3.11.0
 libnsl 2.0.1
-libntlm 1.4
+libntlm 1.8
 libopenblas 0.3.34
 libopentelemetry-cpp 1.30.0
 libopentelemetry-cpp-headers 1.30.0
@@ -142,7 +141,7 @@ libpdal-tiledb 2.10.2
 libpdal-trajectory 2.10.2
 libpmix 5.0.8
 libpng 1.6.59
-libpq 18.6
+libpq 18.7
 libprotobuf 7.35.1
 libpsl 0.23.1
 libpython 3.14.10
@@ -163,7 +162,6 @@ libthrift 0.25.0
 libtiff 4.7.2
 libudev1 262.2
 libumfpack 6.3.5
-liburing 2.15
 libutf8proc 2.12.0
 libuuid 2.42.4
 libwebp-base 1.6.0
@@ -172,7 +170,6 @@ libxcrypt 4.4.38
 libxml2 2.15.4
 libxml2-16 2.15.4
 libxml2-devel 2.15.4
-libxslt 1.1.45
 libzlib 1.3.2
 llvm-openmp 23.1.5
 lz4-c 1.10.0
@@ -200,7 +197,6 @@ pdal 2.10.2
 pillow 13.0.0
 pip 26.2.2
 pkgconf 3.0.11
-postgresql 18.6
 proj 9.9.0
 prometheus-cpp 1.3.0
 pthread-stubs 0.4
@@ -224,11 +220,10 @@ snuggs 1.4.7
 spdlog 1.17.0
 sqlite 3.54.1
 suitesparse 7.10.1
-tifffile 2026.11.12
+tifffile 2026.11.16
 tiledb 2.30.1
 tk 8.6.13
 typing_extensions 4.16.0
-tzcode 2026f
 tzdata 2026e
 ucc 1.8.0
 ucx 1.22.0
