@@ -1,6 +1,6 @@
 # pathology — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pathology.yaml   Built: 2026.11.16.171906   Builder: 218ed32
-# lock-hash: c20d4955cf75   packages: 216
+# Source spec: envs/pathology.yaml   Built: 2026.11.17.170821   Builder: 8f528c2
+# lock-hash: c5ccb8ad0635   packages: 216
 # Regenerate with: ./builder/build-env.sh pathology
 _openmp_mutex 4.5
 aom 3.15.3
@@ -190,12 +190,12 @@ s2n 1.7.7
 scikit-image 0.26.0
 scipy 1.18.1
 setuptools 84.2.1
-simdjson 5.1.1
+simdjson 5.2.0
 snappy 1.3.1
 sortedcontainers 2.4.0
 svt-av1 4.3.0
 tblib 3.2.2
-tifffile 2026.11.12
+tifffile 2026.11.16
 tk 8.6.13
 toolz 1.2.0
 tornado 6.6.1
