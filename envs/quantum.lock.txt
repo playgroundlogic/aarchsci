@@ -1,6 +1,6 @@
 # quantum — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/quantum.yaml   Built: 2026.11.16.172140   Builder: 218ed32
-# lock-hash: 7761584ffb57   packages: 158
+# Source spec: envs/quantum.yaml   Built: 2026.11.18.164419   Builder: 366c17a
+# lock-hash: de388be211ce   packages: 158
 # Regenerate with: ./builder/build-env.sh quantum
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -101,7 +101,7 @@ mpc 1.4.1
 mpfr 4.2.2
 mpmath 1.4.1
 munkres 1.1.4
-narwhals 2.28.0
+narwhals 2.29.0
 ncurses 6.6
 networkx 3.7
 numpy 2.5.5
