@@ -1,6 +1,6 @@
 # structbio — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/structbio.yaml   Built: 2026.11.17.170627   Builder: 8f528c2
-# lock-hash: 71812eb32c60   packages: 115
+# Source spec: envs/structbio.yaml   Built: 2026.11.19.165108   Builder: 999dea8
+# lock-hash: bd80103cee22   packages: 115
 # Regenerate with: ./builder/build-env.sh structbio
 _openmp_mutex 4.5
 biopython 1.88
@@ -18,7 +18,7 @@ font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
 font-ttf-ubuntu 0.83
-fontconfig 2.18.3
+fontconfig 2.18.4
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
 fonttools 4.68.0
