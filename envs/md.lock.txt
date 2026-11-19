@@ -1,6 +1,6 @@
 # md — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/md.yaml   Built: 2026.11.18.164209   Builder: 366c17a
-# lock-hash: 5d1fcc8d6706   packages: 251
+# Source spec: envs/md.yaml   Built: 2026.11.19.164829   Builder: 999dea8
+# lock-hash: 413b9c6a89ea   packages: 251
 # Regenerate with: ./builder/build-env.sh md
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -43,7 +43,7 @@ font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
 font-ttf-ubuntu 0.83
-fontconfig 2.18.3
+fontconfig 2.18.4
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
 fonttools 4.68.0
