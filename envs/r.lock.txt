@@ -1,6 +1,6 @@
 # r — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/r.yaml   Built: 2026.11.18.164210   Builder: 366c17a
-# lock-hash: 4bae3c745182   packages: 328
+# Source spec: envs/r.yaml   Built: 2026.11.19.165021   Builder: 999dea8
+# lock-hash: dec9419f5991   packages: 328
 # Regenerate with: ./builder/build-env.sh r
 _openmp_mutex 4.5
 _r-mutex 1.0.1
@@ -35,7 +35,7 @@ font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
 font-ttf-ubuntu 0.83
-fontconfig 2.18.3
+fontconfig 2.18.4
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
 freetype 2.14.3
@@ -245,7 +245,7 @@ r-pkgconfig 2.0.3
 r-plyr 1.8.9
 r-prettyunits 1.2.0
 r-proc 1.19.1
-r-processx 3.9.0
+r-processx 3.10.0
 r-prodlim 2026.03.11
 r-progress 1.2.3
 r-progressr 1.1.0
@@ -273,7 +273,7 @@ r-rpart 4.1.27
 r-rstudioapi 0.19.0
 r-rvest 1.0.5
 r-s2 1.1.11
-r-s7 0.2.2
+r-s7 1.0.0
 r-sass 0.4.10
 r-scales 1.4.0
 r-selectr 0.6_0
