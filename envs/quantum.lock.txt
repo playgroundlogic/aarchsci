@@ -1,6 +1,6 @@
 # quantum — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/quantum.yaml   Built: 2026.11.18.164419   Builder: 366c17a
-# lock-hash: de388be211ce   packages: 158
+# Source spec: envs/quantum.yaml   Built: 2026.11.19.164828   Builder: 999dea8
+# lock-hash: 378018abee19   packages: 158
 # Regenerate with: ./builder/build-env.sh quantum
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -37,7 +37,7 @@ font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
 font-ttf-ubuntu 0.83
-fontconfig 2.18.3
+fontconfig 2.18.4
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
 fonttools 4.68.0
