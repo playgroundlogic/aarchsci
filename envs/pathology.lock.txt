@@ -1,6 +1,6 @@
 # pathology — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pathology.yaml   Built: 2026.11.18.164209   Builder: 366c17a
-# lock-hash: f864c9346000   packages: 216
+# Source spec: envs/pathology.yaml   Built: 2026.11.19.164827   Builder: 999dea8
+# lock-hash: 55ae7d08f1ed   packages: 216
 # Regenerate with: ./builder/build-env.sh pathology
 _openmp_mutex 4.5
 aom 3.15.3
@@ -46,7 +46,7 @@ font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
 font-ttf-ubuntu 0.83
-fontconfig 2.18.3
+fontconfig 2.18.4
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
 fonttools 4.68.0
@@ -104,9 +104,9 @@ libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.1
 libgomp 16.2.0
-libgoogle-cloud 3.12.0
-libgoogle-cloud-storage 3.12.0
-libgrpc 1.85.2
+libgoogle-cloud 3.14.0
+libgoogle-cloud-storage 3.14.0
+libgrpc 1.85.3
 libharfbuzz 15.0.0
 libhwy 1.4.0
 libiconv 1.18
