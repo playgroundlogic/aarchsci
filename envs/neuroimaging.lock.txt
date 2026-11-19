@@ -1,6 +1,6 @@
 # neuroimaging — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/neuroimaging.yaml   Built: 2026.11.18.164213   Builder: 366c17a
-# lock-hash: 630011fb322e   packages: 302
+# Source spec: envs/neuroimaging.yaml   Built: 2026.11.19.165038   Builder: 999dea8
+# lock-hash: a0802ae33e68   packages: 302
 # Regenerate with: ./builder/build-env.sh neuroimaging
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -37,7 +37,7 @@ brotli-bin 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
 ca-certificates 2026.10.23
-cachebox 5.2.3
+cachebox 6.2.10
 cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
@@ -52,7 +52,7 @@ cpython 3.14.10
 cycler 0.12.1
 dbus 1.16.2
 decorator 5.3.1
-deepdiff 9.1.0
+deepdiff 9.2.1
 dipy 1.12.1
 docutils 0.22.4
 epoxy 1.5.10
@@ -62,7 +62,7 @@ font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
 font-ttf-ubuntu 0.83
-fontconfig 2.18.3
+fontconfig 2.18.4
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
 fonttools 4.68.0
@@ -143,9 +143,9 @@ libglvnd 1.7.0
 libglx 1.7.0
 libglx-devel 1.7.0
 libgomp 16.2.0
-libgoogle-cloud 3.12.0
-libgoogle-cloud-storage 3.12.0
-libgrpc 1.85.2
+libgoogle-cloud 3.14.0
+libgoogle-cloud-storage 3.14.0
+libgrpc 1.85.3
 libharfbuzz 15.0.0
 libharfbuzz-devel 15.0.0
 libiconv 1.18
@@ -268,7 +268,7 @@ tk 8.6.13
 tqdm 4.70.1
 traits 7.3.0
 trx-python 0.5.0
-typer 0.29.1
+typer 0.29.2
 typing-extensions 4.16.0
 typing-inspection 0.4.5
 typing_extensions 4.16.0
