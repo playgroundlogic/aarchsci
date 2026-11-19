@@ -1,6 +1,6 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.11.13.154116   Builder: 84cfe24
-# lock-hash: 6c1f78854d83   packages: 216
+# Source spec: envs/comp-chem.yaml   Built: 2026.11.19.164828   Builder: 999dea8
+# lock-hash: ad2057945759   packages: 217
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -26,13 +26,13 @@ cuda-version 11.8
 cycler 0.12.1
 cyrus-sasl 2.1.28
 eigen-abi 3.4.0.100
-filelock 4.2.9
+filelock 4.2.12
 fmt 12.0.0
 font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
 font-ttf-ubuntu 0.83
-fontconfig 2.18.3
+fontconfig 2.18.4
 fonts-conda-ecosystem 1
 fonts-conda-forge 1
 fonttools 4.68.0
@@ -73,7 +73,7 @@ libcantera 3.2.0
 libcblas 3.11.0
 libccolamd 3.3.4
 libcholmod 5.3.1
-libcint 6.1.3
+libcint 6.2.1
 libcolamd 3.3.4
 libcurl 8.23.0
 libcxsparse 4.4.1
@@ -100,7 +100,7 @@ liblzma 5.8.3
 libmpdec 4.0.0
 libnetcdf 4.10.1
 libnghttp2 1.71.0
-libntlm 1.4
+libntlm 1.8
 libopenblas 0.3.34
 libparu 1.0.0
 libpng 1.6.59
@@ -139,12 +139,12 @@ mpfr 4.2.2
 mrcfile 1.5.4
 msgpack-python 1.2.4
 munkres 1.1.4
-narwhals 2.28.0
+narwhals 2.29.0
 ncurses 6.6
 netcdf4 1.7.5
 networkx 3.7
 numexpr 2.14.2
-numpy 2.5.4
+numpy 2.5.5
 ocl-icd 2.3.4
 ocl-icd-system 1.0.0
 openbabel 3.2.1
@@ -162,7 +162,8 @@ pdbfixer 1.12
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.14.5
+pkgconf 3.0.11
+platformdirs 4.14.7
 pooch 1.9.0
 pthread-stubs 0.4
 py-cpuinfo 9.0.0
@@ -170,7 +171,7 @@ pybind11-abi 11
 pycairo 1.29.2
 pyedr 0.8.0
 pyparsing 3.3.2
-pyscf 2.15.0
+pyscf 2.15.1
 pytables 3.11.1
 python 3.14.10
 python-dateutil 4.0.0
@@ -192,7 +193,7 @@ seaborn 0.13.2
 seaborn-base 0.13.2
 setuptools 84.2.1
 snappy 1.3.1
-sqlalchemy 2.1.8
+sqlalchemy 2.1.9
 statsmodels 0.15.0
 suitesparse 7.10.1
 sundials 7.5.0
