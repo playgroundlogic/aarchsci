@@ -1,6 +1,6 @@
 # pic — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pic.yaml   Built: 2026.11.19.164943   Builder: 999dea8
-# lock-hash: 4363e9e55220   packages: 149
+# Source spec: envs/pic.yaml   Built: 2026.11.20.162256   Builder: 42ffc4a
+# lock-hash: 7dc1605e98d9   packages: 148
 # Regenerate with: ./builder/build-env.sh pic
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -72,7 +72,7 @@ libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.1
 libgomp 16.2.0
-libharfbuzz 15.1.0
+libharfbuzz 15.2.0
 libiconv 1.18
 libjpeg-turbo 3.2.1
 liblapack 3.11.0
@@ -113,12 +113,11 @@ picmistandard 0.35.0
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
-pkgconf 3.0.11
 pthread-stubs 0.4
 pyamrex 26.11
 pybind11-abi 11
-pydantic 2.14.3
-pydantic-core 2.50.4
+pydantic 2.14.4
+pydantic-core 2.50.5
 pyparsing 3.3.3
 python 3.14.10
 python-dateutil 4.0.0
