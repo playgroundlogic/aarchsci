@@ -1,13 +1,13 @@
 # pointcloud — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pointcloud.yaml   Built: 2026.11.20.162513   Builder: 42ffc4a
-# lock-hash: 85b6e8f10d28   packages: 223
+# Source spec: envs/pointcloud.yaml   Built: 2026.11.21.153533   Builder: ef7dba7
+# lock-hash: d75694461a60   packages: 223
 # Regenerate with: ./builder/build-env.sh pointcloud
 _openmp_mutex 4.5
 affine 3.0.1
 attrs 26.1.0
 aws-c-auth 1.0.0
 aws-c-cal 1.0.0
-aws-c-common 1.0.5
+aws-c-common 1.0.6
 aws-c-compression 1.0.0
 aws-c-event-stream 1.0.0
 aws-c-http 1.0.0
@@ -27,10 +27,10 @@ blosc 1.21.7
 bzip2 1.0.8
 c-ares 1.34.9
 c-blosc2 3.6.1
-ca-certificates 2026.10.23
+ca-certificates 2026.11.20
 capnproto 1.5.0
 ceres-solver 2.2.0
-certifi 2026.10.23
+certifi 2026.11.20
 click 8.5.1
 click-plugins 1.1.1.2
 cligj 0.7.2
@@ -104,7 +104,7 @@ libgfortran-ng 16.2.0
 libgfortran5 16.2.0
 libgoogle-cloud 3.12.0
 libgoogle-cloud-storage 3.12.0
-libgrpc 1.85.3
+libgrpc 1.85.4
 libhwy 1.4.0
 libiconv 1.18
 libjpeg-turbo 3.2.1
