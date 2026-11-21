@@ -1,16 +1,16 @@
 # structbio — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/structbio.yaml   Built: 2026.11.20.162254   Builder: 42ffc4a
-# lock-hash: a4191cf2d313   packages: 114
+# Source spec: envs/structbio.yaml   Built: 2026.11.21.153531   Builder: ef7dba7
+# lock-hash: 03650a5bbace   packages: 114
 # Regenerate with: ./builder/build-env.sh structbio
 _openmp_mutex 4.5
 biopython 1.88
 brotli 1.2.1
 brotli-bin 1.2.1
 bzip2 1.0.8
-ca-certificates 2026.10.23
+ca-certificates 2026.11.20
 cairo 1.18.6
 cctbx-base 2026.10
-certifi 2026.10.23
+certifi 2026.11.20
 charset-normalizer 3.5.1
 contourpy 1.4.0
 cycler 0.12.1
