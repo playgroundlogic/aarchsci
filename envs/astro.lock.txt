@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.11.20.162454   Builder: 42ffc4a
-# lock-hash: d8c00f25491f   packages: 361
+# Source spec: envs/astro.yaml   Built: 2026.11.21.153533   Builder: ef7dba7
+# lock-hash: c8ae8f8fb588   packages: 361
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -27,7 +27,7 @@ asttokens 3.0.2
 attrs 26.1.0
 aws-c-auth 1.0.0
 aws-c-cal 1.0.0
-aws-c-common 1.0.5
+aws-c-common 1.0.6
 aws-c-compression 1.0.0
 aws-c-event-stream 1.0.0
 aws-c-http 1.0.0
@@ -57,12 +57,12 @@ brotli 1.2.1
 brotli-bin 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
-ca-certificates 2026.10.23
+ca-certificates 2026.11.20
 cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
 cdflib 1.3.14
-certifi 2026.10.23
+certifi 2026.11.20
 cffi 2.1.1
 cfitsio 4.7.0
 charset-normalizer 3.5.1
@@ -181,7 +181,7 @@ libglib 2.90.1
 libgomp 16.2.0
 libgoogle-cloud 3.12.0
 libgoogle-cloud-storage 3.12.0
-libgrpc 1.85.3
+libgrpc 1.85.4
 libharfbuzz 15.0.0
 libhwy 1.4.0
 libiconv 1.18
@@ -315,7 +315,7 @@ slicerator 1.1.0
 snappy 1.3.1
 snuggs 1.4.7
 sortedcontainers 2.4.0
-soupsieve 4.1.2
+soupsieve 4.1.3
 specutils 2.4.0
 spiceypy 8.4.0
 sqlite 3.54.1
