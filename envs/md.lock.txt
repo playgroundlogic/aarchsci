@@ -1,6 +1,6 @@
 # md — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/md.yaml   Built: 2026.11.20.162256   Builder: 42ffc4a
-# lock-hash: 584c1b6787e2   packages: 250
+# Source spec: envs/md.yaml   Built: 2026.11.21.153744   Builder: ef7dba7
+# lock-hash: 3d95dbaaadf3   packages: 250
 # Regenerate with: ./builder/build-env.sh md
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -9,7 +9,7 @@ annotated-types 0.8.0
 arpack 3.9.1
 aws-c-auth 1.0.2
 aws-c-cal 1.0.0
-aws-c-common 1.0.5
+aws-c-common 1.0.6
 aws-c-compression 1.0.0
 aws-c-http 1.0.0
 aws-c-io 1.1.2
@@ -25,11 +25,11 @@ brotli-bin 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
 c-blosc2 3.6.2
-ca-certificates 2026.10.23
+ca-certificates 2026.11.20
 cached-property 2.0.1
 cached_property 2.0.1
 cairo 1.18.6
-certifi 2026.10.23
+certifi 2026.11.20
 cftime 1.6.5
 charset-normalizer 3.5.1
 cloudpickle 3.1.3
@@ -233,7 +233,7 @@ typing-extensions 4.16.0
 typing-inspection 0.4.5
 typing_extensions 4.16.0
 tzdata 2026e
-ucc 1.8.0
+ucc 1.9.0
 ucx 1.22.0
 urllib3 2.8.0
 voro 0.4.6
