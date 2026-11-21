@@ -63,7 +63,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
 - Available envs (all native arm64, verified, signed, public):
   - `geospatial` (110 pkgs — gdal, proj, geos, rasterio, fiona, shapely, pyproj,
     scikit-image, numpy, scipy).
-  - `earth-observation` (246 pkgs — geospatial base + xarray, dask, rioxarray,
+  - `earth-observation` (245 pkgs — geospatial base + xarray, dask, rioxarray,
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
   - `geo-ml` (369 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
@@ -104,7 +104,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the R 4.5 line on purpose: r-base reaches 4.6.1 on arm64 but ZERO of conda-forge's
     3162 linux-aarch64 `r-*` packages have an r46 build, and `r-base=4.6.1 r-tidyverse`
     does not solve at all).
-  - `viz` (248 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
+  - `viz` (249 pkgs — paraview/`pvbatch`, vtk, mesalib, xorg-xvfb-server, pillow;
     headless scientific visualisation, software-rendered on CPU. Needs no GPU but DOES
     need a display: conda-forge has no OSMesa and EGL has no device to bind to, so
     rendering goes via GLX against Xvfb, which ships in the image).
@@ -150,7 +150,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     finite-volume scheme holds uniform flow to machine zero even on skewed cells; a broken
     one does not. Note: conda-forge's su2 ships no meshes/tutorial cases and no pysu2
     binding, so the smoke test generates its own mesh and drives SU2_CFD as a binary).
-  - `optimization` (64 pkgs — HiGHS + highspy, SCIP + PySCIPOpt, CBC, scipy; linear and
+  - `optimization` (63 pkgs — HiGHS + highspy, SCIP + PySCIPOpt, CBC, scipy; linear and
     mixed-integer programming. Its own env rather than part of geo-ml because optimization
     is a cross-cutting METHOD, not a domain. Verification uses exact identities rather than
     tolerances: the LP optimum is a textbook value (36 exactly), the primal-dual gap must be
@@ -183,7 +183,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     would pass a cross-check alone; ARI rather than label equality because cluster names
     are arbitrary. `louvain` is excluded — its aarch64 builds stop at py312 and scanpy
     deprecates it in favour of leiden.)
-  - `bayes` (123 pkgs — cmdstan 2.40 + cmdstanpy + arviz, xarray; Bayesian inference and
+  - `bayes` (124 pkgs — cmdstan 2.40 + cmdstanpy + arviz, xarray; Bayesian inference and
     MCMC with Stan. Fills a domain the catalog had nothing for. TWO runtime requirements
     that a naive spec misses, both found by building: (1) Stan ships NO precompiled models
     — it translates each model to C++ with stanc and COMPILES it at run time, and the
@@ -259,7 +259,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the support exactly and that both sampled distributions match the EXACT statevector
     probabilities within their own sampling error, sqrt(p(1−p)/N) — worst deviation
     1.67 sigma at 20000 shots.)
-  - `hep` (352 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
+  - `hep` (353 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
     datasets, hepmc3, fastjet, lhapdf, yoda, uproot, awkward; high-energy physics. ITS OWN
     env — nothing existing is close, and ROOT alone is a large self-contained framework.
     GEANT4 IS PINNED `noqt_*`, WHICH INVERTS WHAT ISSUE #34 ASKED FOR, and the reason is
