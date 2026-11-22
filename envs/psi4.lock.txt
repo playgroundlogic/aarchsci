@@ -1,10 +1,10 @@
 # psi4 — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/psi4.yaml   Built: 2026.11.21.153710   Builder: ef7dba7
-# lock-hash: bf864fca96ae   packages: 82
+# Source spec: envs/psi4.yaml   Built: 2026.11.22.153648   Builder: e0d5f16
+# lock-hash: 580652ae7a6d   packages: 82
 # Regenerate with: ./builder/build-env.sh psi4
 _openmp_mutex 4.5
 annotated-types 0.8.0
-armadillo 15.6.2
+armadillo 15.8.0
 arpack 3.9.1
 bzip2 1.0.8
 c-ares 1.34.9
