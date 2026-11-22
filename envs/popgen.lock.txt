@@ -1,6 +1,6 @@
 # popgen — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/popgen.yaml   Built: 2026.11.21.153727   Builder: ef7dba7
-# lock-hash: f31b8e7d6d91   packages: 253
+# Source spec: envs/popgen.yaml   Built: 2026.11.22.153650   Builder: e0d5f16
+# lock-hash: d3d0a7eb1a16   packages: 253
 # Regenerate with: ./builder/build-env.sh popgen
 _openmp_mutex 4.5
 apricot-select 0.6.1
@@ -13,7 +13,7 @@ aws-c-event-stream 1.0.0
 aws-c-http 1.0.0
 aws-c-io 1.0.0
 aws-c-mqtt 1.0.0
-aws-c-s3 1.0.0
+aws-c-s3 1.1.3
 aws-c-sdkutils 1.0.1
 aws-checksums 1.0.1
 aws-crt-cpp 0.43.8
@@ -44,7 +44,7 @@ demes 0.2.3
 distributed 2026.8.0
 donfig 0.8.1.post1
 exceptiongroup 1.3.2
-filelock 4.2.12
+filelock 4.3.0
 fmt 12.1.0
 font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
@@ -66,7 +66,7 @@ google-crc32c 1.9.0
 graphite2 1.3.15
 gsl 2.8
 h5py 3.16.0
-hdf5 2.2.0
+hdf5 1.14.6
 humanize 4.17.0
 icu 78.3
 importlib-metadata 10.0.0
@@ -111,8 +111,8 @@ libgcc-ng 16.2.0
 libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.1
-libgoogle-cloud 3.14.0
-libgoogle-cloud-storage 3.14.0
+libgoogle-cloud 3.14.1
+libgoogle-cloud-storage 3.14.1
 libgrpc 1.85.4
 libharfbuzz 15.0.0
 libiconv 1.18
