@@ -1,6 +1,6 @@
 # pathology — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pathology.yaml   Built: 2026.11.21.153531   Builder: ef7dba7
-# lock-hash: 7969f27d8e03   packages: 215
+# Source spec: envs/pathology.yaml   Built: 2026.11.22.153647   Builder: e0d5f16
+# lock-hash: 2b6df620335f   packages: 215
 # Regenerate with: ./builder/build-env.sh pathology
 _openmp_mutex 4.5
 aom 3.15.3
@@ -104,8 +104,8 @@ libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.1
 libgomp 16.2.0
-libgoogle-cloud 3.14.0
-libgoogle-cloud-storage 3.14.0
+libgoogle-cloud 3.14.1
+libgoogle-cloud-storage 3.14.1
 libgrpc 1.85.4
 libharfbuzz 15.0.0
 libhwy 1.4.0
