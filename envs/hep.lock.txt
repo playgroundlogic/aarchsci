@@ -1,13 +1,13 @@
 # hep — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/hep.yaml   Built: 2026.11.21.153807   Builder: ef7dba7
-# lock-hash: d1d8964e2f88   packages: 353
+# Source spec: envs/hep.yaml   Built: 2026.11.22.153650   Builder: e0d5f16
+# lock-hash: c8640a16a229   packages: 353
 # Regenerate with: ./builder/build-env.sh hep
 _openmp_mutex 4.5
 _python_abi3_support 1.0
 adwaita-icon-theme 51.0
 anyio 4.16.0
 argon2-cffi 25.1.0
-argon2-cffi-bindings 26.1.0
+argon2-cffi-bindings 26.2.0
 arrow 1.4.0
 asttokens 3.0.2
 async-lru 2.4.0
