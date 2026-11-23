@@ -65,7 +65,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     scikit-image, numpy, scipy).
   - `earth-observation` (245 pkgs — geospatial base + xarray, dask, rioxarray,
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
-  - `geo-ml` (369 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
+  - `geo-ml` (370 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
   - `climate` (268 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
