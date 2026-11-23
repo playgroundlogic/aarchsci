@@ -63,7 +63,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
 - Available envs (all native arm64, verified, signed, public):
   - `geospatial` (110 pkgs — gdal, proj, geos, rasterio, fiona, shapely, pyproj,
     scikit-image, numpy, scipy).
-  - `earth-observation` (245 pkgs — geospatial base + xarray, dask, rioxarray,
+  - `earth-observation` (250 pkgs — geospatial base + xarray, dask, rioxarray,
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
   - `geo-ml` (370 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).

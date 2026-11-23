@@ -3,6 +3,22 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-11-23 (earth-observation gains boto3)
+
+### Added — `boto3` to `earth-observation` (issue #48)
+boto3 could not be installed into this env at all. Every botocore release requires
+`python-dateutil <3.0.0`, and the env's unconstrained solve had moved to dateutil 4.0.0 on
+2026-11-01, so adding boto3 hit an unsolvable conflict. Declaring boto3 lets botocore hold
+dateutil below 3 itself. Measured: 245 → 250 packages (boto3, botocore, jmespath,
+s3transfer, six), dateutil 4.0.0 → 2.9.0.post0, nothing else moving. D3 builds an unsigned
+S3 client offline and asserts botocore's dateutil timestamp parsing.
+
+**Correction to the report:** the issue described this as lock drift, with the lock pinning
+2.9.0.post0 while the image had 4.0.0. It wasn't. The lock committed for the reported image
+(`Built: 2026.11.21.153534`) says 4.0.0 too, so image and lock agreed; the 2.9 value was from
+a lock before 2026-11-01. 18 other envs also resolve dateutil 4.0.0 and so cannot take boto3
+either; only earth-observation is AWS-oriented enough to warrant it.
+
 ## 2026-10-18 (xtb removed for wrong forces; a tz regression of ours fixed; flox, scipy-tests)
 
 Three issues from a user running upstream's own tests and reference geometries against our

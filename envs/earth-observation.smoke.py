@@ -48,6 +48,7 @@ HEADLINE = [
     "odc.stac",         # odc-stac
     "netCDF4",
     "zarr",
+    "boto3", "botocore",
 ]
 print("[smoke] 1. imports")
 for mod in HEADLINE:
@@ -165,6 +166,36 @@ def _stac():
         datetime=datetime(2026, 1, 1, tzinfo=timezone.utc), properties={},
     )
     assert item.id == "probe"
+
+
+# --- 4. AWS client layer, offline (issue #48) -----------------------------------
+print("[smoke] 4. boto3 / botocore (offline)")
+
+
+@check("boto3 builds an unsigned S3 client and botocore parses timestamps via dateutil")
+def _boto():
+    import boto3
+    import botocore
+    import dateutil
+    from botocore import UNSIGNED
+    from botocore.config import Config
+    from botocore.utils import parse_timestamp
+    # The regression guard for #48: botocore requires python-dateutil <3, and this env
+    # once resolved 4.0.0, which made boto3 uninstallable. Assert the constraint holds.
+    major = int(dateutil.__version__.split(".")[0])
+    assert major < 3, f"python-dateutil {dateutil.__version__} >= 3; botocore cannot coexist"
+    # No network and no credentials: an UNSIGNED client is how public buckets such as
+    # Earth Search's COGs are read, and constructing one exercises botocore's endpoint
+    # resolution and service-model loading from the installed package data.
+    s3 = boto3.client("s3", region_name="us-west-2", config=Config(signature_version=UNSIGNED))
+    assert s3.meta.region_name == "us-west-2", f"region {s3.meta.region_name!r}"
+    assert "amazonaws.com" in s3.meta.endpoint_url, f"endpoint {s3.meta.endpoint_url!r}"
+    # botocore parses S3 timestamps through dateutil — the exact code path the version
+    # conflict was about. An ISO-8601 instant must round-trip to the same epoch second.
+    ts = parse_timestamp("2024-01-02T03:04:05Z")
+    assert int(ts.timestamp()) == 1704164645, f"parse_timestamp gave {ts!r}"
+    print(f"       (boto3 {boto3.__version__}, botocore {botocore.__version__}, "
+          f"dateutil {dateutil.__version__}; unsigned S3 client at {s3.meta.endpoint_url})")
 
 
 # --- verdict --------------------------------------------------------------------

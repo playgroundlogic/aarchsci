@@ -106,7 +106,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | Env | Pkgs | What's in it |
 |-----|-----:|--------------|
 | [`geospatial`](envs/geospatial.yaml) | 110 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
-| [`earth-observation`](envs/earth-observation.yaml) | 245 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr |
+| [`earth-observation`](envs/earth-observation.yaml) | 250 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr, boto3 |
 | [`geo-ml`](envs/geo-ml.yaml) | 370 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader, scipy-tests |
 | [`climate`](envs/climate.yaml) | 268 | xarray/dask + flox, cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
 | [`pointcloud`](envs/pointcloud.yaml) | 231 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |

@@ -33,3 +33,15 @@ dependencies:
   - netcdf4
   - zarr
   - bottleneck
+  # --- AWS access (issue #48) ---
+  # This image's main targets (Earth Search STAC, Sentinel/Landsat COGs) live on S3, so
+  # boto3 is a common next install — and before this line it could not be installed into
+  # the env at all. Every botocore release requires `python-dateutil <3.0.0`, while this
+  # env's unconstrained solve had moved to dateutil 4.0.0 (since 2026-11-01), so
+  # `pip/micromamba install boto3` hit an unsolvable conflict. Declaring boto3 here lets
+  # botocore hold dateutil below 3 itself, which is the honest form of that pin — a bare
+  # `python-dateutil <3` would read as arbitrary with nothing in the env needing it.
+  # Measured: 245 -> 250 packages (boto3, botocore, jmespath, s3transfer, six) with
+  # dateutil 4.0.0 -> 2.9.0.post0 and NOTHING else moving. pandas and pystac-client work
+  # with 2.9, as astro and geo-ml (which already carry botocore via s3fs) show.
+  - boto3
