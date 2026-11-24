@@ -43,8 +43,9 @@
 #      only the file diff showed /usr/share/zoneinfo/US disappearing.
 #   2. For each dropped OS path an env relies on, restore it below and add a `test -e`
 #      assertion, so a later base dropping it fails the build instead of shipping.
-#   3. Rebuild EVERY env and run every D3, not just the env motivating the bump. Then publish
-#      them all: the reconciler will NOT, because a base change moves no env's lock-hash.
+#   3. Rebuild EVERY env locally and run every D3, not just the env motivating the bump.
+#      Publishing them is automatic: any non-comment change here changes every env's
+#      build-input hash, and the reconciler republishes envs on mismatch (#56).
 # Known and accepted on 2.9.0-debian13: /usr/share/zoneinfo/posix/ is absent (tzdata-legacy
 # restores US/, right/ and the old aliases, but not posix/). Nothing here uses posix/ names.
 ARG MAMBA_VERSION=2.9.0-debian13
@@ -63,6 +64,9 @@ ARG SMOKE_DEST=smoke.py
 # builder commit that produced it.
 ARG SOURCE_SPEC
 ARG BUILDER_GIT_SHA=unknown
+# Hash of the build inputs no lock reflects (this file + the env's smoke test); the
+# reconciler rebuilds on mismatch. Computed by builder/input-hash.sh (issue #56).
+ARG BUILD_INPUT_HASH=unknown
 ARG TARGETPLATFORM
 ARG BUILD_PLATFORM=${TARGETPLATFORM}
 
@@ -226,6 +230,7 @@ LABEL org.opencontainers.image.title="${ENV_NAME}" \
       org.opencontainers.image.description="Native arm64 build of the conda-forge '${ENV_NAME}' scientific env. Verified (assemble+import+functional smoke test), not just solved. Unofficial community build by Playground Logic; not affiliated with or endorsed by conda-forge, Anaconda, or AWS." \
       science.aarch.env="${ENV_NAME}" \
       science.aarch.builder-git-sha="${BUILDER_GIT_SHA}" \
+      science.aarch.build-input-hash="${BUILD_INPUT_HASH}" \
       science.aarch.build-platform="${BUILD_PLATFORM}" \
       science.aarch.publisher="Playground Logic"
 

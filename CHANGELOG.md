@@ -3,6 +3,28 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-11-24 (the reconciler rebuilds envs when the builder changes)
+
+### Added — a build-input hash, so builder changes reach published images (issue #56)
+The reconciler rebuilt an env when its conda solve drifted or quay lacked an image for the
+committed lock. Neither notices a change to the **builder**: a base bump, an OS fix such as
+`tzdata-legacy` (#45), an activate.d fix, or a corrected smoke test moves no lock-hash, so
+every env read "up to date" and kept its old build. That is why #45 needed eight envs
+republished by hand.
+
+`builder/input-hash.sh <env>` hashes `builder/Dockerfile` plus the env's smoke test, with
+whole-line comments and blank lines stripped, so editing a comment in the heavily commented
+Dockerfile doesn't rebuild all 29 envs. Measured: a comment-only edit leaves the hash
+unchanged, a one-line `RUN` changes it. `build-env.sh` stamps the value as the label
+`science.aarch.build-input-hash`. `reconcile.yml` reads it from the published `s<lock-hash>`
+image's config with no pull (~2 s per env) and queues any env whose label differs as
+**BUILDER-STALE**. A registry read error is never treated as stale.
+
+This supersedes the "publish every env by hand after a base bump" step from #53: any
+non-comment Dockerfile change now republishes every env on the next reconcile. **The first
+reconcile after this lands rebuilds the whole catalog once**, since no image carries the
+label yet.
+
 ## 2026-11-24 (a base-image bump checklist, with a script that would have caught #45)
 
 ### Added — `builder/base-diff.sh` and a checklist for base bumps (issue #53)

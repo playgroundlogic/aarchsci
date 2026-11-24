@@ -52,6 +52,10 @@ fi
 # Provenance: link any tag back to the committed spec + builder commit.
 SOURCE_SPEC="https://github.com/playgroundlogic/aarchsci/blob/main/envs/${ENV_NAME}.yaml"
 GIT_SHA="$(git -C "$HERE" rev-parse --short HEAD 2>/dev/null || echo unknown)"
+# Build-input hash (issue #56): Dockerfile + this env's smoke test, comments stripped. Stamped
+# on the image so the reconciler can rebuild envs when the BUILDER changes, which no
+# lock-hash reflects. See builder/input-hash.sh.
+INPUT_HASH="$("$HERE/input-hash.sh" "$ENV_NAME")"
 
 # uv locally (project standard), python3 on CI (lessons #12). Array so it expands
 # whether it's one word or two.
@@ -87,6 +91,7 @@ docker buildx build \
   --build-arg ENV_NAME="$ENV_NAME" \
   --build-arg SOURCE_SPEC="$SOURCE_SPEC" \
   --build-arg BUILDER_GIT_SHA="$GIT_SHA" \
+  --build-arg BUILD_INPUT_HASH="$INPUT_HASH" \
   --build-arg SMOKE_FILE="$(basename "$SMOKE_FILE")" \
   --build-arg SMOKE_DEST="$SMOKE_DEST" \
   -f "$HERE/Dockerfile" \
@@ -176,6 +181,7 @@ if [ "${PUSH:-0}" = "1" ]; then
     --build-arg ENV_NAME="$ENV_NAME" \
     --build-arg SOURCE_SPEC="$SOURCE_SPEC" \
     --build-arg BUILDER_GIT_SHA="$GIT_SHA" \
+    --build-arg BUILD_INPUT_HASH="$INPUT_HASH" \
     --build-arg SMOKE_FILE="$(basename "$SMOKE_FILE")" \
     --build-arg SMOKE_DEST="$SMOKE_DEST" \
     -f "$HERE/Dockerfile" \
@@ -212,6 +218,7 @@ emit build_tag  "$BUILD_TAG"
 emit date_tag   "$DATE_TAG"
 emit hash_tag   "$HASH_TAG"
 emit lock_hash  "$LOCK_HASH"
+emit input_hash "$INPUT_HASH"
 emit packages   "$PKG_COUNT"
 emit image      "$DATE_IMAGE"
 emit digest     "$DIGEST"

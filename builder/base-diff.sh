@@ -22,9 +22,10 @@
 # Read section 1 for anything the envs might rely on. The conda prefix (/opt/conda) is
 # excluded: conda packages come from the env spec, not the base.
 #
-# AFTER A BUMP, REBUILD EVERY ENV. The reconciler will not do it for you: a base change does
-# not move any env's lock-hash, so every env reads "up to date" and keeps its old base until
-# conda-forge happens to drift. Dispatch publish.yml with the full env list.
+# AFTER A BUMP, EVERY ENV REBUILDS. A base change moves no env's lock-hash, but since #56 it
+# changes every env's build-input hash (builder/input-hash.sh), so the next reconcile flags
+# them all BUILDER-STALE and republishes them. Before landing a bump, still rebuild locally
+# and run every D3: the reconciler republishes, but a failing env just fails its publish.
 set -euo pipefail
 
 OLD="${1:?usage: base-diff.sh <old-tag> <new-tag>   (e.g. 1.5.8 2.9.0-debian13)}"

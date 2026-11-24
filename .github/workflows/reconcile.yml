@@ -22,6 +22,9 @@
 # catch different failures and neither subsumes the other:
 #   solve  != committed  -> the channel moved (rebuild to catch up)
 #   s<committed> absent  -> the registry is behind the repo (publish what we claim)
+#   input-hash differs   -> the BUILDER changed (Dockerfile or the env's smoke test)
+#                           since the image was built (#56). Neither check above can see
+#                           this, because a base bump or an OS fix moves no lock-hash.
 #
 # Runs on hosted arm64 runners (no farm dependency) — it only ever handles the
 # delta, and the solve is just an API/solver call, so hosted speed is fine and it
@@ -136,6 +139,24 @@ jobs:
             esac
           }
 
+          # Third question (issue #56): was the published image built with the CURRENT
+          # builder? A change to builder/Dockerfile or an env's smoke test moves no
+          # lock-hash, so without this the two checks above call every env "up to date"
+          # after a base bump or an OS fix, and the fix never ships. build-env.sh stamps
+          # builder/input-hash.sh's value as a label; read it from the published s<hash>
+          # image's config with no pull (~2 s per env). Echoes the label, "" if the image
+          # predates labelling, or "ERR" if quay couldn't be read. ERR is never treated as
+          # stale, for the same reason `unknown` above isn't.
+          published_input_hash() {
+            local out
+            if out="$(docker buildx imagetools inspect "quay.io/aarchsci/$1:s$2" \
+                  --format '{{ index .Image.Config.Labels "science.aarch.build-input-hash" }}' 2>/dev/null)"; then
+              echo "$out"
+            else
+              echo ERR
+            fi
+          }
+
           # The tracked set = every committed env spec. The catalog tracks itself.
           for spec in envs/*.yaml; do
             env_name="$(basename "$spec" .yaml)"
@@ -173,7 +194,16 @@ jobs:
             # together with its lock lands here, looking identical to "nothing to do".
             case "$(published_has_hash "$env_name" "$committed")" in
               yes)
-                echo "$env_name up to date ($committed, published)" ;;
+                want="$(./builder/input-hash.sh "$env_name")"
+                have="$(published_input_hash "$env_name" "$committed")"
+                if [ "$have" = "ERR" ]; then
+                  echo "::warning::$env_name — could not read s$committed's build-input label; assuming current (not rebuilding on a registry error)"
+                elif [ "$have" != "$want" ]; then
+                  echo "::notice::$env_name BUILDER-STALE: published s$committed was built with inputs ${have:-<unlabelled>}, current builder is $want -> rebuild"
+                  drifted+=("$env_name")
+                else
+                  echo "$env_name up to date ($committed, published, builder $want)"
+                fi ;;
               stale)
                 echo "::notice::$env_name STALE IMAGE: solve matches committed=$committed but quay has no s$committed -> publish"
                 drifted+=("$env_name") ;;
