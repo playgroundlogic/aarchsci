@@ -22,8 +22,17 @@ set -uo pipefail
 
 ENV_NAME="${1:?usage: solve-hash.sh <env-name>}"
 PLATFORM="${PLATFORM:-linux/arm64}"
-MAMBA_IMAGE="${MAMBA_IMAGE:-mambaorg/micromamba:1.5.8}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# Solve on THE SAME BASE THE BUILDER USES, read from builder/Dockerfile so they can't diverge.
+# This used to be hard-coded to micromamba 1.5.8 (Debian 12, glibc 2.36), and it was left
+# there when the builder moved to 2.9.0-debian13 (glibc 2.41) on 2026-10-08. From then on,
+# any env whose resolution depends on the glibc virtual package solved differently here than
+# in the build. The reconciler saw permanent "drift" and rebuilt 13 envs EVERY DAY: measured
+# for bayes, 1.5.8 solves to 145156f2b787 while the real base gives 0a0ffef1e198, matching
+# the committed lock. Found while verifying issue #56.
+MAMBA_VERSION="$(sed -n 's/^ARG MAMBA_VERSION=//p' "$HERE/Dockerfile" | head -1)"
+[ -n "$MAMBA_VERSION" ] || { echo "[solve-hash] ERROR: no ARG MAMBA_VERSION in builder/Dockerfile" >&2; exit 2; }
+MAMBA_IMAGE="${MAMBA_IMAGE:-mambaorg/micromamba:${MAMBA_VERSION}}"
 ENV_FILE="$(cd "$HERE/.." && pwd)/envs/${ENV_NAME}.yaml"
 [ -f "$ENV_FILE" ] || { echo "[solve-hash] ERROR: no env spec at $ENV_FILE" >&2; exit 2; }
 

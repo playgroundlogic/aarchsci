@@ -3,6 +3,22 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-11-24 (the reconciler stops rebuilding 13 envs every day)
+
+### Fixed — the reconciler solved on the old base, so 13 envs rebuilt daily (issue #57)
+`builder/solve-hash.sh` computes the reconciler's "has the channel moved?" hash, and it was
+still hard-coded to `micromamba:1.5.8` (Debian 12, glibc 2.36) after the builder moved to
+`2.9.0-debian13` (glibc 2.41) on 2026-10-08. For any env whose resolution depends on the
+`__glibc` virtual package, the reconciler's solve never matched the build, so it reported
+drift on every run. Since then, roughly 13 envs have been rebuilt, re-signed and republished
+**daily** with unchanged content. Measured on bayes: 1.5.8 solves to `145156f2b787` (the hash
+reported as "current"), and 2.9.0-debian13 gives `0a0ffef1e198`, the committed lock. After
+the fix, bayes, md, r and single-cell all solve to exactly their committed locks.
+
+`solve-hash.sh` now reads `ARG MAMBA_VERSION` from `builder/Dockerfile`, so the two can't
+diverge again. Found while verifying #56. It is the third consequence of that single base
+bump, after the lock reader (#18) and the tz links (#45).
+
 ## 2026-11-24 (the reconciler rebuilds envs when the builder changes)
 
 ### Added — a build-input hash, so builder changes reach published images (issue #56)

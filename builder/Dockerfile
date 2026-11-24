@@ -48,6 +48,8 @@
 #      build-input hash, and the reconciler republishes envs on mismatch (#56).
 # Known and accepted on 2.9.0-debian13: /usr/share/zoneinfo/posix/ is absent (tzdata-legacy
 # restores US/, right/ and the old aliases, but not posix/). Nothing here uses posix/ names.
+# builder/solve-hash.sh parses this exact line to solve on the same base: keep it a
+# literal `ARG MAMBA_VERSION=<tag>` default here, not only a --build-arg.
 ARG MAMBA_VERSION=2.9.0-debian13
 FROM mambaorg/micromamba:${MAMBA_VERSION}
 
