@@ -1,6 +1,6 @@
 # hep — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/hep.yaml   Built: 2026.11.23.193030   Builder: 8ce622f
-# lock-hash: b9fc166e8f09   packages: 353
+# Source spec: envs/hep.yaml   Built: 2026.11.24.190711   Builder: 33c13f4
+# lock-hash: a5d738aca7de   packages: 353
 # Regenerate with: ./builder/build-env.sh hep
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -290,7 +290,7 @@ root 6.40.04
 root_base 6.40.04
 root_cxx_standard 20
 rpds-py 2026.9.1
-s2n 1.7.13
+s2n 1.7.14
 scipy 1.18.1
 scitokens-cpp 1.4.0
 send2trash 2.2.0
@@ -348,7 +348,7 @@ xorg-libxtst 1.2.6
 xorg-libxxf86vm 1.1.7
 xorg-xorgproto 2025.1
 xxhash 0.8.3
-yaml 0.2.6
+yaml 0.2.7
 yoda 2.1.5
 zeromq 4.3.5
 zipp 4.1.2
