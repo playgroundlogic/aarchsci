@@ -1,6 +1,6 @@
 # astro — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/astro.yaml   Built: 2026.11.23.193246   Builder: 8ce622f
-# lock-hash: 451f62ad2239   packages: 361
+# Source spec: envs/astro.yaml   Built: 2026.11.24.190714   Builder: 33c13f4
+# lock-hash: 62dc8849e2d5   packages: 361
 # Regenerate with: ./builder/build-env.sh astro
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -78,12 +78,12 @@ cryptography 50.0.2
 cspice 67
 cycler 0.12.1
 cytoolz 1.2.0
-dask 2026.8.0
-dask-core 2026.8.0
+dask 2026.11.0
+dask-core 2026.11.0
 dask-image 2026.5.0
 dbus 1.16.2
 debugpy 1.8.22
-distributed 2026.8.0
+distributed 2026.11.0
 donfig 0.8.1.post1
 drms 0.9.1
 ewah-bool-utils 1.3.0
@@ -164,7 +164,7 @@ libcap 2.78
 libcblas 3.11.0
 libcrc32c 1.1.2
 libcurl 8.23.0
-libdeflate 1.25
+libdeflate 1.26
 libedit 3.1.20260512
 libev 4.33
 libevent 2.1.13
@@ -174,7 +174,7 @@ libfreetype 2.14.3
 libfreetype6 2.14.3
 libgcc 16.2.0
 libgcc-ng 16.2.0
-libgdal-core 3.12.4
+libgdal-core 3.13.3
 libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.1
@@ -267,7 +267,7 @@ pims 0.7
 pip 26.2.2
 pixman 0.46.4
 platformdirs 4.14.8
-proj 9.8.1
+proj 9.9.0
 prometheus-cpp 1.3.0
 prompt-toolkit 3.0.53
 propcache 0.5.4
@@ -293,7 +293,7 @@ pyvo 1.10.0
 pyyaml 6.0.3
 pyzmq 27.3.0
 qhull 2020.2
-rasterio 1.5.0
+rasterio 1.5.2
 re2 2025.11.05
 readline 8.3
 rebound 5.0.1
@@ -320,7 +320,7 @@ specutils 2.4.0
 spiceypy 8.4.0
 sqlite 3.54.1
 stack_data 0.6.3
-sunpy 8.0.0
+sunpy 8.0.1
 sympy 1.14.0
 tblib 3.2.2
 tifffile 2026.11.16
@@ -352,7 +352,7 @@ xorg-libxdmcp 1.1.5
 xorg-libxext 1.3.7
 xorg-libxrender 0.9.13
 xyzservices 2026.9.1
-yaml 0.2.6
+yaml 0.2.7
 yarl 1.25.1
 yt 4.4.4
 zarr 3.4.2
