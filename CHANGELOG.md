@@ -25,6 +25,19 @@ non-comment Dockerfile change now republishes every env on the next reconcile. *
 reconcile after this lands rebuilds the whole catalog once**, since no image carries the
 label yet.
 
+
+### First run: 28 of 29 republished, and D3 caught a single-cell regression
+The one-time catalog rebuild republished 28 envs with the label; all 28 were verified as
+labelled with the current builder hash. `single-cell` failed D3, for a reason unrelated to
+this change: conda-forge's channel had moved. It took two fixes, each found by D3:
+- Unconstrained, the solver **silently dropped squidpy 1.8.2 → 1.2.2**, a years-old release,
+  because that solve is 86 packages smaller. 1.2.2 imports anndata internals that are gone.
+  Fixed with `squidpy >=1.8`.
+- With the floor, squidpy 1.8.2 failed on **scanpy 1.13.0**, which removed the private
+  `scanpy.plotting._tools` that squidpy still imports, and squidpy declares no upper bound.
+  Fixed with `scanpy >=1.12,<1.13`, to be lifted when squidpy supports 1.13.
+Result: 533 packages with scanpy 1.12.5 and squidpy 1.8.2, as in the last good lock.
+`single-cell:latest` was never replaced by a broken image; D3 blocked the publish.
 ## 2026-11-24 (a base-image bump checklist, with a script that would have caught #45)
 
 ### Added — `builder/base-diff.sh` and a checklist for base bumps (issue #53)

@@ -46,7 +46,11 @@ dependencies:
   # --- the Python half ---
   # anndata must be solved WITH scanpy, not against it: the aarchbio#63 breakage was
   # exactly a 2021 scanpy paired with a 2026 anndata.
-  - scanpy >=1.12
+  # The <1.13 cap is a compatibility pin for squidpy, not a judgement on scanpy (2026-11-24).
+  # scanpy 1.13.0 removed the private module `scanpy.plotting._tools`, and squidpy 1.8.2
+  # (the newest) still imports it with no upper bound on scanpy, so `import squidpy`
+  # fails. Lift the cap when a squidpy release supports scanpy 1.13.
+  - scanpy >=1.12,<1.13
   - anndata
   # leidenalg + python-igraph are NOT pulled in by a bare scanpy solve, and an env
   # without them loads data fine and then fails at `sc.tl.leiden` — after the user has
@@ -75,5 +79,12 @@ dependencies:
   # Both noarch and both sit on top of the scanpy/anndata stack already here, so they add
   # capability without adding a solve constraint. Measured: the env goes to 533 packages
   # with python 3.14.8 and numpy 2.5.4 unchanged.
-  - squidpy
+  # The floor is required, not cosmetic (2026-11-24). Unconstrained, the solver silently
+  # dropped squidpy 1.8.2 -> 1.2.2, a years-old release, because that solve is 86 packages
+  # smaller (447 vs 533). squidpy 1.2.2 imports `anndata._core.views.SparseCSCView`, gone
+  # from anndata 0.13, so `import squidpy` failed and D3 refused to publish. Not caused by
+  # anndata, which stayed at 0.13.4. With the floor alone, squidpy 1.8.2 then failed on
+  # scanpy 1.13.0 (see the cap on scanpy above). Floor plus cap: 533 packages, scanpy
+  # 1.12.5 and squidpy 1.8.2 as in the last good lock, no downgrades.
+  - squidpy >=1.8
   - scvelo
