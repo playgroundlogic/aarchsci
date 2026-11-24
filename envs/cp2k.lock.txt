@@ -1,6 +1,6 @@
 # cp2k — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/cp2k.yaml   Built: 2026.11.23.193032   Builder: 8ce622f
-# lock-hash: 948b989bad88   packages: 114
+# Source spec: envs/cp2k.yaml   Built: 2026.11.24.190916   Builder: a3954b6
+# lock-hash: 1218a05c0d90   packages: 114
 # Regenerate with: ./builder/build-env.sh cp2k
 _openmp_mutex 4.5
 aws-c-auth 0.10.4
@@ -23,7 +23,7 @@ dbcsr 2.10.0
 elpa 2026.02.002
 fftw 3.3.11
 fmt 12.1.0
-gawk 5.4.1
+gawk 5.4.2
 gmp 6.3.0
 gsl 2.8
 hdf5 2.2.0
@@ -34,7 +34,7 @@ krb5 1.22.2
 ld_impl_linux-aarch64 2.46.1
 libabseil 20260817.0
 libaec 1.1.8
-libasprintf 0.25.1
+libasprintf 1.0
 libblas 3.11.0
 libcap 2.78
 libcblas 3.11.0
@@ -47,7 +47,7 @@ libfabric 2.7.0
 libfabric1 2.7.0
 libffi 3.7.0
 libgcc 16.2.0
-libgettextpo 0.25.1
+libgettextpo 1.0
 libgfortran 16.2.0
 libgfortran5 16.2.0
 libhwloc 2.13.0
