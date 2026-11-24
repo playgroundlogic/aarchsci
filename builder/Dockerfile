@@ -32,6 +32,21 @@
 # changed `list --json` from a bare array to `{"log_history":..., "packages":[...]}`,
 # which silently broke the lock reader in build-env.sh for every env until that parser
 # was taught both shapes.
+#
+# Third-order cost, and the reason for the checklist below: Debian 13 also moved the legacy
+# time-zone links (US/Pacific, ...) into `tzdata-legacy`, which silently broke pyarrow in
+# eight envs for ten days (issue #45). The bump was checked for glibc and nothing else.
+#
+# BEFORE CHANGING MAMBA_VERSION (issue #53):
+#   1. Run `./builder/base-diff.sh <current> <candidate>` and read section 1, the paths the
+#      new base drops. A package-level diff is NOT enough: `tzdata` was in both bases, and
+#      only the file diff showed /usr/share/zoneinfo/US disappearing.
+#   2. For each dropped OS path an env relies on, restore it below and add a `test -e`
+#      assertion, so a later base dropping it fails the build instead of shipping.
+#   3. Rebuild EVERY env and run every D3, not just the env motivating the bump. Then publish
+#      them all: the reconciler will NOT, because a base change moves no env's lock-hash.
+# Known and accepted on 2.9.0-debian13: /usr/share/zoneinfo/posix/ is absent (tzdata-legacy
+# restores US/, right/ and the old aliases, but not posix/). Nothing here uses posix/ names.
 ARG MAMBA_VERSION=2.9.0-debian13
 FROM mambaorg/micromamba:${MAMBA_VERSION}
 

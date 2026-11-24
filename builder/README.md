@@ -24,6 +24,10 @@ This is the aarchbio builder adapted across the four design divergences:
   an arm64 host) → read the **actually-resolved** package set from the finished
   image → run the in-image **D3 smoke test** (refuse to tag if it fails) → write the
   committed lock → tag + optionally push.
+- `base-diff.sh <old> <new>` — run before changing `MAMBA_VERSION`. Lists the OS paths and
+  packages the candidate base drops. File-level on purpose: the Debian 12 → 13 bump kept
+  the `tzdata` package but dropped `/usr/share/zoneinfo/US`, which only a file diff shows
+  (issue #53). The checklist that goes with it is in the `Dockerfile` header.
 
 ## Usage
 

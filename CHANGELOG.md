@@ -3,6 +3,24 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-11-24 (a base-image bump checklist, with a script that would have caught #45)
+
+### Added — `builder/base-diff.sh` and a checklist for base bumps (issue #53)
+The 2026-10-08 move to Debian 13 was checked for glibc and nothing else, and it broke legacy
+time zones in eight envs for ten days (#45). `builder/base-diff.sh <old> <new>` now
+snapshots two micromamba bases and lists the paths the new one drops, plus package and glibc
+changes. It works at file level on purpose. Run against the actual 1.5.8 → 2.9.0-debian13 bump,
+`tzdata` shows only as **changed**, so a package diff would have missed the regression,
+while the file diff lists `/usr/share/zoneinfo/US` (12 links) among 998 removed paths. The
+`builder/Dockerfile` header now holds the checklist: run the diff, restore and `test -e` any
+OS path an env relies on, then rebuild and publish **every** env. The reconciler won't do
+that last step, because a base change moves no env's lock-hash.
+
+Found by the script on its first run: `tzdata-legacy` restored `US/`, `right/` and the old
+aliases, but `/usr/share/zoneinfo/posix/` is still absent. Nothing in the catalog uses
+`posix/` names (pyarrow, `zoneinfo` and pandas don't), so it's recorded as accepted rather
+than patched.
+
 ## 2026-11-24 (publish runs serialized per env)
 
 ### Fixed — concurrent publishes of the same env could ship the older spec (issue #51)
