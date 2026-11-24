@@ -61,8 +61,27 @@ jobs:
       fail-fast: false
       matrix:
         env: ${{ fromJSON(needs.prep.outputs.envs) }}
+    # ONE PUBLISH PER ENV AT A TIME (issue #51). Before this, a reconcile-dispatched run
+    # and a manual run could publish the same env concurrently: both pushed `latest`, so
+    # whichever finished LAST won — including an image built from the older spec — and
+    # both committed that env's lock, so one rebase conflicted and aborted. The group is
+    # per env, so different envs still build in parallel. cancel-in-progress is false so
+    # a running publish is never killed mid-push; GitHub keeps at most one pending job per
+    # group and a newer one replaces it, which is safe ONLY because of the checkout below.
+    concurrency:
+      group: publish-env-${{ matrix.env }}
+      cancel-in-progress: false
     steps:
+      # Check out the branch HEAD at job start, NOT the dispatch-time SHA (the default).
+      # Load-bearing together with the concurrency group above: a job that waited behind
+      # another publish of the same env would otherwise build the commit that existed when
+      # it was DISPATCHED, and could republish an older spec over a newer one that landed
+      # while it queued. Building the current head means the last publish to run is always
+      # the newest spec, so `latest` cannot regress. Its lock commit compares against the
+      # same head, so the "unchanged lock-hash -> no commit" gate stays correct.
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
       - uses: docker/setup-buildx-action@v3
       - uses: sigstore/cosign-installer@v3
       - name: Login
@@ -200,6 +219,12 @@ jobs:
     needs: build
     if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04-arm
+    # Serialize across runs (issue #51): two publish runs finishing together would each
+    # rewrite README/llms.txt/index.html. A newer pending sync replaces an older one, which
+    # is fine — it syncs from whatever locks are on main when it starts.
+    concurrency:
+      group: publish-sync-docs
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:

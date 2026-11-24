@@ -3,6 +3,23 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-11-24 (publish runs serialized per env)
+
+### Fixed — concurrent publishes of the same env could ship the older spec (issue #51)
+`publish.yml` had no concurrency control. A reconcile-dispatched run and a manual run of the
+same env could build at once; both pushed `latest`, so whichever finished last won, even if
+it was built from the older spec, and both committed that env's lock, so one rebase
+conflicted. The build job now runs in a per-env concurrency group (`publish-env-<env>`, never
+cancelling a running publish), and it checks out the branch head at job start instead of the
+dispatch-time SHA. The checkout change is what makes queuing safe: without it, a job that
+waited behind another publish would build the commit that existed when it was dispatched and
+could republish a stale spec. Different envs still build in parallel. `sync-docs` is
+serialized across runs too.
+
+The rebase conflicts seen in October came from committing locally built lock files alongside
+spec changes. `builder/README.md` now says to push the spec only and let `publish.yml` commit
+the lock for the image it actually shipped.
+
 ## 2026-11-23 (earth-observation gains boto3)
 
 ### Added — `boto3` to `earth-observation` (issue #48)

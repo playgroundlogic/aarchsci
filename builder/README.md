@@ -76,6 +76,24 @@ reconciler's "changed?" signal (OQ4):** re-solve the spec, rebuild; if the new
 lock-hash differs from the committed one, the pinned set drifted → publish a new
 dated tag. If it matches, it's a no-op.
 
+### Landing a spec change: commit the spec, let `publish.yml` commit the lock
+
+Build locally first to prove D3, but **don't commit the lock your local build wrote**.
+Push the spec and smoke-test change, then dispatch `publish.yml`, which commits the lock for
+the image it actually shipped. Two reasons:
+
+- **The lock should describe the published image.** A local build and the CI build an hour
+  later can resolve differently as conda-forge moves (it happened to `md` on 2026-10-11 and
+  to `quantum`/`hep` on 2026-10-10), so a locally committed lock can name an image that was
+  never published.
+- **It's what caused the rebase conflicts in issue #51.** The daily reconciler publishes
+  drifted envs and commits their locks, so a locally committed lock for the same env
+  collides with it. With only `publish.yml` writing locks, its per-env concurrency group
+  serializes every write to a given env's lock and nothing conflicts.
+
+`git checkout -- envs/<name>.lock.txt` after a local build discards the local lock.
+`sync-doc-counts.py` runs in `publish.yml` too, so doc counts follow the published lock.
+
 ## v1 scope: arm64-only
 
 The geospatial head is arch-specific *as a whole* (gdal/proj/geos are native), so it
