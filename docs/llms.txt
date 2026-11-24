@@ -75,7 +75,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     ocean equation of state); it ships the official TEOS-10 check-value table inside the
     package, so its verification reproduces published reference numbers offline rather
     than asserting a tolerance band).
-  - `pointcloud` (231 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
+  - `pointcloud` (223 pkgs — geospatial base + pdal, python-pdal, laspy, richdem;
     LiDAR/DEM/terrain processing).
   - `comp-chem` (216 pkgs — rdkit, openbabel, openmm, mdanalysis, mdtraj, parmed,
     pdbfixer, ase, pyscf, vina, cantera (xtb REMOVED 2026-10-18 — its aarch64 build returns wrong analytic gradients with correct energies, in all seven builds; images before that date contain it); cheminformatics + MD + quantum chemistry
@@ -409,7 +409,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     vocab.vectors.shape is (0,0) and has_vector is True anyway via tok2vec fallback — so
     similarity scores here are not static-embedding similarities; the smoke test asserts
     the absence so it is discoverable.)
-  - `gw` (211 pkgs — bilby 2.8.2, lalsuite 7.25 / python-lal 7.6.1, pycbc 2.10.0,
+  - `gw` (234 pkgs — bilby 2.8.2, lalsuite 7.25 / python-lal 7.6.1, pycbc 2.10.0,
     numpy/scipy/matplotlib on PYTHON 3.13; gravitational-wave parameter estimation. ITS OWN
     ENV and on 3.13 deliberately: pycbc has no py314 build on ANY platform (2.10.0 is
     py311-py313 on linux-64 too), so it is a python cap rather than an arm64 gap, and

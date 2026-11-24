@@ -109,7 +109,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`earth-observation`](envs/earth-observation.yaml) | 250 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr, boto3 |
 | [`geo-ml`](envs/geo-ml.yaml) | 370 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader, scipy-tests |
 | [`climate`](envs/climate.yaml) | 268 | xarray/dask + flox, cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
-| [`pointcloud`](envs/pointcloud.yaml) | 231 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
+| [`pointcloud`](envs/pointcloud.yaml) | 223 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
 | [`comp-chem`](envs/comp-chem.yaml) | 216 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, vina, cantera — **xtb removed 2026-10-18**, see below |
 | [`dft`](envs/dft.yaml) | 232 | gpaw, siesta, **cp2k**, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
 | [`md`](envs/md.yaml) | 250 | gromacs, lammps, ambertools, OpenMPI, mdanalysis, mdtraj, parmed |
@@ -133,7 +133,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`tomography`](envs/tomography.yaml) | 88 | ASTRA (CPU) + TomoPy, scikit-image, tifffile — CT reconstruction |
 | [`psi4`](envs/psi4.yaml) | 82 | Psi4 — correlated-wavefunction molecular quantum chemistry (HF, DFT, MP2, CC) |
 | [`nlp`](envs/nlp.yaml) | 88 | spaCy + the packaged `en_core_web_sm` pipeline — NLP, no model download |
-| [`gw`](envs/gw.yaml) | 211 | Bilby, LALSuite, PyCBC — gravitational-wave parameter estimation (python 3.13) |
+| [`gw`](envs/gw.yaml) | 234 | Bilby, LALSuite, PyCBC — gravitational-wave parameter estimation (python 3.13) |
 
 `dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes
 further than the others': the smoke tests run the same calculation serially and again under
