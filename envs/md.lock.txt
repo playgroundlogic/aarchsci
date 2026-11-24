@@ -1,6 +1,6 @@
 # md — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/md.yaml   Built: 2026.11.23.193030   Builder: 8ce622f
-# lock-hash: 1513ce5d31c4   packages: 250
+# Source spec: envs/md.yaml   Built: 2026.11.24.190929   Builder: 2c13e09
+# lock-hash: d8ce919b7476   packages: 250
 # Regenerate with: ./builder/build-env.sh md
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -38,7 +38,7 @@ contourpy 1.4.0
 cpython 3.14.10
 cycler 0.12.1
 fftw 3.3.11
-filelock 4.3.0
+filelock 4.3.1
 font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
@@ -52,7 +52,7 @@ freesasa 2.2.1
 freesasa-python 2.2.1
 freetype 2.14.3
 fribidi 1.0.18
-gawk 5.4.1
+gawk 5.4.2
 gcc_impl_linux-aarch64 14.4.0
 gcc_linux-aarch64 14.4.0
 gemmi 0.7.5
@@ -84,7 +84,7 @@ lcms2 2.20
 ld_impl_linux-aarch64 2.46.1
 lerc 4.3.0
 libaec 1.1.8
-libasprintf 0.25.1
+libasprintf 1.0
 libblas 3.11.0
 libbrotlicommon 1.2.1
 libbrotlidec 1.2.1
@@ -105,7 +105,7 @@ libfreetype6 2.14.3
 libgcc 16.2.0
 libgcc-devel_linux-aarch64 14.4.0
 libgcc-ng 16.2.0
-libgettextpo 0.25.1
+libgettextpo 1.0
 libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.1
@@ -215,7 +215,7 @@ readline 8.3
 requests 2.34.2
 rhash 1.4.6
 rich 15.0.0
-s2n 1.7.13
+s2n 1.7.14
 scikit-learn 1.9.1
 scipy 1.18.1
 seaborn 0.13.2
