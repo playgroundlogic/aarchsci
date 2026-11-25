@@ -106,9 +106,9 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | Env | Pkgs | What's in it |
 |-----|-----:|--------------|
 | [`geospatial`](envs/geospatial.yaml) | 110 | gdal, proj, geos, rasterio, fiona, shapely, pyproj, scikit-image |
-| [`earth-observation`](envs/earth-observation.yaml) | 250 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr, boto3 |
+| [`earth-observation`](envs/earth-observation.yaml) | 263 | + xarray, dask, rioxarray, stackstac, pystac-client, odc-stac, netcdf4, zarr, boto3 |
 | [`geo-ml`](envs/geo-ml.yaml) | 370 | + scikit-learn, xgboost, lightgbm, geopandas, pysal, statsmodels, datashader, scipy-tests |
-| [`climate`](envs/climate.yaml) | 268 | xarray/dask + flox, cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
+| [`climate`](envs/climate.yaml) | 279 | xarray/dask + flox, cartopy, cfgrib, eccodes, metpy, xesmf, esmpy, cdo, nco, gsw |
 | [`pointcloud`](envs/pointcloud.yaml) | 223 | + pdal, python-pdal, laspy, richdem (LiDAR / DEM / terrain) |
 | [`comp-chem`](envs/comp-chem.yaml) | 216 | rdkit, openbabel, openmm, mdanalysis, mdtraj, ase, pyscf, vina, cantera — **xtb removed 2026-10-18**, see below |
 | [`dft`](envs/dft.yaml) | 232 | gpaw, siesta, **cp2k**, nwchem, quantum-espresso + sssp, ase, libxc, libvdwxc, ELPA, ScaLAPACK, OpenMPI, spglib, phonopy, pymatgen |
@@ -119,9 +119,9 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`fem-cfd`](envs/fem-cfd.yaml) | 131 | fenics-dolfinx, basix, ufl, PETSc/SLEPc (+py bindings), CalculiX, OpenMPI, mpi4py, HDF5/ADIOS2 |
 | [`cfd-fv`](envs/cfd-fv.yaml) | 56 | SU2 (finite-volume CFD), OpenMPI, mpi4py — compressible/aerodynamic flow |
 | [`optimization`](envs/optimization.yaml) | 63 | HiGHS, SCIP, CBC + highspy/PySCIPOpt — LP & mixed-integer programming |
-| [`neuroimaging`](envs/neuroimaging.yaml) | 301 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
-| [`single-cell`](envs/single-cell.yaml) | 533 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
-| [`bayes`](envs/bayes.yaml) | 124 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
+| [`neuroimaging`](envs/neuroimaging.yaml) | 311 | AFNI, DIPY, nibabel, nilearn, nipype — volume-based fMRI & diffusion MRI |
+| [`single-cell`](envs/single-cell.yaml) | 543 | Scanpy + Seurat (both ecosystems), anndata, leidenalg, igraph, umap, scikit-misc — single-cell transcriptomics |
+| [`bayes`](envs/bayes.yaml) | 146 | CmdStan + cmdstanpy + ArviZ — Bayesian inference / MCMC (compiles models at runtime) |
 | [`geoscience`](envs/geoscience.yaml) | 104 | ObsPy (seismology), MODFLOW 6 + FloPy (groundwater flow) |
 | [`cp2k`](envs/cp2k.yaml) | 114 | **deprecated** — CP2K now ships inside [`dft`](envs/dft.yaml); kept as a transition alias |
 | [`pathology`](envs/pathology.yaml) | 215 | OpenSlide + openslide-python, tifffile/imagecodecs, scikit-image, zarr, dask — whole-slide imaging |

@@ -63,11 +63,11 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
 - Available envs (all native arm64, verified, signed, public):
   - `geospatial` (110 pkgs — gdal, proj, geos, rasterio, fiona, shapely, pyproj,
     scikit-image, numpy, scipy).
-  - `earth-observation` (250 pkgs — geospatial base + xarray, dask, rioxarray,
+  - `earth-observation` (263 pkgs — geospatial base + xarray, dask, rioxarray,
     stackstac, pystac-client, odc-stac, netcdf4, zarr).
   - `geo-ml` (370 pkgs — geospatial base + scikit-learn, xgboost, lightgbm,
     geopandas, pysal, statsmodels, datashader; CPU ML on geo/tabular data).
-  - `climate` (268 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
+  - `climate` (279 pkgs — xarray/dask + cartopy, cfgrib, eccodes, metpy, xesmf,
     esmpy, netcdf4, zarr, cdo, nco, gsw; atmospheric/climate analysis with GRIB +
     regridding, plus ocean thermodynamics. cdo and nco are the netCDF/GRIB command-line
     operators — the CLI complement to the Python stack; both are serial/OpenMP with no
@@ -158,7 +158,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     same problem. Note `scip` is pinned <10.1: pyscipopt 6.2.1 links libscip.so.10.0 while
     declaring `scip >=10.0.0,<11.0a0`, so an unpinned solve installs scip 10.1.0 and
     `import pyscipopt` then fails — an upstream soname/metadata bug, caught by D3.)
-  - `neuroimaging` (301 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
+  - `neuroimaging` (311 pkgs — AFNI, DIPY, nibabel, nilearn, nipype, scikit-learn;
     volume-based fMRI, diffusion MRI and structural MRI. In scope for this project rather
     than the bioinformatics sister project because none of these packages are on bioconda at
     all — they are conda-forge only. Verified with no staged or downloaded data: a NIfTI
@@ -168,7 +168,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     `ants` has no linux-aarch64 build at all and FSL/FreeSurfer/MRtrix3 are not on
     conda-forge, so registration-heavy and surface-based pipelines are out of reach;
     `templateflow` is excluded because it downloads atlases at runtime.)
-  - `single-cell` (533 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
+  - `single-cell` (543 pkgs — scanpy + anndata + leidenalg/python-igraph/umap-learn on
     python 3.14, AND r-seurat 5.5 on R 4.5, in one image; single-cell transcriptomics in
     both ecosystems. Here because it is an ENVIRONMENT (DESIGN D5: the split with the
     sister project is artifact shape, not subject) — aarch.bio also ships a single-tool
@@ -183,7 +183,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     would pass a cross-check alone; ARI rather than label equality because cluster names
     are arbitrary. `louvain` is excluded — its aarch64 builds stop at py312 and scanpy
     deprecates it in favour of leiden.)
-  - `bayes` (124 pkgs — cmdstan 2.40 + cmdstanpy + arviz, xarray; Bayesian inference and
+  - `bayes` (146 pkgs — cmdstan 2.40 + cmdstanpy + arviz, xarray; Bayesian inference and
     MCMC with Stan. Fills a domain the catalog had nothing for. TWO runtime requirements
     that a naive spec misses, both found by building: (1) Stan ships NO precompiled models
     — it translates each model to C++ with stanc and COMPILES it at run time, and the
