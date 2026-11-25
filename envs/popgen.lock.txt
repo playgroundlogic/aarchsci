@@ -1,6 +1,6 @@
 # popgen — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/popgen.yaml   Built: 2026.11.24.190844   Builder: 33c13f4
-# lock-hash: db2c566c8108   packages: 253
+# Source spec: envs/popgen.yaml   Built: 2026.11.25.181233   Builder: 4b17413
+# lock-hash: 3159d8251336   packages: 253
 # Regenerate with: ./builder/build-env.sh popgen
 _openmp_mutex 4.5
 apricot-select 0.6.1
@@ -111,8 +111,8 @@ libgcc-ng 16.2.0
 libgfortran 16.2.0
 libgfortran5 16.2.0
 libglib 2.90.1
-libgoogle-cloud 3.14.1
-libgoogle-cloud-storage 3.14.1
+libgoogle-cloud 3.14.2
+libgoogle-cloud-storage 3.14.2
 libgrpc 1.85.4
 libharfbuzz 15.0.0
 libiconv 1.18
@@ -179,7 +179,7 @@ openjpeg 2.5.4
 openssl 3.6.5
 optree 0.20.0
 orc 2.3.1
-packaging 26.3
+packaging 26.4
 pandas 3.1.1
 partd 1.4.2
 pathspec 1.1.1
