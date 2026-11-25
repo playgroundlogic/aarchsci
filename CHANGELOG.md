@@ -3,6 +3,25 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-11-24 (SciPy's own test suite in five more envs, 10x faster)
+
+### Added — `scipy-tests` to climate, earth-observation, single-cell, neuroimaging, bayes (issue #54)
+The envs where scipy's compiled paths are load-bearing now run SciPy's own `linalg` and
+`special` suites in D3, as geo-ml has since #45: 19,400 upstream tests at upstream's
+tolerances on every build. Measured with dry-run solves before adding: purely additive in all
+five, with no package changing version. bayes grows the most, 124 → 146, mostly pytest,
+hypothesis and requests.
+
+### Fixed — the suite was 10x slower than it needed to be
+The ~24 s estimate in #54 came from a bare container. Inside the real envs it took
+**5.5 to 20 minutes** each (bayes 19 min 48 s, climate 5 min 36 s, for the same 19,400
+tests). The cause was BLAS oversubscription. OpenBLAS starts one thread per core (12 here)
+for each of thousands of tiny matrices, so the threads only contend. Measured on one image:
+**326 s with default threads, 33 s with `OPENBLAS_NUM_THREADS=1`**, same tests passing.
+The suite now runs in a child interpreter with BLAS pinned to one thread. It has to be a
+subprocess because the variable must be set before OpenBLAS loads, and the smoke test has
+already imported numpy. geo-ml's check, shipped in #45, had the same cost and gets the same fix.
+
 ## 2026-11-24 (the reconciler stops rebuilding 13 envs every day)
 
 ### Fixed — the reconciler solved on the old base, so 13 envs rebuilt daily (issue #57)

@@ -62,3 +62,10 @@ dependencies:
   # all noarch, so it moves nothing: measured 265 -> 267 packages, python and numpy
   # unchanged. (The request cited "flox 9.11"; the channel's version is 0.11.2.)
   - flox
+  # --- SciPy's own test suite (issue #54) ---
+  # D3 runs SciPy's linalg + special subsets (~19,400 tests, ~24 s) on every build, because
+  # this env leans on scipy's COMPILED paths and upstream's suite at upstream's tolerances
+  # beats any check we could write. scipy-tests is a separate conda-forge output pinned to
+  # the exact scipy build installed, and brings pytest + hypothesis with it. Measured when
+  # added: purely additive, no package changed version. Same shape as geo-ml (#45).
+  - scipy-tests

@@ -45,3 +45,10 @@ dependencies:
   # dateutil 4.0.0 -> 2.9.0.post0 and NOTHING else moving. pandas and pystac-client work
   # with 2.9, as astro and geo-ml (which already carry botocore via s3fs) show.
   - boto3
+  # --- SciPy's own test suite (issue #54) ---
+  # D3 runs SciPy's linalg + special subsets (~19,400 tests, ~24 s) on every build, because
+  # this env leans on scipy's COMPILED paths and upstream's suite at upstream's tolerances
+  # beats any check we could write. scipy-tests is a separate conda-forge output pinned to
+  # the exact scipy build installed, and brings pytest + hypothesis with it. Measured when
+  # added: purely additive, no package changed version. Same shape as geo-ml (#45).
+  - scipy-tests

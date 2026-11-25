@@ -285,6 +285,39 @@ def _flox():
           f"reshape to {d_ref:.1e}; anomaly per-hour mean {resid:.1e})")
 
 
+# --- 7. SciPy's OWN test suite, not ours (issue #54) -----------------------------
+print("[smoke] 7. SciPy's shipped test suite: linalg + special")
+
+
+@check("SciPy's own linalg and special test suites pass")
+def _scipy_suite():
+    import glob
+    import os
+    import scipy
+    # Upstream's tests at upstream's tolerances. linalg is SciPy's own coverage of the
+    # BLAS/LAPACK layer, where an arm64 build is most likely to go wrong; special exercises
+    # the compiled cephes layer. Same check as geo-ml (#45), rolled out in #54.
+    n_files = len(glob.glob(os.path.join(os.path.dirname(scipy.__file__),
+                                         "**", "tests", "test_*.py"), recursive=True))
+    assert n_files > 100, f"only {n_files} SciPy test files — scipy-tests is not installed"
+    # Run in a SUBPROCESS with one BLAS thread. Measured: 326 s with OpenBLAS's default
+    # thread count (one per core, 12 here), 33 s pinned to one, with the same 19,400 tests
+    # passing. The suite is thousands of tiny matrices, so threads only add contention.
+    # The variable must be set before OpenBLAS loads, and numpy is already imported in this
+    # process, hence the child interpreter rather than os.environ here.
+    import subprocess
+    import sys
+    env = dict(os.environ, OPENBLAS_NUM_THREADS="1", OMP_NUM_THREADS="1")
+    code = ("import scipy, sys; sys.exit(0 if scipy.test('fast', "
+            "tests=['scipy.linalg', 'scipy.special'], "
+            "extra_argv=['-q', '-p', 'no:cacheprovider']) else 1)")
+    r = subprocess.run([sys.executable, "-c", code], env=env, capture_output=True,
+                       text=True, timeout=1800)
+    summary = (r.stdout.strip().splitlines() or ["(no output)"])[-1]
+    assert r.returncode == 0, f"SciPy's own linalg/special tests failed: {summary}\n{r.stdout[-3000:]}"
+    print(f"       (scipy {scipy.__version__}: {n_files} test files; {summary})")
+
+
 # --- verdict --------------------------------------------------------------------
 print("[smoke] " + ("-" * 50))
 if FAILURES:
