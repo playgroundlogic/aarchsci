@@ -1,6 +1,6 @@
 # geo-ml — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geo-ml.yaml   Built: 2026.11.24.190709   Builder: 33c13f4
-# lock-hash: 3cf42087e449   packages: 370
+# Source spec: envs/geo-ml.yaml   Built: 2026.11.25.181017   Builder: 274e8da
+# lock-hash: d34845133c40   packages: 370
 # Regenerate with: ./builder/build-env.sh geo-ml
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -249,7 +249,7 @@ opencl-headers 2025.06.13
 openjpeg 2.5.4
 openssl 3.6.5
 orc 2.3.1
-packaging 26.3
+packaging 26.4
 pandas 3.1.1
 param 2.4.2
 parso 0.8.7
