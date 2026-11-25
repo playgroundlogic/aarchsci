@@ -1,8 +1,9 @@
 # bayes — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/bayes.yaml   Built: 2026.11.21.153534   Builder: ef7dba7
-# lock-hash: 0a0ffef1e198   packages: 124
+# Source spec: envs/bayes.yaml   Built: 2026.11.25.005953   Builder: 9f86c4d
+# lock-hash: 21e833fd2151   packages: 146
 # Regenerate with: ./builder/build-env.sh bayes
 _openmp_mutex 4.5
+_python_abi3_support 1.0
 arviz 1.3.0
 arviz-base 1.3.1
 arviz-plots 1.3.2
@@ -15,12 +16,17 @@ brotli-bin 1.2.1
 bzip2 1.0.8
 ca-certificates 2026.11.20
 cairo 1.18.6
+certifi 2026.11.20
+charset-normalizer 3.5.1
 cmdstan 2.40.0
 cmdstanpy 1.3.2
+colorama 0.4.6
 conda-gcc-specs 15.3.0
 contourpy 1.4.0
+cpython 3.14.10
 cxx-compiler 2.0.0
 cycler 0.12.1
+exceptiongroup 1.3.2
 font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
@@ -38,7 +44,10 @@ graphite2 1.3.15
 gxx 15.3.0
 gxx_impl_linux-aarch64 15.3.0
 gxx_linux-aarch64 15.3.0
+hypothesis 6.170.17
 icu 78.3
+idna 3.20
+iniconfig 2.3.1
 kernel-headers_linux-aarch64 4.18.0
 kiwisolver 1.5.1
 lazy-loader 0.6
@@ -70,6 +79,7 @@ liblapack 3.11.0
 liblzma 5.8.3
 libmpdec 4.0.0
 libopenblas 0.3.34
+libpkgconf 3.0.11
 libpng 1.6.59
 libpython 3.14.10
 libraqm 0.11.0
@@ -97,24 +107,36 @@ pcre2 10.49
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
+pkgconf 3.0.11
+platformdirs 4.14.8
+pluggy 1.7.0
+pooch 1.9.0
 pthread-stubs 0.4
+pygments 2.21.0
 pyparsing 3.3.3
+pytest 9.2.0
 python 3.14.10
 python-dateutil 4.0.0
+python-gil 3.14.10
 python-tzdata 2026.6
 python_abi 3.14
 qhull 2020.2
 readline 8.3
+requests 2.34.2
 scipy 1.18.1
+scipy-tests 1.18.1
+sortedcontainers 2.4.0
 stanio 0.5.1
 sysroot_linux-aarch64 2.17
 tbb 2023.2.0
 tbb-devel 2023.2.0
 tcm 1.6.0
 tk 8.6.13
+tomli 2.5.0
 tqdm 4.70.1
 typing_extensions 4.16.0
 tzdata 2026e
+urllib3 2.8.0
 xarray 2026.9.0
 xarray-einstats 0.11.0
 xorg-libice 1.1.2
