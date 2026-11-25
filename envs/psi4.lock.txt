@@ -1,6 +1,6 @@
 # psi4 — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/psi4.yaml   Built: 2026.11.24.190708   Builder: 33c13f4
-# lock-hash: 0b990a9afc17   packages: 82
+# Source spec: envs/psi4.yaml   Built: 2026.11.25.181017   Builder: 274e8da
+# lock-hash: 55a011a0eb0d   packages: 82
 # Regenerate with: ./builder/build-env.sh psi4
 _openmp_mutex 4.5
 annotated-types 0.8.0
@@ -54,7 +54,7 @@ numpy 2.5.5
 openorbitaloptimizer 0.3.0
 openssl 3.6.5
 optking 0.5.0
-packaging 26.3
+packaging 26.4
 pcmsolver 1.2.3
 pint 0.26.2
 pip 26.2.2
