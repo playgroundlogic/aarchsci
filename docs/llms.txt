@@ -342,7 +342,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     implementations disagreeing with your constant means re-check the constant. NOT in
     scope: dxtbx and reciprocalspaceship have no aarch64 build at latest, so DIALS-style
     diffraction-image processing is out of reach even with cctbx present.)
-  - `popgen` (253 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
+  - `popgen` (252 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
     coalescent simulation and population genetics, a domain the catalog could not touch.
     Both compiled headliners have py314 aarch64 builds at current versions. Verification is
     unusually strong because a tree sequence is a CONSERVATION STRUCTURE: dump-to-disk and

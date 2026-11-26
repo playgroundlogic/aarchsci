@@ -129,7 +129,7 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`hep`](envs/hep.yaml) | 353 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
 | [`pic`](envs/pic.yaml) | 148 | WarpX (electromagnetic particle-in-cell) + AMReX/pyAMReX, openPMD, yt — plasma physics, OpenMP-threaded |
 | [`structbio`](envs/structbio.yaml) | 114 | cctbx + gemmi (two independent symmetry implementations), biopython — crystallography |
-| [`popgen`](envs/popgen.yaml) | 253 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
+| [`popgen`](envs/popgen.yaml) | 252 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
 | [`tomography`](envs/tomography.yaml) | 88 | ASTRA (CPU) + TomoPy, scikit-image, tifffile — CT reconstruction |
 | [`psi4`](envs/psi4.yaml) | 82 | Psi4 — correlated-wavefunction molecular quantum chemistry (HF, DFT, MP2, CC) |
 | [`nlp`](envs/nlp.yaml) | 88 | spaCy + the packaged `en_core_web_sm` pipeline — NLP, no model download |
