@@ -1,6 +1,6 @@
 # gw — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/gw.yaml   Built: 2026.11.25.181015   Builder: 274e8da
-# lock-hash: 3dd2c88e0283   packages: 234
+# Source spec: envs/gw.yaml   Built: 2026.11.26.175440   Builder: 6fef213
+# lock-hash: aeb25e13b8cf   packages: 234
 # Regenerate with: ./builder/build-env.sh gw
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -115,7 +115,7 @@ libcurl 8.23.0
 libdeflate 1.26
 libedit 3.1.20260512
 libev 4.33
-libexpat 2.9.0
+libexpat 2.11.0
 libffi 3.7.0
 libframel 8.50.3
 libfreetype 2.14.3
@@ -206,7 +206,7 @@ pytz 2026.6
 pyyaml 6.0.3
 qhull 2020.2
 readline 8.3
-regex 2026.11.24
+regex 2026.11.25
 requests 2.34.2
 s2n 1.7.14
 safe-netrc 1.0.1
