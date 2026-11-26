@@ -1,6 +1,6 @@
 # single-cell — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/single-cell.yaml   Built: 2026.11.25.181018   Builder: 274e8da
-# lock-hash: b3e699d9b333   packages: 543
+# Source spec: envs/single-cell.yaml   Built: 2026.11.26.175438   Builder: 6fef213
+# lock-hash: ce8f55903724   packages: 543
 # Regenerate with: ./builder/build-env.sh single-cell
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -36,7 +36,7 @@ azure-storage-files-datalake-cpp 12.17.0
 binutils_impl_linux-aarch64 2.46.1
 binutils_linux-aarch64 2.46.1
 blosc 1.21.7
-bokeh 3.10.0
+bokeh 3.10.2
 branca 0.8.2
 brotli 1.2.1
 brotli-bin 1.2.1
@@ -155,7 +155,7 @@ libdeflate 1.25
 libedit 3.1.20260512
 libev 4.33
 libevent 2.1.13
-libexpat 2.9.0
+libexpat 2.11.0
 libffi 3.7.0
 libfreetype 2.14.3
 libfreetype6 2.14.3
@@ -266,7 +266,7 @@ orc 2.3.1
 packaging 26.4
 pandas 3.1.1
 pandoc 3.14
-param 2.4.2
+param 2.5.0
 partd 1.4.2
 pathlib-abc 0.5.2
 pathspec 1.1.1
