@@ -1,6 +1,6 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.11.25.181147   Builder: 4c153e5
-# lock-hash: 56aefdebbad2   packages: 216
+# Source spec: envs/comp-chem.yaml   Built: 2026.11.26.175437   Builder: 6fef213
+# lock-hash: 64320452fb8a   packages: 216
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -10,7 +10,7 @@ brotli 1.2.1
 brotli-bin 1.2.1
 bzip2 1.0.8
 c-ares 1.34.9
-c-blosc2 3.7.0
+c-blosc2 3.8.0
 ca-certificates 2026.11.20
 cached-property 2.0.1
 cached_property 2.0.1
@@ -80,7 +80,7 @@ libcxsparse 4.4.1
 libdeflate 1.26
 libedit 3.1.20260512
 libev 4.33
-libexpat 2.9.0
+libexpat 2.11.0
 libffi 3.7.0
 libfreetype 2.14.3
 libfreetype6 2.14.3
@@ -181,7 +181,7 @@ pytng 0.3.4
 qhull 2020.2
 rdkit 2026.03.1
 readline 8.3
-reportlab 5.1.1
+reportlab 5.1.2
 requests 2.34.2
 rlpycairo 0.4.0
 ruamel.yaml 0.19.1
