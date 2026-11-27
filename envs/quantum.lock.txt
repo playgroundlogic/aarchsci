@@ -1,6 +1,6 @@
 # quantum — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/quantum.yaml   Built: 2026.11.26.175439   Builder: 6fef213
-# lock-hash: a62592aeaacd   packages: 157
+# Source spec: envs/quantum.yaml   Built: 2026.11.27.174218   Builder: 43dc388
+# lock-hash: 795e4edec892   packages: 157
 # Regenerate with: ./builder/build-env.sh quantum
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -74,7 +74,7 @@ libfreetype6 2.14.3
 libgcc 16.2.0
 libgfortran 16.2.0
 libgfortran5 16.2.0
-libglib 2.90.1
+libglib 2.90.2
 libgomp 16.2.0
 libharfbuzz 15.2.0
 libiconv 1.18
@@ -158,4 +158,4 @@ xorg-libxdmcp 1.1.5
 xorg-libxext 1.3.7
 xorg-libxrender 0.9.13
 zlib-ng 2.3.3
-zstd 1.5.7
+zstd 1.6.0
