@@ -150,7 +150,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     finite-volume scheme holds uniform flow to machine zero even on skewed cells; a broken
     one does not. Note: conda-forge's su2 ships no meshes/tutorial cases and no pysu2
     binding, so the smoke test generates its own mesh and drives SU2_CFD as a binary).
-  - `optimization` (63 pkgs — HiGHS + highspy, SCIP + PySCIPOpt, CBC, scipy; linear and
+  - `optimization` (64 pkgs — HiGHS + highspy, SCIP + PySCIPOpt, CBC, scipy; linear and
     mixed-integer programming. Its own env rather than part of geo-ml because optimization
     is a cross-cutting METHOD, not a domain. Verification uses exact identities rather than
     tolerances: the LP optimum is a textbook value (36 exactly), the primal-dual gap must be
@@ -208,7 +208,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     leave a mean of exactly zero (3.6e-15). flopy is included although only obspy and
     modflow6 were requested: mf6 alone reads and writes its own formats, so the solver is
     near-unusable without it, and flopy is noarch.)
-  - `cp2k` (114 pkgs — cp2k 2026.2 `mpi_openmpi`, openmpi, mpi4py; Gaussian-and-plane-waves
+  - `cp2k` (116 pkgs — cp2k 2026.2 `mpi_openmpi`, openmpi, mpi4py; Gaussian-and-plane-waves
     DFT, ab-initio MD, QM/MM. Closes what GAPS.md had called "the one most worth upstream
     effort" since the first coverage probe: cp2k had NO linux-aarch64 build at all, and
     conda-forge now ships one. ITS OWN ENV rather than part of `dft`, and the obstacle was
@@ -259,7 +259,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the support exactly and that both sampled distributions match the EXACT statevector
     probabilities within their own sampling error, sqrt(p(1−p)/N) — worst deviation
     1.67 sigma at 20000 shots.)
-  - `hep` (353 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
+  - `hep` (352 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
     datasets, hepmc3, fastjet, lhapdf, yoda, uproot, awkward; high-energy physics. ITS OWN
     env — nothing existing is close, and ROOT alone is a large self-contained framework.
     GEANT4 IS PINNED `noqt_*`, WHICH INVERTS WHAT ISSUE #34 ASKED FOR, and the reason is
@@ -342,7 +342,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     implementations disagreeing with your constant means re-check the constant. NOT in
     scope: dxtbx and reciprocalspaceship have no aarch64 build at latest, so DIALS-style
     diffraction-image processing is out of reach even with cctbx present.)
-  - `popgen` (252 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
+  - `popgen` (253 pkgs — msprime 1.4.4, tskit 1.0.3, tszip, demes, pyslim, scikit-allel;
     coalescent simulation and population genetics, a domain the catalog could not touch.
     Both compiled headliners have py314 aarch64 builds at current versions. Verification is
     unusually strong because a tree sequence is a CONSERVATION STRUCTURE: dump-to-disk and
@@ -377,7 +377,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     FBP's floor for this phantom rather than a defect. tomopy is verified at import plus its
     phantom generator only — the siesta precedent — because its reconstruction conventions
     need calibration and its multiprocessing path failed intermittently under load.)
-  - `psi4` (82 pkgs — psi4 1.11, numpy, scipy; correlated-wavefunction MOLECULAR quantum
+  - `psi4` (84 pkgs — psi4 1.11, numpy, scipy; correlated-wavefunction MOLECULAR quantum
     chemistry: HF, DFT, MP2, coupled cluster. ITS OWN ENV as of 2026-10-16 after being a
     refugee twice. Requested for `comp-chem` in 2026-08 and declined (no py313 aarch64
     build then, would have dragged that env back 13 packages), so it went to `dft` which was
@@ -409,7 +409,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     vocab.vectors.shape is (0,0) and has_vector is True anyway via tok2vec fallback — so
     similarity scores here are not static-embedding similarities; the smoke test asserts
     the absence so it is discoverable.)
-  - `gw` (234 pkgs — bilby 2.8.2, lalsuite 7.25 / python-lal 7.6.1, pycbc 2.10.0,
+  - `gw` (224 pkgs — bilby 2.8.2, lalsuite 7.25 / python-lal 7.6.1, pycbc 2.10.0,
     numpy/scipy/matplotlib on PYTHON 3.13; gravitational-wave parameter estimation. ITS OWN
     ENV and on 3.13 deliberately: pycbc has no py314 build on ANY platform (2.10.0 is
     py311-py313 on linux-64 too), so it is a python cap rather than an arm64 gap, and
