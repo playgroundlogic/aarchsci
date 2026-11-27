@@ -1,6 +1,6 @@
 # tomography — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/tomography.yaml   Built: 2026.11.26.175437   Builder: 6fef213
-# lock-hash: 843e1753bd45   packages: 88
+# Source spec: envs/tomography.yaml   Built: 2026.11.27.174140   Builder: b532d13
+# lock-hash: 31a50926cc65   packages: 88
 # Regenerate with: ./builder/build-env.sh tomography
 _openmp_mutex 4.5
 aom 3.15.3
@@ -8,7 +8,7 @@ astra-toolbox 2.5.0
 blosc 1.21.7
 brunsli 0.1
 bzip2 1.0.8
-c-blosc2 3.7.0
+c-blosc2 3.9.0
 ca-certificates 2026.11.20
 charls 2.4.5
 fftw 3.3.11
@@ -89,4 +89,4 @@ xorg-libxdmcp 1.1.5
 zfp 1.0.1
 zipp 4.1.2
 zlib-ng 2.3.3
-zstd 1.5.7
+zstd 1.6.0
