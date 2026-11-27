@@ -1,6 +1,6 @@
 # optimization — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/optimization.yaml   Built: 2026.11.26.175438   Builder: 6fef213
-# lock-hash: f9bf64e6b253   packages: 63
+# Source spec: envs/optimization.yaml   Built: 2026.11.27.173952   Builder: 77a7764
+# lock-hash: 9ad09fcdf372   packages: 64
 # Regenerate with: ./builder/build-env.sh optimization
 _openmp_mutex 4.5
 ampl-asl 1.0.0
@@ -14,7 +14,7 @@ coin-or-utils 2.11.13
 gmp 6.3.0
 highs 1.16.0
 highspy 1.16.0
-icu 78.3
+icu 79.1
 ipopt 3.14.19
 ld_impl_linux-aarch64 2.46.1
 libblas 3.11.0
@@ -25,7 +25,7 @@ libffi 3.7.0
 libgcc 16.2.0
 libgfortran 16.2.0
 libgfortran5 16.2.0
-libhwloc 2.13.0
+libhwloc 2.15.0
 libiconv 1.18
 liblapack 3.11.0
 liblapacke 3.11.0
@@ -60,8 +60,9 @@ python_abi 3.14
 readline 8.3
 scip 10.0.3
 scipy 1.18.1
-tbb 2023.1.0
+tbb 2023.2.0
+tcm 1.6.0
 tk 8.6.13
 tzdata 2026e
 z3-solver 5.1.0.0
-zstd 1.5.7
+zstd 1.6.0
