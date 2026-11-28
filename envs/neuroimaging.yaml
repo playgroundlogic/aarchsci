@@ -84,3 +84,13 @@ dependencies:
   # the exact scipy build installed, and brings pytest + hypothesis with it. Measured when
   # added: purely additive, no package changed version. Same shape as geo-ml (#45).
   - scipy-tests
+  # --- libexpat <2.11 is a WORKAROUND for an AFNI linking bug (issue #59) ---
+  # AFNI's own libf2c.so calls sinh() without declaring libm (its DT_NEEDED is just libc +
+  # ld-linux). It only ever worked because some other library had already loaded libm, and
+  # in 3dinfo's six-library tree that was libexpat. libexpat 2.11.0 no longer links libm, so
+  # from 2026-11-26 `3dinfo` died with "libf2c.so: undefined symbol: sinh" and D3 refused to
+  # publish. Measured: libexpat 2.9.0 declares libm, 2.11.0 does not; with this pin 3dinfo
+  # runs again. The real fix is upstream: link libf2c with -lm in conda-forge's afni build.
+  # Lift this once that lands. D3's 3dinfo check fails loudly if the pin stops being enough.
+  - libexpat <2.11
+

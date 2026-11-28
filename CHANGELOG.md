@@ -3,6 +3,32 @@
 All notable changes to aarch.science. Dates are UTC. The catalog itself is
 versioned per-image (date + content-hash tags); this records project-level milestones.
 
+## 2026-11-28 (one writer for locks; an AFNI linking bug worked around)
+
+The first three scheduled reconciles after #57 each published 26-29 envs. The daily drift
+is genuine channel movement (zstd 1.5.7 → 1.6.0 reached nearly every env, plus httpx and
+c-blosc2), so the rebuilds are the reconciler doing its job. #57 removed only the *false*
+drift. All three runs still failed, for two reasons.
+
+### Fixed — publish legs raced each other pushing locks (issue #58)
+Each build leg committed and pushed its own lock. With 26-29 legs racing onto main, one or
+two per run ran out of retries: pathology and pic on 11-25, geoscience on 11-26, astro on
+11-27. Their images shipped but their locks never landed, so they read as drifted the next
+day and rebuilt again. Now each leg uploads its lock as an artifact, and a single
+`commit-locks` job after the matrix applies every changed lock, then the doc counts, in one
+push. It is serialized across runs and replaces both the per-leg pushes and `sync-docs`.
+
+### Fixed — neuroimaging: AFNI's libf2c is under-linked, and libexpat 2.11 exposed it (issue #59)
+From 11-26, D3 blocked neuroimaging with `3dinfo: ... libf2c.so: undefined symbol: sinh`, so
+`latest` stayed on the last good image. AFNI's `libf2c.so` calls `sinh()` but declares only
+`libc` and `ld-linux`, not `libm`. It worked because libexpat, the only other library in
+3dinfo's six-library tree that references `libm.so.6`, had already loaded it. libexpat
+2.11.0 dropped that dependency. Measured: 2.9.0 declares libm and 2.11.0 doesn't, and with
+`libexpat <2.11` 3dinfo runs again. That pin is a documented workaround; the real fix is
+linking libf2c with `-lm` in conda-forge's afni build. Ruled out: afni itself (unchanged
+since 2025-09) and the GTK/graphviz stack that also dropped out of the solve (restoring it
+via `pydot >=4` doesn't fix 3dinfo).
+
 ## 2026-11-24 (SciPy's own test suite in five more envs, 10x faster)
 
 ### Added — `scipy-tests` to climate, earth-observation, single-cell, neuroimaging, bayes (issue #54)

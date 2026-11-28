@@ -102,71 +102,28 @@ jobs:
           echo "signing $pinned"
           cosign sign --yes "$pinned"
 
-      # Commit the lock the build actually produced. This is NOT bookkeeping — it is
-      # what makes the reconciler work at all: reconcile.yml decides "has the channel
-      # moved?" by diffing a fresh solve against the COMMITTED lock-hash (OQ4). If the
-      # lock never lands on main, that baseline is frozen at the day the env was first
-      # built, every reconcile run sees drift forever, and all six envs get rebuilt and
-      # republished daily. (That is exactly what happened: geospatial's committed
-      # lock-hash sat at c35344f5346d/123 pkgs while the registry moved on for ~40 days.)
+      # Hand the lock the build actually produced to the commit-locks job. This is NOT
+      # bookkeeping — it is what makes the reconciler work at all: reconcile.yml decides
+      # "has the channel moved?" by diffing a fresh solve against the COMMITTED lock-hash
+      # (OQ4). A lock that never lands leaves that env reading as drifted, so it rebuilds
+      # every day. (geospatial's committed lock sat at c35344f5346d for ~40 days that way.)
       #
-      # Runs after build/push/sign so a committed lock always corresponds to an image
-      # that passed D3 AND actually shipped (build-env.sh wrote the file in step 4),
-      # but BEFORE the visibility flip — deliberately. Registry visibility is orthogonal
-      # to what was built: an image is shipped and signed by the time we get here. Having
-      # the lock commit sit downstream of set-public means a failed cosmetic flip skips
-      # it and silently re-arms the daily-rebuild loop this step exists to prevent. That
-      # is not hypothetical — it happened on dft's first publish (changevisibility 403).
-      - name: Commit the refreshed lock
-        run: |
-          set -uo pipefail
-          LOCK="envs/${{ matrix.env }}.lock.txt"
-          lock_hash_of() { grep -m1 'lock-hash:' | sed -E 's/.*lock-hash: *([0-9a-f]+).*/\1/'; }
-
-          # Gate on the LOCK-HASH, not on file content. The lock header also carries
-          # `Built: <date>` and `Builder: <sha>`, so the file differs on every rebuild
-          # even when the resolved package set is byte-identical — gating on `git diff`
-          # would commit empty-meaning churn on any manual re-dispatch. OQ4 defines
-          # "changed" as lock-hash drift, so that is what we commit on.
-          hash="$(lock_hash_of < "$LOCK")"
-          pkgs="$(grep -m1 'lock-hash:' "$LOCK" | sed -E 's/.*packages: *([0-9]+).*/\1/')"
-          committed="$(git show "HEAD:$LOCK" 2>/dev/null | lock_hash_of || true)"
-
-          if [ -n "$committed" ] && [ "$committed" = "$hash" ]; then
-            echo "lock-hash unchanged ($hash) — resolved set identical, nothing to commit"
-            git checkout -- "$LOCK" || true   # drop the date/sha-only header churn
-            exit 0
-          fi
-          echo "::notice::$LOCK drifted: ${committed:-none} -> $hash; committing the new baseline."
-          git --no-pager diff --stat -- "$LOCK" || true
-
-          git config user.name  'aarchsci-bot'
-          git config user.email 'aarchsci-bot@users.noreply.github.com'
-
-          git add -- "$LOCK"
-          git commit -q -m "lock: ${{ matrix.env }} -> s${hash} (${pkgs} pkgs)" \
-                        -m "Resolved set drifted on conda-forge linux-aarch64; rebuilt, D3-verified, signed, published. Automated by publish.yml."
-
-          # The matrix runs up to 6 envs concurrently and each pushes to main, so a
-          # non-fast-forward is expected, not exceptional. Each leg touches only its
-          # own lock file, so a rebase always resolves cleanly — retry rather than fail
-          # (a lost push would silently re-arm the daily-rebuild loop for that env).
-          for attempt in 1 2 3 4 5; do
-            if git push origin "HEAD:${GITHUB_REF_NAME}"; then
-              echo "::notice::pushed lock for ${{ matrix.env }} (s${hash}) on attempt ${attempt}"
-              exit 0
-            fi
-            echo "push rejected (attempt ${attempt}) — rebasing onto origin/${GITHUB_REF_NAME}"
-            git fetch -q origin "${GITHUB_REF_NAME}"
-            if ! git rebase "origin/${GITHUB_REF_NAME}"; then
-              git rebase --abort || true
-              echo "::error::could not rebase lock commit for ${{ matrix.env }} — push it by hand or the reconciler will rebuild this env daily"
-              exit 1
-            fi
-            sleep $(( attempt * 3 ))
-          done
-          echo "::error::exhausted push retries for ${{ matrix.env }}'s lock — the reconciler will keep rebuilding it until this lands"
-          exit 1
+      # Uploaded as an artifact rather than pushed from here (issue #58). Each leg used to
+      # commit and push its own lock, racing up to 29 others onto main with 5 retries, and
+      # once nearly every env drifted daily (zstd 1.6.0 et al.) one or two legs per run
+      # exhausted their retries: pathology+pic on 11-25, geoscience on 11-26, astro on
+      # 11-27. One writer after the matrix has no race to lose.
+      #
+      # Runs after build/push/sign so an uploaded lock always corresponds to an image that
+      # passed D3 AND shipped, but BEFORE the visibility flip, deliberately: a failed
+      # cosmetic flip must not lose the lock (it happened on dft's first publish, a 403).
+      - name: Upload the lock for commit-locks
+        uses: actions/upload-artifact@v4
+        with:
+          name: lock-${{ matrix.env }}
+          path: envs/${{ matrix.env }}.lock.txt
+          retention-days: 3
+          if-no-files-found: error
 
       # Last, because it is the only step that changes nothing about the artifact.
       # Quay creates repos private; going public stays a deliberate opt-in (SAFETY note
@@ -198,66 +155,93 @@ jobs:
           fi
           exit 1
 
-  # Regenerate the docs' package counts from the locks the matrix just committed.
+  # The ONE job that writes to main for a publish run: the locks the matrix produced, then
+  # the doc counts derived from them. Previously each build leg pushed its own lock and a
+  # separate sync-docs job pushed the counts. With up to 29 legs racing onto main, one or
+  # two per run lost the race and their locks never landed (issue #58).
   #
-  # WHY THIS IS A SEPARATE JOB and not part of the per-env lock commit: the build matrix
-  # runs up to six envs concurrently, and that step's push-retry loop is safe precisely
-  # because each leg touches only its OWN lock file, so a rebase can never conflict. Six
-  # legs editing one README would conflict constantly. One follow-up job on one runner
-  # has no such problem.
+  # `!cancelled()` rather than `success()` on purpose: if one env fails D3, the others still
+  # shipped and their locks must still land. A failed leg uploads no lock, so nothing about
+  # it is committed.
   #
-  # WHY IT EXISTS AT ALL: the reconciler rewrites locks whenever conda-forge drifts, but
-  # the counts in README/llms.txt/index.html used to be hand-written, so they rotted
-  # silently — eight of fifteen were wrong after ~6 weeks, and index.html had drifted to a
-  # third value for two envs. Nobody mistyped them; they were right when written and the
-  # channel moved. `publish.yml` is the ONLY workflow that writes locks (reconcile.yml
-  # only reads them to compare hashes), so self-healing here covers the whole mechanism.
-  #
-  # `!cancelled()` rather than `success()` on purpose: if one env fails D3 the others
-  # still published and committed locks, and their counts should still be made true.
-  sync-docs:
+  # The doc counts exist because counts in README/llms.txt/index.html used to be
+  # hand-written and rotted silently as the channel moved. publish.yml is the only workflow
+  # that writes locks, so deriving the counts here covers the whole mechanism.
+  commit-locks:
     needs: build
     if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04-arm
-    # Serialize across runs (issue #51): two publish runs finishing together would each
-    # rewrite README/llms.txt/index.html. A newer pending sync replaces an older one, which
-    # is fine — it syncs from whatever locks are on main when it starts.
+    # Serialized across runs: two publish runs finishing together would otherwise race each
+    # other the same way the legs used to. A newer pending job replaces an older one, which
+    # is safe because each run's artifacts belong to that run and are applied only if their
+    # lock-hash differs from what main already has.
     concurrency:
-      group: publish-sync-docs
+      group: publish-commit-locks
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref_name }}
-      - name: Sync doc counts to envs/*.lock.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: lock-*
+          path: ${{ runner.temp }}/locks
+          merge-multiple: true
+      - name: Commit changed locks and doc counts in one push
+        env:
+          LOCKS: ${{ runner.temp }}/locks
         run: |
           set -uo pipefail
           git config user.name  'aarchsci-bot'
           git config user.email 'aarchsci-bot@users.noreply.github.com'
+          lock_hash_of() { grep -m1 'lock-hash:' | sed -E 's/.*lock-hash: *([0-9a-f]+).*/\1/'; }
 
-          # The matrix pushed its lock commits after this job's checkout was resolved,
-          # so start by taking them.
-          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+          # Gate on the LOCK-HASH, not file content: the header carries `Built:` and
+          # `Builder:`, so the file differs on every rebuild even when the resolved set is
+          # identical. OQ4 defines "changed" as lock-hash drift.
+          changed=()
+          for f in "$LOCKS"/*.lock.txt; do
+            [ -e "$f" ] || { echo "no lock artifacts (every leg failed?)"; break; }
+            name="$(basename "$f")"; env_name="${name%.lock.txt}"
+            new="$(lock_hash_of < "$f")"
+            old="$(lock_hash_of < "envs/$name" 2>/dev/null || true)"
+            if [ -n "$old" ] && [ "$old" = "$new" ]; then
+              echo "$env_name: lock-hash unchanged ($new)"; continue
+            fi
+            cp "$f" "envs/$name"
+            pkgs="$(grep -m1 'lock-hash:' "$f" | sed -E 's/.*packages: *([0-9]+).*/\1/')"
+            echo "::notice::$env_name: ${old:-none} -> $new ($pkgs pkgs)"
+            changed+=("$env_name -> s$new ($pkgs pkgs)")
+          done
+
+          if [ "${#changed[@]}" -gt 0 ]; then
+            git add -- envs/*.lock.txt
+            git commit -q -m "lock: ${#changed[@]} env(s) refreshed" \
+              -m "$(printf '%s\n' "${changed[@]}")" \
+              -m "Resolved sets drifted on conda-forge linux-aarch64; rebuilt, D3-verified, signed, published. Automated by publish.yml."
+          fi
 
           python3 builder/sync-doc-counts.py
-
-          if git diff --quiet -- README.md docs/llms.txt docs/index.html; then
-            echo "doc counts already match the locks — nothing to commit"
-            exit 0
+          if ! git diff --quiet -- README.md docs/llms.txt docs/index.html; then
+            git add -- README.md docs/llms.txt docs/index.html
+            git commit -q -m "docs: sync package counts to the committed locks" \
+                          -m "Generated by builder/sync-doc-counts.py from envs/*.lock.txt. Automated by publish.yml."
           fi
-          git --no-pager diff --stat -- README.md docs/llms.txt docs/index.html
 
-          git add -- README.md docs/llms.txt docs/index.html
-          git commit -q -m "docs: sync package counts to the committed locks" \
-                        -m "Generated by builder/sync-doc-counts.py from envs/*.lock.txt. Automated by publish.yml."
-
+          if [ "$(git rev-list --count "origin/${GITHUB_REF_NAME}..HEAD")" = "0" ]; then
+            echo "nothing to commit"; exit 0
+          fi
+          # Single writer per run, serialized across runs, so a rejection now means a human
+          # pushed meanwhile. Each lock file is owned by exactly one env, so rebases resolve.
           for attempt in 1 2 3 4 5; do
             if git push origin "HEAD:${GITHUB_REF_NAME}"; then
-              echo "::notice::pushed doc-count sync on attempt ${attempt}"
+              echo "::notice::pushed ${#changed[@]} lock(s) and doc counts on attempt ${attempt}"
               exit 0
             fi
             echo "push rejected (attempt ${attempt}) — rebasing onto origin/${GITHUB_REF_NAME}"
-            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || true
+            git fetch -q origin "${GITHUB_REF_NAME}"
+            git rebase "origin/${GITHUB_REF_NAME}" || { git rebase --abort || true; echo "::error::rebase conflict"; exit 1; }
+            sleep $(( attempt * 5 ))
           done
-          echo "::error::could not push the doc-count sync after 5 attempts"
+          echo "::error::exhausted push retries — these envs will read as drifted tomorrow: ${changed[*]}"
           exit 1
