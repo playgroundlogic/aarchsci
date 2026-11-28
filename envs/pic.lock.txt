@@ -1,6 +1,6 @@
 # pic — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/pic.yaml   Built: 2026.11.27.174227   Builder: 43dc388
-# lock-hash: 8254db2440e8   packages: 148
+# Source spec: envs/pic.yaml   Built: 2026.11.28.075635   Builder: 7f09ea0
+# lock-hash: 03df326fe85d   packages: 148
 # Regenerate with: ./builder/build-env.sh pic
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -115,7 +115,7 @@ pip 26.2.2
 pixman 0.46.4
 pthread-stubs 0.4
 pyamrex 26.11
-pybind11-abi 11
+pybind11-abi 12
 pydantic 2.14.4
 pydantic-core 2.50.5
 pyparsing 3.3.3
