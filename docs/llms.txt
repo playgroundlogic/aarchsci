@@ -259,7 +259,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     the support exactly and that both sampled distributions match the EXACT statevector
     probabilities within their own sampling error, sqrt(p(1−p)/N) — worst deviation
     1.67 sigma at 20000 shots.)
-  - `hep` (352 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
+  - `hep` (353 pkgs — ROOT 6.40.04, pythia8, geant4 11.4.3 `noqt_*` + its twelve physics
     datasets, hepmc3, fastjet, lhapdf, yoda, uproot, awkward; high-energy physics. ITS OWN
     env — nothing existing is close, and ROOT alone is a large self-contained framework.
     GEANT4 IS PINNED `noqt_*`, WHICH INVERTS WHAT ISSUE #34 ASKED FOR, and the reason is
@@ -409,7 +409,7 @@ verification is `Rscript /opt/aarchsci/smoke.R` and it is run the same way.
     vocab.vectors.shape is (0,0) and has_vector is True anyway via tok2vec fallback — so
     similarity scores here are not static-embedding similarities; the smoke test asserts
     the absence so it is discoverable.)
-  - `gw` (224 pkgs — bilby 2.8.2, lalsuite 7.25 / python-lal 7.6.1, pycbc 2.10.0,
+  - `gw` (234 pkgs — bilby 2.8.2, lalsuite 7.25 / python-lal 7.6.1, pycbc 2.10.0,
     numpy/scipy/matplotlib on PYTHON 3.13; gravitational-wave parameter estimation. ITS OWN
     ENV and on 3.13 deliberately: pycbc has no py314 build on ANY platform (2.10.0 is
     py311-py313 on linux-64 too), so it is a python cap rather than an arm64 gap, and

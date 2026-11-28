@@ -126,14 +126,14 @@ neither moves; comparing one against the other just looks like a mismatch when i
 | [`cp2k`](envs/cp2k.yaml) | 116 | **deprecated** — CP2K now ships inside [`dft`](envs/dft.yaml); kept as a transition alias |
 | [`pathology`](envs/pathology.yaml) | 215 | OpenSlide + openslide-python, tifffile/imagecodecs, scikit-image, zarr, dask — whole-slide imaging |
 | [`quantum`](envs/quantum.yaml) | 157 | Qiskit + Aer (CPU), qiskit-algorithms/optimization/machine-learning, openfermion, QuTiP — quantum circuit simulation |
-| [`hep`](envs/hep.yaml) | 352 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
+| [`hep`](envs/hep.yaml) | 353 | ROOT, Pythia8, Geant4 (headless) + data, HepMC3, FastJet, LHAPDF, YODA, uproot, awkward — high-energy physics |
 | [`pic`](envs/pic.yaml) | 148 | WarpX (electromagnetic particle-in-cell) + AMReX/pyAMReX, openPMD, yt — plasma physics, OpenMP-threaded |
 | [`structbio`](envs/structbio.yaml) | 114 | cctbx + gemmi (two independent symmetry implementations), biopython — crystallography |
 | [`popgen`](envs/popgen.yaml) | 253 | msprime + tskit, tszip, demes, scikit-allel — coalescent simulation / population genetics |
 | [`tomography`](envs/tomography.yaml) | 88 | ASTRA (CPU) + TomoPy, scikit-image, tifffile — CT reconstruction |
 | [`psi4`](envs/psi4.yaml) | 84 | Psi4 — correlated-wavefunction molecular quantum chemistry (HF, DFT, MP2, CC) |
 | [`nlp`](envs/nlp.yaml) | 88 | spaCy + the packaged `en_core_web_sm` pipeline — NLP, no model download |
-| [`gw`](envs/gw.yaml) | 224 | Bilby, LALSuite, PyCBC — gravitational-wave parameter estimation (python 3.13) |
+| [`gw`](envs/gw.yaml) | 234 | Bilby, LALSuite, PyCBC — gravitational-wave parameter estimation (python 3.13) |
 
 `dft`, `md`, `fem-cfd` and `cfd-fv` are the MPI-parallel envs, so their verification goes
 further than the others': the smoke tests run the same calculation serially and again under
