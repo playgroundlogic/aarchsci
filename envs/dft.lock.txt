@@ -1,9 +1,9 @@
 # dft — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/dft.yaml   Built: 2026.11.27.173953   Builder: 77a7764
-# lock-hash: a19854a59a19   packages: 232
+# Source spec: envs/dft.yaml   Built: 2026.11.28.162320   Builder: 0d1ac7b
+# lock-hash: 2e8e777626cd   packages: 232
 # Regenerate with: ./builder/build-env.sh dft
 _openmp_mutex 4.5
-ase 3.29.0
+ase 3.30.0
 aws-c-auth 1.0.4
 aws-c-cal 1.0.0
 aws-c-common 1.0.6
@@ -182,7 +182,7 @@ plotly 7.2.0
 plumed 2.10.2
 pthread-stubs 0.4
 pugixml 1.15
-pybind11-abi 11
+pybind11-abi 12
 pymatgen 2026.10.24
 pymatgen-core 2026.10.31
 pyparsing 3.3.3

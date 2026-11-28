@@ -1,10 +1,10 @@
 # comp-chem — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/comp-chem.yaml   Built: 2026.11.27.173956   Builder: 77a7764
-# lock-hash: aa1eed45b083   packages: 216
+# Source spec: envs/comp-chem.yaml   Built: 2026.11.28.162321   Builder: 0d1ac7b
+# lock-hash: 38a7988b03c2   packages: 216
 # Regenerate with: ./builder/build-env.sh comp-chem
 _openmp_mutex 4.5
 _python_abi3_support 1.0
-ase 3.29.0
+ase 3.30.0
 blosc 1.21.7
 brotli 1.2.1
 brotli-bin 1.2.1
@@ -26,7 +26,7 @@ cuda-version 11.8
 cycler 0.12.1
 cyrus-sasl 2.1.28
 eigen-abi 3.4.0.100
-filelock 4.3.1
+filelock 4.3.2
 fmt 12.0.0
 font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
@@ -162,7 +162,7 @@ pdbfixer 1.12
 pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
-platformdirs 4.14.8
+platformdirs 4.14.9
 pooch 1.9.0
 pthread-stubs 0.4
 py-cpuinfo 9.0.0

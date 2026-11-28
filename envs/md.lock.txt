@@ -1,6 +1,6 @@
 # md — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/md.yaml   Built: 2026.11.27.173953   Builder: 77a7764
-# lock-hash: ff85852fbd61   packages: 250
+# Source spec: envs/md.yaml   Built: 2026.11.28.162321   Builder: 0d1ac7b
+# lock-hash: f03bc8aa4b9d   packages: 250
 # Regenerate with: ./builder/build-env.sh md
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -38,7 +38,7 @@ contourpy 1.4.0
 cpython 3.14.10
 cycler 0.12.1
 fftw 3.3.11
-filelock 4.3.1
+filelock 4.3.2
 font-ttf-dejavu-sans-mono 2.37
 font-ttf-inconsolata 3.000
 font-ttf-source-code-pro 2.038
@@ -191,7 +191,7 @@ pillow 13.0.0
 pip 26.2.2
 pixman 0.46.4
 pkg-config 0.29.2
-platformdirs 4.14.8
+platformdirs 4.14.9
 plumed 2.9.2
 pooch 1.9.0
 psutil 7.2.2

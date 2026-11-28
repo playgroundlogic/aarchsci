@@ -1,6 +1,6 @@
 # geo-ml — resolved conda-forge package set (linux-aarch64)
-# Source spec: envs/geo-ml.yaml   Built: 2026.11.27.173953   Builder: 77a7764
-# lock-hash: 623b2c61aae5   packages: 370
+# Source spec: envs/geo-ml.yaml   Built: 2026.11.28.162320   Builder: 0d1ac7b
+# lock-hash: 9622510df7f3   packages: 370
 # Regenerate with: ./builder/build-env.sh geo-ml
 _openmp_mutex 4.5
 _python_abi3_support 1.0
@@ -107,7 +107,7 @@ h5netcdf 1.8.3
 h5py 3.16.0
 hdf4 4.2.15
 hdf5 1.14.6
-hypothesis 6.170.17
+hypothesis 6.170.23
 icu 78.3
 idna 3.20
 imageio 2.38.2
@@ -262,7 +262,7 @@ pint 0.26.2
 pip 26.2.2
 pixman 0.46.4
 pkgconf 3.0.11
-platformdirs 4.14.8
+platformdirs 4.14.9
 pluggy 1.7.0
 pointpats 2.6.0
 pooch 1.9.0
